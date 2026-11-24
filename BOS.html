@@ -1,0 +1,2145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Night Market · Game Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e0916; --bg2:#150f20; --card:#1b1327; --card2:#251a35; --raise:#2d2142;
+  --line:rgba(240,198,116,.14); --line2:rgba(240,198,116,.38);
+  --gold:#f0c674; --amber:#e8a33d; --plum:#8a5aae; --rose:#d98fa8;
+  --text:#f2e9db; --muted:#ab9ec0; --faint:#7d7092; --ok:#7fc8a0; --bad:#e58585;
+  --serif:'Cormorant Garamond','Cormorant',Georgia,'Times New Roman',serif;
+  --sans:'Nunito Sans','Nunito',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 var(--sans);-webkit-font-smoothing:antialiased;min-height:100vh}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+   radial-gradient(900px 600px at 10% -8%,rgba(232,163,61,.16),transparent 62%),
+   radial-gradient(800px 700px at 105% 105%,rgba(138,90,174,.22),transparent 62%),
+   radial-gradient(600px 500px at 60% 40%,rgba(217,143,168,.05),transparent 70%),
+   linear-gradient(180deg,#0e0916,#130c1d)}
+::selection{background:rgba(240,198,116,.3)}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+input,select,textarea{font:inherit;color:var(--text)}
+a{color:var(--gold)}
+.ico{flex:none;vertical-align:middle}
+
+/* fireflies */
+#flies{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.fly{position:absolute;width:4px;height:4px;border-radius:50%;background:#ffe3a0;box-shadow:0 0 10px 3px rgba(255,214,130,.55);opacity:0;animation:fly var(--d) ease-in-out var(--dl) infinite}
+@keyframes fly{0%{opacity:0;transform:translate(0,0)}15%{opacity:.9}50%{opacity:.35;transform:translate(var(--x),var(--y))}85%{opacity:.9}100%{opacity:0;transform:translate(calc(var(--x)*-.4),calc(var(--y)*1.5))}}
+@media (prefers-reduced-motion:reduce){.fly{animation:none;opacity:.35}*{transition:none!important}}
+
+/* shell */
+.shell{position:relative;z-index:1;display:grid;grid-template-columns:272px minmax(0,1fr);min-height:100vh}
+aside.side{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:26px 18px 18px;border-right:1px solid var(--line);background:linear-gradient(180deg,rgba(21,15,32,.85),rgba(14,9,22,.92));backdrop-filter:blur(8px)}
+.brand{display:flex;align-items:center;gap:13px;padding:4px 8px 22px}
+.brand .moon{width:44px;height:44px;flex:none;filter:drop-shadow(0 0 14px rgba(240,198,116,.45))}
+.brand .t{font:700 25px/1.05 var(--serif);letter-spacing:.01em;color:var(--text)}
+.brand .s{font:800 10.5px/1 var(--sans);letter-spacing:.34em;color:var(--gold);margin-top:7px;text-transform:uppercase}
+nav.nav{display:flex;flex-direction:column;gap:3px;overflow:auto}
+.nav button{display:flex;align-items:center;gap:13px;padding:11px 14px;border-radius:13px;color:var(--muted);font-weight:700;text-align:left;position:relative;transition:.18s}
+.nav button:hover{background:rgba(240,198,116,.06);color:var(--text)}
+.nav button.on{color:var(--gold);background:linear-gradient(90deg,rgba(240,198,116,.17),rgba(240,198,116,.02))}
+.nav button.on::before{content:"";position:absolute;left:-18px;top:9px;bottom:9px;width:4px;border-radius:0 4px 4px 0;background:var(--gold);box-shadow:0 0 12px var(--gold)}
+.nav .n{margin-left:auto;font-size:12px;font-weight:800;color:var(--faint);background:rgba(255,255,255,.05);padding:1px 9px;border-radius:99px}
+.nav button.on .n{color:#1b1327;background:var(--gold)}
+.side .foot{margin-top:auto;padding:14px 10px 0;border-top:1px solid var(--line);color:var(--faint);font-size:12.5px}
+.side .foot b{color:var(--muted)}
+
+.main{min-width:0}
+header.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:14px 34px;background:rgba(14,9,22,.72);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.search{flex:1;max-width:520px;display:flex;align-items:center;gap:10px;padding:0 16px;height:44px;border-radius:99px;background:rgba(255,255,255,.045);border:1px solid var(--line);color:var(--muted);transition:.18s}
+.search:focus-within{border-color:var(--line2);box-shadow:0 0 0 4px rgba(240,198,116,.08);background:rgba(255,255,255,.06)}
+.search input{flex:1;min-width:0;background:none;border:0;outline:0;height:100%}
+.search input::placeholder{color:var(--faint)}
+.search kbd{font:700 11px var(--sans);color:var(--faint);border:1px solid var(--line);border-radius:6px;padding:1px 7px}
+.sp{flex:1}
+.btn{display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 17px;border-radius:99px;font-weight:800;font-size:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);transition:.18s;white-space:nowrap}
+.btn:hover{border-color:var(--line2);background:rgba(240,198,116,.08)}
+.btn.gold{border:0;color:#2a1a08;background:linear-gradient(135deg,#f6d98c,#e8a33d);box-shadow:0 6px 22px rgba(232,163,61,.28)}
+.btn.gold:hover{filter:brightness(1.07);transform:translateY(-1px)}
+.btn.sm{height:34px;padding:0 13px;font-size:13px}
+.btn.ghost{background:none}
+.btn.danger{color:var(--bad);border-color:rgba(229,133,133,.3)}
+.btn.danger:hover{background:rgba(229,133,133,.1);border-color:var(--bad)}
+.btn.on{background:rgba(240,198,116,.16);border-color:var(--line2);color:var(--gold)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 8px var(--amber)}
+.switch{width:34px;height:19px;border-radius:99px;background:rgba(255,255,255,.14);position:relative;transition:.2s;flex:none}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;transition:.2s}
+.btn.on .switch{background:var(--gold)}.btn.on .switch::after{left:17px;background:#2a1a08}
+
+.page{padding:38px 34px 90px;max-width:1380px}
+.pagehead{margin-bottom:26px}
+.eyebrow{font:800 11px var(--sans);letter-spacing:.3em;color:var(--gold);text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.eyebrow::after{content:"";height:1px;width:56px;background:linear-gradient(90deg,var(--gold),transparent)}
+h1.title{font:700 clamp(40px,5.2vw,64px)/1.02 var(--serif);margin:10px 0 8px;letter-spacing:-.005em;background:linear-gradient(180deg,#fff3d6,#f0c674 70%,#d99a3e);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block}
+.blurb{color:var(--muted);font-size:17px;max-width:720px;margin:0}
+h2.sec{font:700 30px/1.1 var(--serif);margin:42px 0 16px;display:flex;align-items:center;gap:14px;color:var(--text)}
+h2.sec .l{flex:1;height:1px;background:linear-gradient(90deg,var(--line2),transparent)}
+h2.sec small{font:800 12px var(--sans);letter-spacing:.14em;color:var(--faint);text-transform:uppercase}
+
+/* chips */
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 22px}
+.tgroup{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.tlabel{font:800 11px var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin-right:4px}
+.fchip{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:99px;border:1px solid var(--line);color:var(--muted);font-weight:700;font-size:13.5px;transition:.16s;background:rgba(255,255,255,.03)}
+.fchip:hover{border-color:var(--line2);color:var(--text)}
+.fchip.on{background:var(--gold);color:#2a1a08;border-color:var(--gold)}
+.fchip i{width:9px;height:9px;border-radius:50%;background:var(--c,var(--gold));display:block;box-shadow:0 0 8px var(--c,transparent)}
+.fchip.on i{box-shadow:none;outline:2px solid rgba(42,26,8,.35)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:99px;padding:3px;background:rgba(255,255,255,.03)}
+.seg button{padding:6px 15px;border-radius:99px;font-weight:800;font-size:13px;color:var(--muted)}
+.seg button.on{background:rgba(240,198,116,.18);color:var(--gold)}
+
+/* cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:18px}
+.card{--c:var(--gold);position:relative;padding:20px 21px 18px;border-radius:20px;background:linear-gradient(160deg,var(--card2),var(--card));border:1px solid var(--line);box-shadow:0 12px 34px rgba(0,0,0,.34);cursor:pointer;transition:.22s;overflow:hidden;display:flex;flex-direction:column;gap:11px;text-align:left}
+.card::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,var(--c),transparent 85%)}
+.card::after{content:"";position:absolute;right:-60px;top:-60px;width:170px;height:170px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--c) 22%,transparent),transparent);opacity:.7;pointer-events:none}
+.card:hover{transform:translateY(-4px);border-color:var(--line2);box-shadow:0 18px 44px rgba(0,0,0,.45),0 0 0 1px rgba(240,198,116,.1)}
+.card h3{font:700 25px/1.1 var(--serif);margin:0;color:var(--text);position:relative;z-index:1}
+.card .row{display:flex;flex-wrap:wrap;gap:7px;align-items:center;position:relative;z-index:1}
+.card p{margin:0;color:var(--muted);font-size:14.5px;position:relative;z-index:1}
+.card .method{font:italic 500 17px/1.35 var(--serif);color:#d9cde8}
+.card .tools{position:absolute;right:12px;top:12px;display:none;gap:6px;z-index:3}
+body.edit .card .tools{display:flex}
+.iconbtn{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:rgba(14,9,22,.78);border:1px solid var(--line2);color:var(--gold)}
+.iconbtn:hover{background:var(--gold);color:#2a1a08}
+.iconbtn.del:hover{background:var(--bad);color:#2a0c0c;border-color:var(--bad)}
+.cardfoot{display:flex;align-items:center;gap:10px;margin-top:auto;padding-top:6px;position:relative;z-index:1}
+.addcard{border:1.5px dashed var(--line2);background:rgba(240,198,116,.03);display:none;align-items:center;justify-content:center;min-height:130px;color:var(--gold);font-weight:800;gap:10px;box-shadow:none}
+.addcard::before,.addcard::after{display:none}
+body.edit .addcard{display:flex}
+.addcard:hover{background:rgba(240,198,116,.09)}
+
+.badge{--c:var(--gold);display:inline-flex;align-items:center;gap:7px;padding:3px 11px 3px 9px;border-radius:99px;font:800 11.5px var(--sans);letter-spacing:.04em;color:var(--c);border:1px solid color-mix(in srgb,var(--c) 38%,transparent);background:color-mix(in srgb,var(--c) 12%,transparent);white-space:nowrap}
+.badge i{width:7px;height:7px;border-radius:50%;background:var(--c);box-shadow:0 0 7px var(--c)}
+.badge.lvl{--c:#c8b6e8}
+.badge.plain{color:var(--muted);border-color:var(--line);background:rgba(255,255,255,.04)}
+.gems{display:inline-flex;gap:3px}
+.gems svg{width:12px;height:12px}
+
+.chip{--c:var(--muted);display:inline-flex;align-items:center;gap:7px;padding:4px 11px;border-radius:10px;font:700 13px var(--sans);color:var(--text);background:rgba(255,255,255,.06);border:1px solid var(--line);transition:.15s;cursor:pointer}
+.chip:hover{border-color:var(--line2);background:rgba(240,198,116,.1)}
+.chip i{width:8px;height:8px;border-radius:50%;background:var(--c);box-shadow:0 0 7px var(--c)}
+.chip.craft{border-color:rgba(240,198,116,.3);background:rgba(240,198,116,.07)}
+.chip.craft::after{content:"";width:6px;height:6px;background:var(--gold);transform:rotate(45deg);margin-left:1px}
+.chip.bad{border:1px dashed var(--bad);color:var(--bad);background:rgba(229,133,133,.07)}
+.chip .q{font-weight:800;color:var(--gold)}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.lbl{font:800 10.5px var(--sans);letter-spacing:.22em;text-transform:uppercase;color:var(--faint);margin-bottom:6px;display:block}
+.price{display:inline-flex;align-items:center;gap:7px;font:700 22px var(--serif);color:var(--gold)}
+.price .ico{color:var(--amber)}
+.price small{font:700 12px var(--sans);color:var(--muted);margin-left:2px}
+.moonchip{display:inline-flex;align-items:center;gap:7px;color:var(--muted);font:700 12.5px var(--sans)}
+
+/* overview */
+.hero{position:relative;border-radius:28px;padding:44px 46px;border:1px solid var(--line2);overflow:hidden;background:
+  radial-gradient(600px 300px at 85% 0%,rgba(240,198,116,.22),transparent 65%),
+  linear-gradient(135deg,#2c1d42,#1a1228 60%,#150e20);box-shadow:0 24px 70px rgba(0,0,0,.5)}
+.hero .bigmoon{position:absolute;right:46px;top:30px;width:150px;height:150px;opacity:.95;filter:drop-shadow(0 0 40px rgba(240,198,116,.5))}
+.hero h1{font:700 clamp(44px,6vw,78px)/1 var(--serif);margin:12px 0 12px;background:linear-gradient(180deg,#fff3d6,#f0c674 70%,#d99a3e);-webkit-background-clip:text;background-clip:text;color:transparent;max-width:760px}
+.hero p{max-width:620px;color:#cdbfe0;font-size:18px;margin:0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-top:22px}
+.stat{padding:20px 22px;border-radius:20px;background:linear-gradient(160deg,var(--card2),var(--card));border:1px solid var(--line);display:flex;flex-direction:column;gap:3px;text-align:left;transition:.2s}
+.stat:hover{transform:translateY(-3px);border-color:var(--line2)}
+.stat .v{font:700 46px/1 var(--serif);color:var(--gold)}
+.stat .k{font:800 11px var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.stat .ico{color:var(--amber);margin-bottom:8px}
+.ladder{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;position:relative;margin-top:6px}
+.step{position:relative;padding:22px 18px 18px;border-radius:20px;background:linear-gradient(160deg,var(--card2),var(--card));border:1px solid var(--line)}
+.step .num{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font:700 22px var(--serif);color:#2a1a08;background:linear-gradient(135deg,#f6d98c,#e8a33d);box-shadow:0 0 20px rgba(232,163,61,.45);margin-bottom:12px}
+.step h4{font:700 22px/1.1 var(--serif);margin:0 0 6px}
+.step .e{font-size:13px;color:var(--muted)}
+.step .o{font-size:13.5px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);color:#dccfe9}
+.zones{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.zone{--c:var(--gold);padding:20px;border-radius:20px;background:linear-gradient(160deg,var(--card2),var(--card));border:1px solid var(--line);text-align:left;position:relative;overflow:hidden;transition:.2s;display:flex;flex-direction:column;gap:12px}
+.zone:hover{transform:translateY(-3px);border-color:var(--line2)}
+.zone::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--c),transparent)}
+.zone h4{font:700 26px/1 var(--serif);margin:0;display:flex;align-items:baseline;gap:10px}
+.zone h4 small{font:800 12px var(--sans);color:var(--c)}
+.checks{display:grid;gap:10px}
+.check{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+.check.ok{border-color:rgba(127,200,160,.3);background:rgba(127,200,160,.06);color:var(--ok)}
+.check.warn{border-color:rgba(229,133,133,.3);background:rgba(229,133,133,.06)}
+.check b{color:var(--text)}
+
+/* table */
+.tablewrap{border:1px solid var(--line);border-radius:20px;overflow:auto;background:linear-gradient(160deg,var(--card2),var(--card));box-shadow:0 12px 34px rgba(0,0,0,.34)}
+table.t{width:100%;border-collapse:separate;border-spacing:0;min-width:820px}
+.t th{position:sticky;top:0;text-align:left;padding:14px 16px;font:800 10.5px var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--faint);background:rgba(21,15,32,.96);border-bottom:1px solid var(--line2);white-space:nowrap;cursor:pointer;user-select:none}
+.t th.r,.t td.r{text-align:right}
+.t th.on{color:var(--gold)}
+.t td{padding:13px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+.t tr.band td{padding:18px 16px 9px;font:700 22px var(--serif);color:var(--gold);background:rgba(240,198,116,.045);border-bottom:1px solid var(--line2)}
+.t tr.band td small{font:800 11px var(--sans);letter-spacing:.14em;color:var(--faint);text-transform:uppercase;margin-left:10px}
+.t tr.item:hover td{background:rgba(240,198,116,.04)}
+.t .nm{font:700 20px/1.15 var(--serif);cursor:pointer}
+.t .nm:hover{color:var(--gold)}
+.t .sub{font-size:13px;color:var(--faint);margin-top:3px;max-width:430px}
+.t .sub b{color:var(--muted);font-weight:700}
+.t td.p{font:700 19px var(--serif);text-align:right;font-variant-numeric:tabular-nums;color:var(--text);}
+.t td.p.base{color:var(--gold)}
+.t input.num{width:70px;text-align:right;background:rgba(14,9,22,.6);border:1px dashed var(--line2);border-radius:8px;padding:4px 8px;font:700 18px var(--serif);color:var(--gold)}
+.dash{color:var(--faint)}
+
+/* request card */
+.avatar{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font:700 24px var(--serif);color:#2a1a08;background:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 55%,#fff));flex:none;box-shadow:0 0 18px color-mix(in srgb,var(--c) 45%,transparent)}
+.quote{font:italic 500 19px/1.4 var(--serif);color:#e6dcf3;position:relative;padding-left:16px;border-left:2px solid var(--c)}
+.paybox{display:flex;gap:20px;padding:11px 14px;border-radius:14px;background:rgba(14,9,22,.45);border:1px solid var(--line)}
+.paybox div{display:flex;flex-direction:column}
+.paybox .v{font:700 24px/1.1 var(--serif);color:var(--gold)}
+.paybox .v.w{color:var(--muted)}
+.paybox .k{font:800 10px var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+
+/* rules */
+.tiers{display:grid;gap:12px}
+.tier{display:grid;grid-template-columns:150px 120px 1fr;gap:16px;align-items:center;padding:16px 20px;border-radius:18px;background:linear-gradient(160deg,var(--card2),var(--card));border:1px solid var(--line)}
+.tier h4{font:700 26px var(--serif);margin:0}
+.tier .x{font:700 34px var(--serif);color:var(--gold);font-variant-numeric:tabular-nums}
+.tier .x small{font:700 16px var(--sans);color:var(--muted)}
+.tier .d{color:var(--muted)}
+.tier input.num{width:100px;font:700 30px var(--serif);background:rgba(14,9,22,.6);border:1px dashed var(--line2);border-radius:10px;padding:2px 10px;color:var(--gold)}
+.levels{display:grid;gap:12px}
+.lv{display:grid;grid-template-columns:56px 200px 1fr 1fr;gap:18px;align-items:center;padding:16px 20px;border-radius:18px;background:linear-gradient(160deg,var(--card2),var(--card));border:1px solid var(--line)}
+.lv .num{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font:700 24px var(--serif);color:#2a1a08;background:linear-gradient(135deg,#f6d98c,#e8a33d)}
+.lv h4{font:700 24px var(--serif);margin:0}
+.lv small{display:block;font:800 10px var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin-bottom:2px}
+
+/* edit mode */
+.editbar{display:none;align-items:center;gap:12px;margin:0 0 22px;padding:10px 16px;border-radius:14px;border:1px dashed var(--line2);background:rgba(240,198,116,.06);color:var(--gold);font-weight:700;font-size:14px}
+body.edit .editbar{display:flex}
+body.edit [data-edit]{outline:1px dashed rgba(240,198,116,.5);outline-offset:4px;border-radius:6px;cursor:text}
+body.edit [data-edit]:focus{outline:2px solid var(--gold);background:rgba(240,198,116,.07)}
+.only-edit{display:none!important}
+body.edit .only-edit{display:inline-flex!important}
+body.edit .hide-edit{display:none!important}
+
+/* modal */
+#overlay:empty{display:none}
+.scrim{position:fixed;inset:0;z-index:100;background:rgba(8,5,14,.74);backdrop-filter:blur(7px);display:flex;align-items:flex-start;justify-content:center;padding:5vh 16px;overflow:auto;animation:fade .18s}
+@keyframes fade{from{opacity:0}}
+@keyframes rise{from{opacity:0;transform:translateY(14px) scale(.985)}}
+.modal{--c:var(--gold);width:min(780px,100%);border-radius:26px;background:linear-gradient(165deg,#2b1f3f,#1a1226 55%);border:1px solid var(--line2);box-shadow:0 40px 120px rgba(0,0,0,.65);padding:34px 36px 28px;position:relative;overflow:hidden;animation:rise .24s cubic-bezier(.2,.8,.2,1)}
+.modal::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,var(--c),transparent 80%)}
+.modal.narrow{width:min(620px,100%)}
+.modal h2{font:700 44px/1.02 var(--serif);margin:6px 0 12px;color:var(--text)}
+.modal .x{position:absolute;right:18px;top:18px}
+.modal .sect{margin-top:22px}
+.modal .sect p{margin:0;color:#d6c9e6}
+.modal .ft{display:flex;gap:10px;align-items:center;margin-top:28px;padding-top:20px;border-top:1px solid var(--line)}
+.ladderbars{display:grid;gap:8px}
+.lb{display:grid;grid-template-columns:90px 1fr 56px;gap:12px;align-items:center;font-size:13.5px}
+.lb .nm{color:var(--muted);font-weight:700}
+.lb .bar{height:10px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
+.lb .bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#e8a33d,#f6d98c)}
+.lb .v{text-align:right;font:700 18px var(--serif);color:var(--gold)}
+.need{display:flex;flex-wrap:wrap;gap:8px}
+.callout{padding:14px 16px;border-radius:14px;background:rgba(229,133,133,.07);border:1px solid rgba(229,133,133,.25);color:#f0c8c8}
+.callout b{color:#ffd8d8}
+.note{padding:14px 16px;border-radius:14px;background:rgba(240,198,116,.06);border:1px solid var(--line);color:#e4d8c5}
+
+/* forms */
+.form{display:grid;gap:16px;margin-top:12px}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fld label{display:block;font:800 10.5px var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+.fld input[type=text],.fld input[type=number],.fld select,.fld textarea{width:100%;padding:11px 14px;border-radius:12px;background:rgba(14,9,22,.6);border:1px solid var(--line);outline:0;transition:.15s}
+.fld select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--gold) 50%),linear-gradient(135deg,var(--gold) 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 14px) 50%;background-size:6px 6px;background-repeat:no-repeat;padding-right:36px}
+.fld select option{background:#1b1327}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(240,198,116,.1)}
+.fld textarea{min-height:76px;resize:vertical}
+.fld .hint{font-size:12.5px;color:var(--faint);margin-top:5px}
+.fld .err{font-size:13px;color:var(--bad);margin-top:5px;font-weight:700}
+.newcat{margin-top:8px;display:none}
+.ingp{display:grid;gap:8px}
+.ingrow{display:grid;grid-template-columns:70px 1fr 38px;gap:8px}
+.ingrow input{padding:9px 12px!important}
+.check-row{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--text)}
+.check-row input{width:20px;height:20px;accent-color:var(--gold)}
+
+/* categories drawer */
+.catlist{display:grid;gap:8px;margin-top:10px}
+.catrow{display:grid;grid-template-columns:40px 1fr auto 40px;gap:10px;align-items:center}
+.catrow input[type=color]{width:40px;height:40px;border:0;background:none;padding:0;cursor:pointer;border-radius:10px}
+.catrow input[type=text]{padding:9px 13px;border-radius:12px;background:rgba(14,9,22,.6);border:1px solid var(--line);outline:0}
+.catrow input[type=text]:focus{border-color:var(--gold)}
+.catrow .cnt{font-size:12.5px;color:var(--faint);font-weight:700}
+
+/* toast */
+#toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);z-index:200;padding:12px 22px;border-radius:99px;background:#2d2142;border:1px solid var(--line2);color:var(--gold);font-weight:800;opacity:0;transition:.25s;pointer-events:none;box-shadow:0 14px 40px rgba(0,0,0,.5)}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+.empty{padding:50px 20px;text-align:center;color:var(--faint);border:1px dashed var(--line);border-radius:20px}
+.resrow{display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.03);cursor:pointer;transition:.15s;text-align:left;width:100%}
+.resrow:hover{border-color:var(--line2);background:rgba(240,198,116,.06)}
+.resrow b{font:700 20px var(--serif)}
+.resrow span{color:var(--muted);font-size:13.5px}
+
+@media (max-width:1060px){
+  .shell{grid-template-columns:1fr}
+  aside.side{position:sticky;top:0;z-index:30;height:auto;flex-direction:row;align-items:center;padding:10px 14px;border-right:0;border-bottom:1px solid var(--line);gap:8px}
+  .brand{padding:0 8px 0 0}.brand .s,.side .foot{display:none}.brand .t{font-size:20px}.brand .moon{width:32px;height:32px}
+  nav.nav{flex-direction:row;overflow-x:auto;gap:4px}
+  .nav button{padding:9px 12px;white-space:nowrap}.nav .n{display:none}.nav button.on::before{display:none}
+  header.top{top:57px;padding:10px 16px}
+  .page{padding:26px 16px 80px}
+  .hero{padding:30px 24px}.hero .bigmoon{width:90px;height:90px;right:18px;top:18px}
+  .ladder{grid-template-columns:1fr 1fr}
+  .tier,.lv{grid-template-columns:1fr}
+  .f2{grid-template-columns:1fr}
+  .modal{padding:26px 22px 22px}
+  .btn .lbl-t{display:none}
+}
+</style>
+</head>
+<body>
+<div id="flies"></div>
+<div id="app"></div>
+<div id="overlay"></div>
+<div id="toast"></div>
+<script type="application/json" id="bookdata">{
+ "rev": 1795498537834,
+ "meta": {
+  "title": "The Night Market",
+  "subtitle": "Game Book",
+  "tagline": "Everything we gather, brew, bind and sell. Edit anything. It is all yours."
+ },
+ "sections": {
+  "overview": {
+   "title": "Overview",
+   "blurb": "The market at a glance."
+  },
+  "gather": {
+   "title": "Gathering",
+   "blurb": "Everything you can pick, dig, trade or be given, by zone."
+  },
+  "recipes": {
+   "title": "Recipes & Spells",
+   "blurb": "What to make, what goes in it, and when the moon is right."
+  },
+  "goods": {
+   "title": "Stall Goods",
+   "blurb": "What Stall 13 sells and what each thing earns, done properly or not."
+  },
+  "requests": {
+   "title": "Requests",
+   "blurb": "Who comes to the counter, what ails them, and what they will pay."
+  },
+  "upgrades": {
+   "title": "Stall Upgrades",
+   "blurb": "Ways to make Stall 13 more yours."
+  },
+  "rules": {
+   "title": "Rules",
+   "blurb": "Quality tiers and Stall Standing. Change a number and every price follows."
+  }
+ },
+ "lists": {
+  "zones": [
+   {
+    "name": "Marsh",
+    "color": "#4fb5a0"
+   },
+   {
+    "name": "Woods",
+    "color": "#c9a24a"
+   },
+   {
+    "name": "Canal and shore",
+    "color": "#6c9bd8"
+   },
+   {
+    "name": "Town",
+    "color": "#d98a5a"
+   },
+   {
+    "name": "Reward",
+    "color": "#b58be0"
+   }
+  ],
+  "kinds": [
+   {
+    "name": "Candle",
+    "color": "#f0c674"
+   },
+   {
+    "name": "Incense",
+    "color": "#c9a0dc"
+   },
+   {
+    "name": "Charm",
+    "color": "#8bd3b0"
+   },
+   {
+    "name": "Brew",
+    "color": "#e08fa0"
+   },
+   {
+    "name": "Salve",
+    "color": "#e6a86c"
+   },
+   {
+    "name": "Lantern",
+    "color": "#ffd98a"
+   },
+   {
+    "name": "Craft",
+    "color": "#a9b4c9"
+   },
+   {
+    "name": "Keepsake",
+    "color": "#e8b4cf"
+   },
+   {
+    "name": "Story",
+    "color": "#9d8bd8"
+   }
+  ],
+  "moons": [
+   {
+    "name": "Any",
+    "color": "#a99bbd"
+   },
+   {
+    "name": "New",
+    "color": "#7d7ad0"
+   },
+   {
+    "name": "Waxing",
+    "color": "#d6b86a"
+   },
+   {
+    "name": "Full",
+    "color": "#f6e7b4"
+   },
+   {
+    "name": "Waning",
+    "color": "#c58fb7"
+   }
+  ],
+  "rarities": [
+   {
+    "name": "Common",
+    "color": "#a99bbd"
+   },
+   {
+    "name": "Uncommon",
+    "color": "#7fc8a0"
+   },
+   {
+    "name": "Rare",
+    "color": "#f0c674"
+   }
+  ],
+  "reqkinds": [
+   {
+    "name": "Ailment",
+    "color": "#e08fa0"
+   },
+   {
+    "name": "Worry",
+    "color": "#9fb4e8"
+   },
+   {
+    "name": "Wish",
+    "color": "#f0c674"
+   },
+   {
+    "name": "Favor",
+    "color": "#8bd3b0"
+   },
+   {
+    "name": "Haunting",
+    "color": "#b58be0"
+   }
+  ]
+ },
+ "tiers": [
+  {
+   "name": "Ruined",
+   "mult": 0,
+   "desc": "Wrong ingredient entirely, burnt, or left unfinished overnight."
+  },
+  {
+   "name": "Improper",
+   "mult": 0.4,
+   "desc": "Rushed steep, wrong moon, a gather over a day old, or a substitute ingredient."
+  },
+  {
+   "name": "Proper",
+   "mult": 1,
+   "desc": "Right ingredients, right method, any moon."
+  },
+  {
+   "name": "Fine",
+   "mult": 1.5,
+   "desc": "Proper, made under the best moon for that recipe."
+  },
+  {
+   "name": "Perfect",
+   "mult": 2.5,
+   "desc": "Fine, plus a premium ingredient (beeswax, same-day gather) and no rushing."
+  }
+ ],
+ "levels": [
+  {
+   "level": 1,
+   "name": "Lit Stall",
+   "earn": "Light Stall 13 on Night One",
+   "opens": "Tier 1 wares and the first requests"
+  },
+  {
+   "level": 2,
+   "name": "Regular Hours",
+   "earn": "Help 3 customers and sell 10 goods",
+   "opens": "Tier 2: steeps, salves, Hush and Hearth candles, lanterns"
+  },
+  {
+   "level": 3,
+   "name": "Known Name",
+   "earn": "Help 8 different customers and finish one favor",
+   "opens": "Tier 3: lockets, fog incense, finder's thread, the Duchess favor"
+  },
+  {
+   "level": 4,
+   "name": "Favoured",
+   "earn": "The moth-winged visitor trusts you, and Fenn's lantern is lit",
+   "opens": "Memory Candle, Calling Lantern, the hauntings"
+  },
+  {
+   "level": 5,
+   "name": "Keeper's Hand",
+   "earn": "Wren gives you the key",
+   "opens": "Keeper's Lantern, and the market's own requests"
+  }
+ ],
+ "gathers": [
+  {
+   "id": "g-reed",
+   "name": "Reed",
+   "zone": "Marsh",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "notes": ""
+  },
+  {
+   "id": "g-bog-moss",
+   "name": "Bog Moss",
+   "zone": "Marsh",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "notes": ""
+  },
+  {
+   "id": "g-glowcap",
+   "name": "Glowcap",
+   "zone": "Marsh",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "notes": "Glows faintly"
+  },
+  {
+   "id": "g-marsh-lily",
+   "name": "Marsh Lily",
+   "zone": "Marsh",
+   "when": "Any",
+   "rarity": "Rare",
+   "source": "Gather",
+   "notes": ""
+  },
+  {
+   "id": "g-pine-resin",
+   "name": "Pine Resin",
+   "zone": "Woods",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "notes": ""
+  },
+  {
+   "id": "g-hazelnut",
+   "name": "Hazelnut",
+   "zone": "Woods",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "notes": ""
+  },
+  {
+   "id": "g-thistle",
+   "name": "Thistle",
+   "zone": "Woods",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "notes": ""
+  },
+  {
+   "id": "g-fern",
+   "name": "Fern",
+   "zone": "Woods",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "notes": ""
+  },
+  {
+   "id": "g-raven-feather",
+   "name": "Raven Feather",
+   "zone": "Woods",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "notes": ""
+  },
+  {
+   "id": "g-moonbark",
+   "name": "Moonbark",
+   "zone": "Woods",
+   "when": "Any",
+   "rarity": "Rare",
+   "source": "Gather",
+   "notes": ""
+  },
+  {
+   "id": "g-smooth-stone",
+   "name": "Smooth Stone",
+   "zone": "Canal and shore",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "notes": ""
+  },
+  {
+   "id": "g-sea-glass",
+   "name": "Sea Glass",
+   "zone": "Canal and shore",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "notes": ""
+  },
+  {
+   "id": "g-driftwood",
+   "name": "Driftwood",
+   "zone": "Canal and shore",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "notes": ""
+  },
+  {
+   "id": "g-clay",
+   "name": "Clay",
+   "zone": "Canal and shore",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "notes": ""
+  },
+  {
+   "id": "g-canal-pearl",
+   "name": "Canal Pearl",
+   "zone": "Canal and shore",
+   "when": "Any",
+   "rarity": "Rare",
+   "source": "Gather",
+   "notes": ""
+  },
+  {
+   "id": "g-wax-ends",
+   "name": "Wax Ends",
+   "zone": "Town",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Trade with Wren",
+   "notes": ""
+  },
+  {
+   "id": "g-copper-wire",
+   "name": "Copper Wire",
+   "zone": "Town",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Buy or trade in town",
+   "notes": ""
+  },
+  {
+   "id": "g-ribbon",
+   "name": "Ribbon",
+   "zone": "Town",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Buy or trade in town",
+   "notes": ""
+  },
+  {
+   "id": "g-ink-bottle",
+   "name": "Ink Bottle",
+   "zone": "Town",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Buy or trade in town",
+   "notes": ""
+  },
+  {
+   "id": "g-scrap-iron",
+   "name": "Scrap Iron",
+   "zone": "Town",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Scavenge in town",
+   "notes": ""
+  },
+  {
+   "id": "g-lullwort",
+   "name": "Lullwort",
+   "zone": "Marsh",
+   "when": "Dusk only",
+   "rarity": "Uncommon",
+   "source": "Gather",
+   "notes": "Closes at dawn. Gather before it does."
+  },
+  {
+   "id": "g-dusk-violet",
+   "name": "Dusk Violet",
+   "zone": "Marsh",
+   "when": "Night only",
+   "rarity": "Rare",
+   "source": "Gather",
+   "notes": "Smells faintly like someone's name."
+  },
+  {
+   "id": "g-ember-berry",
+   "name": "Ember Berry",
+   "zone": "Woods",
+   "when": "Day",
+   "rarity": "Common",
+   "source": "Gather",
+   "notes": "Scorches if left in the sun on the counter."
+  },
+  {
+   "id": "g-wild-mint",
+   "name": "Wild Mint",
+   "zone": "Woods",
+   "when": "Day",
+   "rarity": "Common",
+   "source": "Gather",
+   "notes": ""
+  },
+  {
+   "id": "g-yarrow",
+   "name": "Yarrow",
+   "zone": "Woods",
+   "when": "Day",
+   "rarity": "Common",
+   "source": "Gather",
+   "notes": ""
+  },
+  {
+   "id": "g-rosehip",
+   "name": "Rosehip",
+   "zone": "Woods",
+   "when": "Day, after rain",
+   "rarity": "Uncommon",
+   "source": "Gather",
+   "notes": ""
+  },
+  {
+   "id": "g-spider-silk",
+   "name": "Spider Silk",
+   "zone": "Woods",
+   "when": "Dawn dew",
+   "rarity": "Uncommon",
+   "source": "Gather",
+   "notes": "Gone by midmorning."
+  },
+  {
+   "id": "g-willow-bark",
+   "name": "Willow Bark",
+   "zone": "Canal and shore",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "notes": ""
+  },
+  {
+   "id": "g-salt-crystal",
+   "name": "Salt Crystal",
+   "zone": "Canal and shore",
+   "when": "Low tide",
+   "rarity": "Common",
+   "source": "Gather",
+   "notes": "Only shows when the canal drops at night."
+  },
+  {
+   "id": "g-honey",
+   "name": "Honey",
+   "zone": "Town",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Buy or trade in town",
+   "notes": ""
+  },
+  {
+   "id": "g-beeswax",
+   "name": "Beeswax",
+   "zone": "Town",
+   "when": "Any",
+   "rarity": "Uncommon",
+   "source": "Trade with Wren",
+   "notes": "Using it lifts a candle toward Fine."
+  },
+  {
+   "id": "g-glow-moth-scale",
+   "name": "Glow Moth Scale",
+   "zone": "Reward",
+   "when": "Given by the moth-winged visitor",
+   "rarity": "Rare",
+   "source": "Gift",
+   "notes": "Only once the visitor trusts you (Level 4)."
+  }
+ ],
+ "crafts": [
+  {
+   "id": "c-reed-wick-candle",
+   "name": "Reed Wick Candle",
+   "kind": "Candle",
+   "level": 1,
+   "ingredients": "Wax Ends + Reed",
+   "method": "Melt low, set the reed wick straight, pour slow.",
+   "moon": "Any",
+   "purpose": "Opening ware. A calm room.",
+   "price": 6,
+   "improper": "Crooked wick, smoky flame, sputters out in a draught.",
+   "sells": true,
+   "notes": "Opening ware"
+  },
+  {
+   "id": "c-resin-incense",
+   "name": "Resin Incense",
+   "kind": "Incense",
+   "level": 1,
+   "ingredients": "Pine Resin + Fern",
+   "method": "Crush, dry on the counter, burn one pinch.",
+   "moon": "Any",
+   "purpose": "Calms a house. Base for Fog Incense.",
+   "price": 7,
+   "improper": "Too much resin: acrid, waters the eyes instead of calming.",
+   "sells": true,
+   "notes": "Opening ware"
+  },
+  {
+   "id": "c-moss-pouch",
+   "name": "Moss Pouch",
+   "kind": "Charm",
+   "level": 1,
+   "ingredients": "Bog Moss + Ribbon",
+   "method": "Pack dry, tie with three turns.",
+   "moon": "Any",
+   "purpose": "A small comfort and a light ward.",
+   "price": 5,
+   "improper": "Packed damp: goes musty in a day.",
+   "sells": true,
+   "notes": "Opening ware"
+  },
+  {
+   "id": "c-pocket-stone",
+   "name": "Pocket Stone",
+   "kind": "Charm",
+   "level": 1,
+   "ingredients": "Smooth Stone + Ribbon",
+   "method": "Warm by the hearth for an hour, tie it, hold your wish.",
+   "moon": "Waxing",
+   "purpose": "Luck: a good week, a rising loaf.",
+   "price": 5,
+   "improper": "Stone not warmed by the hearth first: cold, plain, no luck in it.",
+   "sells": true,
+   "notes": "Opening ware"
+  },
+  {
+   "id": "c-bog-moss-tea",
+   "name": "Bog Moss Tea",
+   "kind": "Brew",
+   "level": 1,
+   "ingredients": "Bog Moss",
+   "method": "Steep in hot water 3 minutes. Never boil.",
+   "moon": "Any",
+   "purpose": "Chest cough, river fog.",
+   "price": 6,
+   "improper": "Boiled instead of steeped: bitter, and it does not clear a chest.",
+   "sells": true,
+   "notes": ""
+  },
+  {
+   "id": "c-clay-jar",
+   "name": "Clay Jar",
+   "kind": "Craft",
+   "level": 2,
+   "ingredients": "Clay",
+   "method": "Shape, dry a day, fire.",
+   "moon": "Any",
+   "purpose": "Holds brews. An ingredient in many things.",
+   "price": 8,
+   "improper": "Underfired: hairline cracks, weeps when filled.",
+   "sells": true,
+   "notes": "Ingredient"
+  },
+  {
+   "id": "c-wild-mint-steep",
+   "name": "Wild Mint Steep",
+   "kind": "Brew",
+   "level": 2,
+   "ingredients": "Wild Mint + Honey + Clay Jar",
+   "method": "Steep 2 minutes. Stop when it smells sweet.",
+   "moon": "Any",
+   "purpose": "Stomach and nerves.",
+   "price": 8,
+   "improper": "Steeped too long: grassy and harsh, upsets the stomach.",
+   "sells": true,
+   "notes": ""
+  },
+  {
+   "id": "c-brave-jar",
+   "name": "Brave Jar",
+   "kind": "Charm",
+   "level": 2,
+   "ingredients": "Glowcap + Clay Jar",
+   "method": "Seal it the same day you gather the glowcap.",
+   "moon": "Waxing",
+   "purpose": "Stage fright, shaking hands.",
+   "price": 12,
+   "improper": "Jar not sealed the same day: the glow leaks out, and the courage with it.",
+   "sells": true,
+   "notes": ""
+  },
+  {
+   "id": "c-hazelnut-tonic",
+   "name": "Hazelnut Tonic",
+   "kind": "Brew",
+   "level": 2,
+   "ingredients": "Hazelnut + Thistle + Clay Jar",
+   "method": "Crack the nuts fresh, steep 5 minutes.",
+   "moon": "Waxing",
+   "purpose": "Tiredness, low strength.",
+   "price": 14,
+   "improper": "Nuts not cracked fresh: flat, tastes of dust.",
+   "sells": true,
+   "notes": ""
+  },
+  {
+   "id": "c-feather-quill",
+   "name": "Feather Quill",
+   "kind": "Craft",
+   "level": 2,
+   "ingredients": "Raven Feather + Ink Bottle",
+   "method": "Cure the feather by the lamp overnight, then cut the nib.",
+   "moon": "Any",
+   "purpose": "Letters, ledgers, anyone who writes.",
+   "price": 12,
+   "improper": "Feather not cured: splays and blots the ink.",
+   "sells": true,
+   "notes": ""
+  },
+  {
+   "id": "c-driftwood-frame",
+   "name": "Driftwood Frame",
+   "kind": "Craft",
+   "level": 2,
+   "ingredients": "Driftwood + Copper Wire",
+   "method": "Dry the wood fully, bind the corners with wire.",
+   "moon": "Any",
+   "purpose": "Frames for pictures and keepsakes.",
+   "price": 13,
+   "improper": "Wood still damp: warps, and the corners open.",
+   "sells": true,
+   "notes": ""
+  },
+  {
+   "id": "c-glowcap-lantern",
+   "name": "Glowcap Lantern",
+   "kind": "Lantern",
+   "level": 2,
+   "ingredients": "Glowcap + Sea Glass + Copper Wire",
+   "method": "Seal the glowcap behind the glass the same day.",
+   "moon": "Waxing",
+   "purpose": "A steady light. Base for Story and Calling Lanterns.",
+   "price": 18,
+   "improper": "Glowcap a day old: glows grey and sulks.",
+   "sells": true,
+   "notes": ""
+  },
+  {
+   "id": "c-hush-candle",
+   "name": "Hush Candle",
+   "kind": "Candle",
+   "level": 2,
+   "ingredients": "Beeswax + Lullwort + Reed",
+   "method": "Pour at dusk. Say the sleeper's name once.",
+   "moon": "Waning",
+   "purpose": "Sleeplessness and bad dreams.",
+   "price": 16,
+   "improper": "Poured under a waxing moon: keeps the sleeper awake.",
+   "sells": true,
+   "notes": ""
+  },
+  {
+   "id": "c-hearth-candle",
+   "name": "Hearth Candle",
+   "kind": "Candle",
+   "level": 2,
+   "ingredients": "Beeswax + Ember Berry + Pine Resin",
+   "method": "Warm the berry gently. Do not scorch it.",
+   "moon": "Waxing",
+   "purpose": "Homesickness, cold rooms, hens off the lay.",
+   "price": 15,
+   "improper": "Ember Berry scorched: smells of burnt toast, gives no warmth.",
+   "sells": true,
+   "notes": ""
+  },
+  {
+   "id": "c-yarrow-salve",
+   "name": "Yarrow Salve",
+   "kind": "Salve",
+   "level": 2,
+   "ingredients": "Yarrow + Beeswax + Clay Jar",
+   "method": "Melt the wax low, stir the yarrow in off the heat.",
+   "moon": "Any",
+   "purpose": "Cuts, scrapes, small burns.",
+   "price": 10,
+   "improper": "Wax too hot: the yarrow cooks out and it stings.",
+   "sells": true,
+   "notes": ""
+  },
+  {
+   "id": "c-thaw-salve",
+   "name": "Thaw Salve",
+   "kind": "Salve",
+   "level": 2,
+   "ingredients": "Ember Berry + Beeswax + Clay Jar",
+   "method": "Equal parts, warmed through.",
+   "moon": "Any",
+   "purpose": "Cold hands, stiff joints.",
+   "price": 12,
+   "improper": "Too little beeswax: slides off, hands stay cold.",
+   "sells": true,
+   "notes": ""
+  },
+  {
+   "id": "c-willow-fever-draught",
+   "name": "Willow Fever Draught",
+   "kind": "Brew",
+   "level": 2,
+   "ingredients": "Willow Bark + Wild Mint + Clay Jar",
+   "method": "Steep long and cool. Do not boil.",
+   "moon": "Waning",
+   "purpose": "Fever and aches.",
+   "price": 15,
+   "improper": "Boiled: all the bitter, none of the cure.",
+   "sells": true,
+   "notes": ""
+  },
+  {
+   "id": "c-salt-ward-bundle",
+   "name": "Salt Ward Bundle",
+   "kind": "Charm",
+   "level": 2,
+   "ingredients": "Salt Crystal + Reed + Ribbon",
+   "method": "Bind tight and tie nine knots.",
+   "moon": "New",
+   "purpose": "Bad dreams, uninvited visitors.",
+   "price": 14,
+   "improper": "Tied loose: the salt spills and the ward leaks.",
+   "sells": true,
+   "notes": ""
+  },
+  {
+   "id": "c-mending-knot",
+   "name": "Mending Knot",
+   "kind": "Charm",
+   "level": 2,
+   "ingredients": "Spider Silk + Ribbon",
+   "method": "Pull slowly. Tie the broken ends while you say what broke.",
+   "moon": "Any",
+   "purpose": "Quarrels and torn things.",
+   "price": 12,
+   "improper": "Silk pulled tight too fast: snaps and frays at the join.",
+   "sells": true,
+   "notes": ""
+  },
+  {
+   "id": "c-plain-speaking-tea",
+   "name": "Plain Speaking Tea",
+   "kind": "Brew",
+   "level": 2,
+   "ingredients": "Wild Mint + Honey + Thistle",
+   "method": "One thistle leaf only.",
+   "moon": "Any",
+   "purpose": "Helps someone say the true thing, gently. Does not make them say it.",
+   "price": 15,
+   "improper": "Too much thistle: they say true things, all of them, loudly.",
+   "sells": true,
+   "notes": ""
+  },
+  {
+   "id": "c-moonbark-tea",
+   "name": "Moonbark Tea",
+   "kind": "Brew",
+   "level": 3,
+   "ingredients": "Moonbark + Marsh Lily + Clay Jar",
+   "method": "Steep under a dim moon.",
+   "moon": "New",
+   "purpose": "Lost names. Grief that wants remembering.",
+   "price": 40,
+   "improper": "Steeped under a bright moon: just woody tea.",
+   "sells": true,
+   "notes": "Favors and special orders"
+  },
+  {
+   "id": "c-pearl-locket",
+   "name": "Pearl Locket",
+   "kind": "Keepsake",
+   "level": 3,
+   "ingredients": "Canal Pearl + Copper Wire + Ribbon",
+   "method": "Wire the pearl. Never glue it.",
+   "moon": "Full",
+   "purpose": "Weddings and promises.",
+   "price": 55,
+   "improper": "Pearl glued instead of wired: falls out of the setting.",
+   "sells": true,
+   "notes": "Favors and special orders"
+  },
+  {
+   "id": "c-story-lantern",
+   "name": "Story Lantern",
+   "kind": "Lantern",
+   "level": 3,
+   "ingredients": "Glowcap Lantern + Sea Glass + Raven Feather",
+   "method": "Set the feather in the glass before you seal it.",
+   "moon": "Full",
+   "purpose": "The Duchess's favor. Reading aloud.",
+   "price": 60,
+   "improper": "Glass chipped or feather scorched: the story gutters mid-line.",
+   "sells": true,
+   "notes": "Favor for the Duchess"
+  },
+  {
+   "id": "c-fog-incense",
+   "name": "Fog Incense",
+   "kind": "Incense",
+   "level": 3,
+   "ingredients": "Resin Incense + Salt Crystal",
+   "method": "Grind the salt fine. Burn it on the doorstep.",
+   "moon": "New",
+   "purpose": "Fog-sickness in a house.",
+   "price": 30,
+   "improper": "Salt too coarse: crackles and spits, and the fog stays.",
+   "sells": true,
+   "notes": ""
+  },
+  {
+   "id": "c-finder-s-thread",
+   "name": "Finder's Thread",
+   "kind": "Charm",
+   "level": 3,
+   "ingredients": "Spider Silk + Copper Wire + Smooth Stone",
+   "method": "Knot it while you hold the lost thing's name in mind.",
+   "moon": "Waxing",
+   "purpose": "Lost things.",
+   "price": 40,
+   "improper": "Knotted off the waxing moon: it finds things, just not yours.",
+   "sells": true,
+   "notes": ""
+  },
+  {
+   "id": "c-rosehip-heart-tonic",
+   "name": "Rosehip Heart Tonic",
+   "kind": "Brew",
+   "level": 3,
+   "ingredients": "Rosehip + Marsh Lily + Honey + Clay Jar",
+   "method": "Honey goes in last, off the heat.",
+   "moon": "Full",
+   "purpose": "Heartache, and the courage to let go.",
+   "price": 28,
+   "improper": "Honey added hot: turns bitter and sweetens nothing.",
+   "sells": true,
+   "notes": ""
+  },
+  {
+   "id": "c-wren-s-key",
+   "name": "Wren's Key",
+   "kind": "Story",
+   "level": 3,
+   "ingredients": "3 Scrap Iron + Moonbark + Copper Wire",
+   "method": "Wren shows you the forge. One time only.",
+   "moon": "Any",
+   "purpose": "Opens Wren's trunk. Not for sale.",
+   "price": null,
+   "improper": "",
+   "sells": false,
+   "notes": "Goal 3. Story item."
+  },
+  {
+   "id": "c-calling-lantern",
+   "name": "Calling Lantern",
+   "kind": "Lantern",
+   "level": 4,
+   "ingredients": "Glowcap Lantern + Glow Moth Scale",
+   "method": "Open the shutter only at full dark.",
+   "moon": "Full",
+   "purpose": "Draws moths and visitors. Fenn's survey.",
+   "price": 45,
+   "improper": "Moth scale cracked: calls the wrong visitors, or none.",
+   "sells": true,
+   "notes": ""
+  },
+  {
+   "id": "c-memory-candle",
+   "name": "Memory Candle",
+   "kind": "Candle",
+   "level": 4,
+   "ingredients": "Beeswax + Moonbark + Dusk Violet",
+   "method": "Pour under the full moon. Light it for the one remembered.",
+   "moon": "Full",
+   "purpose": "The hauntings. The market wanting to be remembered.",
+   "price": 80,
+   "improper": "Poured off the full moon: the memory comes back wrong.",
+   "sells": true,
+   "notes": ""
+  },
+  {
+   "id": "c-keeper-s-lantern",
+   "name": "Keeper's Lantern",
+   "kind": "Lantern",
+   "level": 5,
+   "ingredients": "Calling Lantern + Pearl Locket + Moonbark",
+   "method": "Wren sets it with you. It only sets once.",
+   "moon": "Full",
+   "purpose": "The market's own requests.",
+   "price": 150,
+   "improper": "Not sold improperly. Done badly it counts as Ruined and costs the market's goodwill.",
+   "sells": true,
+   "notes": ""
+  }
+ ],
+ "upgrades": [
+  {
+   "id": "u-new-awning",
+   "name": "New Awning",
+   "stall": "Stall 13",
+   "ingredients": "Ribbon + Driftwood",
+   "effect": "",
+   "notes": "Stall upgrade"
+  },
+  {
+   "id": "u-display-shelves",
+   "name": "Display Shelves",
+   "stall": "Stall 13",
+   "ingredients": "Driftwood + Copper Wire",
+   "effect": "",
+   "notes": "Stall upgrade"
+  },
+  {
+   "id": "u-lantern-string",
+   "name": "Lantern String",
+   "stall": "Stall 13",
+   "ingredients": "3 Glowcap Lanterns",
+   "effect": "",
+   "notes": "Stall upgrade"
+  }
+ ],
+ "requests": [
+  {
+   "id": "r-pell-the-ferryman",
+   "name": "Pell the ferryman",
+   "kind": "Ailment",
+   "level": 1,
+   "ask": "Three weeks of river fog and this cough will not quit. Got anything for the chest?",
+   "answer": "Bog Moss Tea",
+   "pay": 8,
+   "wrong": "Glowcap steeped in water: pretty, does nothing (pays 2). A bare reed: he keeps it (pays 0).",
+   "notes": ""
+  },
+  {
+   "id": "r-maribel-the-baker",
+   "name": "Maribel the baker",
+   "kind": "Wish",
+   "level": 1,
+   "ask": "Luck for the oven this week. The loaves keep falling.",
+   "answer": "Pocket Stone",
+   "pay": 9,
+   "wrong": "A Moss Pouch comforts her but carries no luck (pays 3).",
+   "notes": ""
+  },
+  {
+   "id": "r-the-moth-winged-visitor",
+   "name": "The moth-winged visitor",
+   "kind": "Favor",
+   "level": 1,
+   "ask": "A candle, at full dark. They will not say what it is for.",
+   "answer": "Reed Wick Candle",
+   "pay": 30,
+   "wrong": "A candle from another moon is taken at a discount, and they say nothing.",
+   "notes": "Any candle will do, but it has to be poured under tonight's moon."
+  },
+  {
+   "id": "r-dov-the-fiddler",
+   "name": "Dov the fiddler",
+   "kind": "Worry",
+   "level": 2,
+   "ask": "My hands will not stop shaking. I play the square tonight.",
+   "answer": "Brave Jar",
+   "pay": 15,
+   "wrong": "Bog Moss in a jar calms him but is not courage (pays 3). A reed in a jar is a reed in a jar (pays 1).",
+   "notes": ""
+  },
+  {
+   "id": "r-sister-alder",
+   "name": "Sister Alder",
+   "kind": "Ailment",
+   "level": 2,
+   "ask": "My stomach turns every time I have to speak before the congregation.",
+   "answer": "Wild Mint Steep",
+   "pay": 11,
+   "wrong": "Hazelnut Tonic is too heavy. She thanks you and does not finish it (pays 3).",
+   "notes": ""
+  },
+  {
+   "id": "r-tobias-the-ferry-boy",
+   "name": "Tobias the ferry-boy",
+   "kind": "Ailment",
+   "level": 2,
+   "ask": "Skinned my knee on the landing. Mam says to ask you.",
+   "answer": "Yarrow Salve",
+   "pay": 13,
+   "wrong": "A Moss Pouch is a kind thought and does nothing for a knee (pays 2).",
+   "notes": ""
+  },
+  {
+   "id": "r-rook-the-blacksmith",
+   "name": "Rook the blacksmith",
+   "kind": "Ailment",
+   "level": 2,
+   "ask": "Burned my hand on the forge. Do not make a fuss.",
+   "answer": "Yarrow Salve",
+   "pay": 14,
+   "wrong": "Thaw Salve warms a burn, which is the opposite of help. He leaves it on the counter (pays 0).",
+   "notes": ""
+  },
+  {
+   "id": "r-corin-the-cooper",
+   "name": "Corin the cooper",
+   "kind": "Ailment",
+   "level": 2,
+   "ask": "My hands lock up in the cold. I cannot hold the mallet.",
+   "answer": "Thaw Salve",
+   "pay": 16,
+   "wrong": "Yarrow Salve soothes but does not loosen (pays 5).",
+   "notes": ""
+  },
+  {
+   "id": "r-brannoch-the-hen-wife",
+   "name": "Brannoch the hen-wife",
+   "kind": "Worry",
+   "level": 2,
+   "ask": "The hens have gone off the lay. Something is wrong in the coop.",
+   "answer": "Hearth Candle",
+   "pay": 20,
+   "wrong": "A Hush Candle puts the hens to sleep and does nothing else (pays 4).",
+   "notes": ""
+  },
+  {
+   "id": "r-old-ines",
+   "name": "Old Ines",
+   "kind": "Ailment",
+   "level": 2,
+   "ask": "I have not slept a full night since spring.",
+   "answer": "Hush Candle",
+   "pay": 22,
+   "wrong": "A Hearth Candle warms the room and she sits up reading by it (pays 6).",
+   "notes": ""
+  },
+  {
+   "id": "r-garrick-the-dockhand",
+   "name": "Garrick the dockhand",
+   "kind": "Worry",
+   "level": 2,
+   "ask": "The sea keeps coming into my dreams. I wake up wet.",
+   "answer": "Salt Ward Bundle + Hush Candle",
+   "pay": 30,
+   "wrong": "Only one of the two: it helps for half the night (pays 12).",
+   "notes": "Asks for both."
+  },
+  {
+   "id": "r-hale-the-lamplighter",
+   "name": "Hale the lamplighter",
+   "kind": "Worry",
+   "level": 2,
+   "ask": "There is someone I cannot say a whole sentence to. I have tried.",
+   "answer": "Plain Speaking Tea",
+   "pay": 20,
+   "wrong": "Too much thistle and he says everything at once, to the wrong person (pays 8).",
+   "notes": "Romance-cast starting point (the gangly one)."
+  },
+  {
+   "id": "r-teodor-the-net-mender",
+   "name": "Teodor the net-mender",
+   "kind": "Worry",
+   "level": 2,
+   "ask": "My brother and I have not spoken since the funeral. I want to mend it and do not know how to start.",
+   "answer": "Mending Knot",
+   "pay": 16,
+   "wrong": "Pulled too tight too fast: it snaps, and so does the talk (pays 6).",
+   "notes": "Romance-cast starting point."
+  },
+  {
+   "id": "r-bryn-the-tanner-s-daughter",
+   "name": "Bryn the tanner's daughter",
+   "kind": "Wish",
+   "level": 3,
+   "ask": "I lost my mother's ring somewhere on the canal path.",
+   "answer": "Finder's Thread",
+   "pay": 50,
+   "wrong": "A Pocket Stone finds her nothing but a better mood (pays 5).",
+   "notes": "Romance-cast starting point."
+  },
+  {
+   "id": "r-linnet",
+   "name": "Linnet",
+   "kind": "Ailment",
+   "level": 3,
+   "ask": "It has been a year and I still set out two cups. I want to stop and I cannot.",
+   "answer": "Rosehip Heart Tonic",
+   "pay": 36,
+   "wrong": "Moonbark Tea brings it all back instead of easing it (pays 10).",
+   "notes": ""
+  },
+  {
+   "id": "r-the-marsh-cottage-family",
+   "name": "The Marsh Cottage family",
+   "kind": "Ailment",
+   "level": 3,
+   "ask": "Fog has got into the walls. The children cough and the lamp will not stay lit.",
+   "answer": "Fog Incense",
+   "pay": 38,
+   "wrong": "Resin Incense alone smells lovely and clears nothing (pays 8).",
+   "notes": ""
+  },
+  {
+   "id": "r-isolde",
+   "name": "Isolde",
+   "kind": "Favor",
+   "level": 3,
+   "ask": "A wedding gift for my sister, something she can keep and wear.",
+   "answer": "Pearl Locket",
+   "pay": 70,
+   "wrong": "A Driftwood Frame is lovely and is not a locket (pays 15).",
+   "notes": ""
+  },
+  {
+   "id": "r-the-duchess",
+   "name": "The Duchess",
+   "kind": "Favor",
+   "level": 3,
+   "ask": "Bring me a lantern that can tell a story.",
+   "answer": "Story Lantern",
+   "pay": 80,
+   "wrong": "A plain Glowcap Lantern is pretty, but she wanted the story (pays 20).",
+   "notes": ""
+  },
+  {
+   "id": "r-fenn",
+   "name": "Fenn",
+   "kind": "Favor",
+   "level": 4,
+   "ask": "I need a light the moths will come to. For the survey, not the jar.",
+   "answer": "Calling Lantern",
+   "pay": 55,
+   "wrong": "A Glowcap Lantern draws gnats and nothing else (pays 8).",
+   "notes": ""
+  },
+  {
+   "id": "r-the-shade-at-the-edge-of-the-lamplight",
+   "name": "The shade at the edge of the lamplight",
+   "kind": "Haunting",
+   "level": 4,
+   "ask": "(It holds out a small book and cannot say why it came.)",
+   "answer": "Memory Candle",
+   "pay": 110,
+   "wrong": "Any other candle: the book stays closed (pays 0).",
+   "notes": ""
+  }
+ ]
+}</script>
+<script>
+(function(){
+"use strict";
+/* ============================================================
+   THE NIGHT MARKET · GAME BOOK
+   One file. Your data lives in <script id="bookdata"> and in this
+   browser (localStorage). Use Publish > Download to bake edits in.
+   ============================================================ */
+const STORE='night-market-gamebook-v1';
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=p=>p+Math.random().toString(36).slice(2,8);
+const clone=o=>JSON.parse(JSON.stringify(o));
+
+/* ---------- icons ---------- */
+const IC={
+ overview:'<circle cx="12" cy="12" r="9"/><path d="M15.6 8.4l-2.1 5.1-5.1 2.1 2.1-5.1z"/>',
+ gather:'<path d="M5 19c0-8.5 5-14 14-14 0 9-5.5 14-14 14z"/><path d="M5 19c3-5 6-8 10-10"/>',
+ recipes:'<path d="M9 3h6M10 3v6l-5.2 9.1A2 2 0 006.5 21h11a2 2 0 001.7-2.9L14 9V3"/><path d="M7.6 15h8.8"/>',
+ goods:'<circle cx="12" cy="12" r="9"/><path d="M12 6.5v11M9.2 9.4c0-1.1 1.2-1.7 2.8-1.7s2.8.6 2.8 1.8-1.2 1.5-2.8 1.9-2.8.8-2.8 2 1.2 1.8 2.8 1.8 2.8-.6 2.8-1.7"/>',
+ requests:'<path d="M7 4h11a2 2 0 012 2v1H9v11a2 2 0 01-2 2H6a2 2 0 01-2-2V7a3 3 0 013-3z"/><path d="M20 7v11a2 2 0 01-2 2H7"/><path d="M12.5 11.5h4.5M12.5 14.5h4.5"/>',
+ upgrades:'<path d="M4 20V10l8-6 8 6v10z"/><path d="M12 17v-6M9.2 13.4L12 10.6l2.8 2.8"/>',
+ rules:'<path d="M12 4v16M6.5 20h11M5 7h14"/><path d="M5 7l-3 7a3.5 3.5 0 006 0zM19 7l-3 7a3.5 3.5 0 006 0z"/>',
+ search:'<circle cx="11" cy="11" r="7"/><path d="M20.5 20.5l-4.2-4.2"/>',
+ edit:'<path d="M4 20l1-4.2L16.8 4a1.8 1.8 0 012.6 0l.6.6a1.8 1.8 0 010 2.6L8.2 19z"/><path d="M14.5 6.5l3 3"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ x:'<path d="M6 6l12 12M18 6L6 18"/>',
+ download:'<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>',
+ gear:'<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2.2"/><circle cx="8" cy="17" r="2.2"/>',
+ coin:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v9M9.6 10c0-.9 1-1.4 2.4-1.4s2.4.5 2.4 1.4-1 1.2-2.4 1.6-2.4.7-2.4 1.6 1 1.4 2.4 1.4 2.4-.5 2.4-1.4"/>',
+ warn:'<path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17.5v.2"/>',
+ check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+ trash:'<path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/>',
+ up:'<path d="M12 19V5M6 11l6-6 6 6"/>'
+};
+const ico=(n,s=20)=>`<svg class="ico" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${IC[n]||''}</svg>`;
+const moonSvg=(phase,s=16)=>{
+  const c='#f0c674',d='#2b2040';
+  let inner='';
+  switch(phase){
+    case'New':inner=`<circle cx="12" cy="12" r="9" fill="${d}" stroke="${c}" stroke-width="1.6"/>`;break;
+    case'Full':inner=`<circle cx="12" cy="12" r="9" fill="${c}" stroke="${c}" stroke-width="1.6"/>`;break;
+    case'Waxing':inner=`<circle cx="12" cy="12" r="9" fill="${d}" stroke="${c}" stroke-width="1.6"/><path d="M12 3a9 9 0 010 18z" fill="${c}"/>`;break;
+    case'Waning':inner=`<circle cx="12" cy="12" r="9" fill="${d}" stroke="${c}" stroke-width="1.6"/><path d="M12 3a9 9 0 000 18z" fill="${c}"/>`;break;
+    default:inner=`<circle cx="12" cy="12" r="9" fill="none" stroke="${c}" stroke-width="1.6" stroke-dasharray="3 3"/>`;
+  }
+  return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" aria-hidden="true">${inner}</svg>`;
+};
+const gem=(on)=>`<svg viewBox="0 0 12 12"><path d="M6 .8l4.4 3.2L6 11.2 1.6 4z" fill="${on?'#f0c674':'none'}" stroke="${on?'#f0c674':'#5b4d70'}" stroke-width="1"/></svg>`;
+const BRANDMOON=`<svg class="moon" viewBox="0 0 64 64"><defs><linearGradient id="mg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0c4"/><stop offset="1" stop-color="#e8a33d"/></linearGradient></defs><path d="M44 8a25 25 0 100 48A20 20 0 0144 8z" fill="url(#mg)"/><circle cx="46" cy="18" r="1.6" fill="#fff0c4"/><circle cx="53" cy="30" r="1.1" fill="#fff0c4"/><circle cx="50" cy="44" r="1.4" fill="#fff0c4"/></svg>`;
+
+/* ---------- data ---------- */
+let D=null, EMB_REV=0;
+function loadData(){
+  const emb=JSON.parse($('#bookdata').textContent);
+  EMB_REV=emb.rev||0; D=emb;
+  try{
+    const raw=localStorage.getItem(STORE);
+    if(raw){const loc=JSON.parse(raw); if((loc.rev||0)>(emb.rev||0)) D=loc;}
+  }catch(e){}
+}
+let saveTimer=null;
+function save(quiet){
+  D.rev=Date.now();
+  try{localStorage.setItem(STORE,JSON.stringify(D));}catch(e){}
+  updateFoot();
+  if(!quiet)toast('Saved in this browser');
+}
+function isDirty(){return (D.rev||0)>EMB_REV;}
+function updateFoot(){
+  const f=$('#footstat'); if(f) f.innerHTML=isDirty()?'<span class="dot" style="display:inline-block;margin-right:8px"></span><b>Unpublished edits.</b> Download to keep them.':'All changes are in this file.';
+  const pd=$('#pubdot'); if(pd) pd.style.display=isDirty()?'inline-block':'none';
+}
+let toastT;
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),1800);}
+
+/* ---------- lookups ---------- */
+let IDX=null;
+function buildIdx(){
+  IDX=new Map();
+  D.gathers.forEach(g=>IDX.set(g.name.toLowerCase(),{type:'gather',e:g}));
+  D.crafts.forEach(c=>IDX.set(c.name.toLowerCase(),{type:'craft',e:c}));
+}
+function resolve(name){
+  const n=name.trim().toLowerCase();
+  if(IDX.has(n))return IDX.get(n);
+  if(n.endsWith('s')&&IDX.has(n.slice(0,-1)))return IDX.get(n.slice(0,-1));
+  return null;
+}
+function parseIng(str){
+  return String(str||'').split('+').map(s=>s.trim()).filter(Boolean).map(p=>{
+    const m=p.match(/^(\d+)\s+(.+)$/);
+    const qty=m?parseInt(m[1],10):1, name=m?m[2]:p;
+    return {qty,name,r:resolve(name)};
+  });
+}
+function serIng(list){return list.filter(x=>x.name.trim()).map(x=>(x.qty>1?x.qty+' ':'')+x.name.trim()).join(' + ');}
+function lvLabel(n){const l=D.levels.find(x=>x.level==n);return l?`L${n} · ${l.name}`:`L${n}`;}
+function lvName(n){const l=D.levels.find(x=>x.level==n);return l?l.name:'';}
+function listColor(list,name){const x=(D.lists[list]||[]).find(i=>i.name===name);return x?x.color:'#a99bbd';}
+function tierMult(name,fallbackIdx){const t=D.tiers.find(x=>x.name===name)||D.tiers[fallbackIdx];return t?Number(t.mult):1;}
+const money=n=>Number.isFinite(n)?String(n):'–';
+function priceAt(base,mult){return Math.round(Number(base||0)*Number(mult||0));}
+
+function rawNeeds(entity,type,mult,stack,out,steps){
+  out=out||new Map();steps=steps||new Map();stack=stack||[];
+  if(type==='craft'){
+    if(stack.includes(entity.id))return {out,steps};
+    stack=stack.concat(entity.id);
+  }
+  parseIng(entity.ingredients||'').forEach(p=>{
+    const q=p.qty*(mult||1);
+    if(!p.r){out.set('?'+p.name,(out.get('?'+p.name)||0)+q);return;}
+    if(p.r.type==='gather'){out.set(p.r.e.name,(out.get(p.r.e.name)||0)+q);}
+    else{steps.set(p.r.e.name,(steps.get(p.r.e.name)||0)+q);rawNeeds(p.r.e,'craft',q,stack,out,steps);}
+  });
+  return {out,steps};
+}
+function requestNeeds(r){
+  const out=new Map(),steps=new Map();
+  parseIng(r.answer).forEach(p=>{
+    if(!p.r)return;
+    if(p.r.type==='craft'){
+      const x=rawNeeds(p.r.e,'craft',p.qty);x.out.forEach((v,k)=>out.set(k,(out.get(k)||0)+v));
+      x.steps.forEach((v,k)=>steps.set(k,(steps.get(k)||0)+v));}
+    else out.set(p.r.e.name,(out.get(p.r.e.name)||0)+p.qty);
+  });
+  return {out,steps};
+}
+function usedIn(name){
+  const n=name.toLowerCase();
+  const hit=list=>list.filter(x=>parseIng(x.ingredients).some(p=>p.r&&p.r.e.name.toLowerCase()===n));
+  return {crafts:hit(D.crafts),upgrades:hit(D.upgrades),
+    requests:D.requests.filter(r=>parseIng(r.answer).some(p=>p.r&&p.r.e.name.toLowerCase()===n))};
+}
+
+/* ---------- ui state ---------- */
+const UI={sec:'overview',prev:'overview',q:'',edit:false,
+  f:{gather:{zone:null,rarity:null,view:'cards'},recipes:{kind:null,level:null,moon:null},
+     goods:{kind:null,level:null,sort:'level',dir:1},requests:{kind:null,level:null}}};
+const SECS=[['overview','Overview','overview'],['gather','Gathering','gather'],['recipes','Recipes & Spells','recipes'],['goods','Stall Goods','goods'],['requests','Requests','requests'],['upgrades','Stall Upgrades','upgrades'],['rules','Rules','rules']];
+const secCount=k=>({gather:D.gathers.length,recipes:D.crafts.length,goods:D.crafts.filter(c=>c.sells).length,requests:D.requests.length,upgrades:D.upgrades.length})[k];
+
+/* editable text helper */
+const ed=(path,txt,tag,cls)=>`<${tag||'span'} class="${cls||''}" data-edit="${path}" spellcheck="false"${UI.edit?' contenteditable="true"':''}>${esc(txt)}</${tag||'span'}>`;
+function getPath(path){return path.split('.').reduce((o,k)=>o&&o[k],D);}
+function setPath(path,val){const ks=path.split('.');const last=ks.pop();ks.reduce((o,k)=>o[k],D)[last]=val;}
+
+/* ---------- small components ---------- */
+function badge(text,color,cls){return `<span class="badge ${cls||''}" style="--c:${color||'#f0c674'}"><i></i>${esc(text)}</span>`;}
+function lvBadge(n){return `<span class="badge lvl" style="--c:#c8b6e8">${esc(lvLabel(n))}</span>`;}
+function moonChip(m){return `<span class="moonchip">${moonSvg(m)} ${m==='Any'?'Any moon':esc(m)+' moon'}</span>`;}
+function gems(r){const n={Common:1,Uncommon:2,Rare:3}[r]||1;return `<span class="gems" title="${esc(r)}">${gem(1)}${gem(n>1)}${gem(n>2)}</span>`;}
+function chipFor(p){
+  if(!p.r)return `<span class="chip bad" title="Not found in the book. Check the spelling or add it.">${p.qty>1?`<span class="q">${p.qty}×</span>`:''}${esc(p.name)}</span>`;
+  const e=p.r.e,t=p.r.type;
+  const c=t==='gather'?listColor('zones',e.zone):listColor('kinds',e.kind);
+  return `<button class="chip ${t==='craft'?'craft':''}" style="--c:${c}" data-act="open" data-type="${t}" data-id="${e.id}">${t==='gather'?'<i></i>':''}${p.qty>1?`<span class="q">${p.qty}×</span>`:''}${esc(e.name)}</button>`;
+}
+function ingChips(str){const l=parseIng(str);return l.length?`<div class="chips">${l.map(chipFor).join('')}</div>`:'<span class="dash">None</span>';}
+function needChips(map){
+  const arr=[...map.entries()];if(!arr.length)return '<span class="dash">Nothing to gather</span>';
+  return `<div class="chips">${arr.map(([n,q])=>chipFor({qty:q,name:n.replace(/^\?/,''),r:n.startsWith('?')?null:resolve(n)})).join('')}</div>`;
+}
+function tools(type,id){return `<div class="tools"><span class="iconbtn" data-act="edit" data-type="${type}" data-id="${id}" title="Edit">${ico('edit',16)}</span><span class="iconbtn del" data-act="del" data-type="${type}" data-id="${id}" title="Delete">${ico('trash',16)}</span></div>`;}
+function pageHead(key,eyebrow){
+  const s=D.sections[key];
+  return `<div class="pagehead"><div class="eyebrow">${esc(eyebrow||'The Night Market')}</div>${ed('sections.'+key+'.title',s.title,'h1','title')}<br>${ed('sections.'+key+'.blurb',s.blurb,'p','blurb')}</div><div class="editbar">${ico('edit',18)} Edit mode is on. Click any dashed title or text to rewrite it, use the pencil on cards, or add new ones. Changes save automatically.</div>`;
+}
+function fchips(sec,key,list,label,extra){
+  const cur=UI.f[sec][key];
+  return `<div class="tgroup"><span class="tlabel">${label}</span><button class="fchip ${cur==null?'on':''}" data-act="filter" data-sec="${sec}" data-key="${key}" data-val="">All</button>${list.map(i=>`<button class="fchip ${String(cur)===String(i.v!=null?i.v:i.name)?'on':''}" style="--c:${i.color||'#c8b6e8'}" data-act="filter" data-sec="${sec}" data-key="${key}" data-val="${esc(i.v!=null?i.v:i.name)}">${i.color?'<i></i>':''}${esc(i.label||i.name)}</button>`).join('')}</div>`;
+}
+const lvOpts=()=>D.levels.map(l=>({v:l.level,label:'L'+l.level+' '+l.name}));
+const addCard=(type,label)=>`<button class="card addcard" data-act="new" data-type="${type}">${ico('plus',20)} ${label}</button>`;
+
+/* ---------- pages ---------- */
+function pgOverview(){
+  const m=D.meta;
+  const missing=[];
+  D.crafts.concat(D.upgrades).forEach(x=>parseIng(x.ingredients).forEach(p=>{if(!p.r)missing.push(`<b>${esc(x.name)}</b> needs “${esc(p.name)}”, which is not in the book.`);}));
+  D.requests.forEach(r=>{const l=parseIng(r.answer);if(!l.length||l.some(p=>!p.r))missing.push(`Request <b>${esc(r.name)}</b>: answer “${esc(r.answer)}” does not match a recipe.`);});
+  const orphans=D.gathers.filter(g=>{const u=usedIn(g.name);return !u.crafts.length&&!u.upgrades.length;}).map(g=>`<b>${esc(g.name)}</b> is gathered but goes into nothing yet.`);
+  const unsold=D.crafts.filter(c=>c.sells&&!(c.price>0)).map(c=>`<b>${esc(c.name)}</b> is marked as sold but has no price.`);
+  const all=missing.concat(orphans,unsold);
+  const zoneCards=D.lists.zones.map(z=>{
+    const gs=D.gathers.filter(g=>g.zone===z.name);
+    return `<button class="zone" style="--c:${z.color}" data-act="goto-zone" data-val="${esc(z.name)}"><h4>${esc(z.name)} <small>${gs.length} ${gs.length===1?'thing':'things'}</small></h4><div class="chips">${gs.slice(0,7).map(g=>`<span class="chip" style="--c:${z.color}"><i></i>${esc(g.name)}</span>`).join('')}${gs.length>7?`<span class="chip">+${gs.length-7}</span>`:''}</div></button>`;
+  }).join('');
+  const lad=D.levels.map(l=>`<div class="step"><div class="num">${l.level}</div><h4>${esc(l.name)}</h4><div class="e">${esc(l.earn)}</div><div class="o">${esc(l.opens)}</div></div>`).join('');
+  return `
+  <div class="editbar">${ico('edit',18)} Edit mode is on. Click any dashed title or text to rewrite it.</div>
+  <section class="hero">
+    <svg class="bigmoon" viewBox="0 0 64 64"><path d="M44 8a25 25 0 100 48A20 20 0 0144 8z" fill="url(#mg)"/><circle cx="46" cy="18" r="1.4" fill="#fff0c4"/><circle cx="53" cy="30" r="1" fill="#fff0c4"/><circle cx="50" cy="44" r="1.2" fill="#fff0c4"/></svg>
+    <div class="eyebrow">${ed('meta.subtitle',m.subtitle,'span')}</div>
+    ${ed('meta.title',m.title,'h1')}
+    ${ed('meta.tagline',m.tagline,'p')}
+  </section>
+  <div class="stats">
+    ${[['gather','Things to gather',D.gathers.length],['recipes','Recipes & spells',D.crafts.length],['goods','Goods for sale',D.crafts.filter(c=>c.sells).length],['requests','Customer requests',D.requests.length]].map(([k,l,v])=>`<button class="stat" data-act="nav" data-val="${k}">${ico(k,24)}<span class="v">${v}</span><span class="k">${l}</span></button>`).join('')}
+  </div>
+  <h2 class="sec">Stall standing <span class="l"></span><small>the path upward</small></h2>
+  <div class="ladder">${lad}</div>
+  <h2 class="sec">The zones <span class="l"></span><small>where things grow</small></h2>
+  <div class="zones">${zoneCards}</div>
+  <h2 class="sec">Book check <span class="l"></span><small>${all.length?all.length+' to look at':'all good'}</small></h2>
+  <div class="checks">${all.length?all.slice(0,12).map(t=>`<div class="check warn">${ico('warn',18)}<div>${t}</div></div>`).join('')+(all.length>12?`<div class="check">…and ${all.length-12} more.</div>`:''):`<div class="check ok">${ico('check',18)}<div>Every ingredient points at something real, every sold item has a price, and every request has a recipe.</div></div>`}</div>`;
+}
+
+function pgGather(){
+  const f=UI.f.gather;
+  let list=D.gathers.filter(g=>(!f.zone||g.zone===f.zone)&&(!f.rarity||g.rarity===f.rarity));
+  const body=f.view==='table'?gatherTable(list):D.lists.zones.concat(D.gathers.filter(g=>!D.lists.zones.find(z=>z.name===g.zone)).map(g=>({name:g.zone,color:'#a99bbd'})).filter((z,i,a)=>a.findIndex(y=>y.name===z.name)===i)).map(z=>{
+    const gs=list.filter(g=>g.zone===z.name);
+    if(!gs.length&&!(UI.edit&&!f.zone))return '';
+    return `<h2 class="sec" style="color:${z.color}">${esc(z.name)} <span class="l"></span><small>${gs.length}</small></h2><div class="grid">${gs.map(g=>gatherCard(g)).join('')}${UI.edit?addCard('gather','Add to '+z.name).replace('data-type="gather"','data-type="gather" data-zone="'+esc(z.name)+'"'):''}</div>`;
+  }).join('');
+  return pageHead('gather','The Night Market · Field guide')+`
+  <div class="toolbar">${fchips('gather','zone',D.lists.zones,'Zone')}${fchips('gather','rarity',D.lists.rarities,'Rarity')}
+  <span class="sp"></span><div class="seg"><button class="${f.view==='cards'?'on':''}" data-act="view" data-sec="gather" data-val="cards">Cards</button><button class="${f.view==='table'?'on':''}" data-act="view" data-sec="gather" data-val="table">Table</button></div></div>
+  ${list.length||UI.edit?body:'<div class="empty">Nothing matches those filters.</div>'}`;
+}
+function gatherCard(g){
+  const c=listColor('zones',g.zone),u=usedIn(g.name);
+  const uses=u.crafts.concat(u.upgrades);
+  return `<div class="card" style="--c:${c}" data-act="open" data-type="gather" data-id="${g.id}">${tools('gather',g.id)}
+   <div class="row">${badge(g.zone,c)}${gems(g.rarity)}</div>
+   <h3>${esc(g.name)}</h3>
+   <div class="row">${g.when&&g.when!=='Any'?`<span class="badge plain">${esc(g.when)}</span>`:''}<span class="badge plain">${esc(g.source)}</span></div>
+   ${g.notes?`<p>${esc(g.notes)}</p>`:''}
+   <div class="cardfoot"><span class="lbl" style="margin:0">Goes into</span><div class="chips">${uses.length?uses.slice(0,3).map(x=>`<span class="chip craft" style="--c:${listColor('kinds',x.kind||'Craft')}">${esc(x.name)}</span>`).join('')+(uses.length>3?`<span class="chip">+${uses.length-3}</span>`:''):'<span class="dash">Nothing yet</span>'}</div></div></div>`;
+}
+function gatherTable(list){
+  return `<div class="tablewrap"><table class="t"><thead><tr><th>Name</th><th>Zone</th><th>When</th><th>Rarity</th><th>Source</th><th>Goes into</th></tr></thead><tbody>${list.map(g=>{
+    const u=usedIn(g.name);const uses=u.crafts.concat(u.upgrades);
+    return `<tr class="item"><td><div class="nm" data-act="open" data-type="gather" data-id="${g.id}">${esc(g.name)}</div>${g.notes?`<div class="sub">${esc(g.notes)}</div>`:''}</td><td>${badge(g.zone,listColor('zones',g.zone))}</td><td>${esc(g.when)}</td><td>${gems(g.rarity)} <span class="sub">${esc(g.rarity)}</span></td><td>${esc(g.source)}</td><td><div class="chips">${uses.map(x=>`<span class="chip craft">${esc(x.name)}</span>`).join('')||'<span class="dash">–</span>'}</div></td></tr>`;}).join('')}</tbody></table></div>`;
+}
+
+function pgRecipes(){
+  const f=UI.f.recipes;
+  const list=D.crafts.filter(c=>(!f.kind||c.kind===f.kind)&&(!f.level||String(c.level)===String(f.level))&&(!f.moon||c.moon===f.moon));
+  const levels=[...new Set(list.map(c=>c.level))].sort((a,b)=>a-b);
+  const body=levels.map(l=>`<h2 class="sec">${esc(lvLabel(l))} <span class="l"></span><small>${list.filter(c=>c.level===l).length} recipes</small></h2><div class="grid">${list.filter(c=>c.level===l).map(recipeCard).join('')}${UI.edit?addCard('craft','New recipe at level '+l).replace('data-type="craft"','data-type="craft" data-level="'+l+'"'):''}</div>`).join('');
+  return pageHead('recipes','The Night Market · Recipe book')+`
+  <div class="toolbar">${fchips('recipes','kind',D.lists.kinds,'Kind')}${fchips('recipes','level',lvOpts(),'Level')}${fchips('recipes','moon',D.lists.moons.map(m=>m),'Moon')}</div>
+  ${list.length?body:'<div class="empty">No recipes match those filters.</div>'}${UI.edit&&!list.length?`<div class="grid">${addCard('craft','New recipe')}</div>`:''}`;
+}
+function recipeCard(c){
+  const col=listColor('kinds',c.kind);
+  return `<div class="card" style="--c:${col}" data-act="open" data-type="craft" data-id="${c.id}">${tools('craft',c.id)}
+   <div class="row">${badge(c.kind,col)}${moonChip(c.moon)}</div>
+   <h3>${esc(c.name)}</h3>
+   ${c.purpose?`<p>${esc(c.purpose)}</p>`:''}
+   ${ingChips(c.ingredients)}
+   ${c.method?`<div class="method">${esc(c.method)}</div>`:''}
+   <div class="cardfoot">${c.sells&&c.price>0?`<span class="price">${ico('coin',18)}${money(c.price)}<small>base</small></span>`:`<span class="badge plain">Not sold</span>`}</div></div>`;
+}
+
+function pgGoods(){
+  const f=UI.f.goods;
+  let list=D.crafts.filter(c=>(UI.edit||c.sells)&&(!f.kind||c.kind===f.kind)&&(!f.level||String(c.level)===String(f.level)));
+  const tiers=D.tiers.filter(t=>Number(t.mult)>0);
+  const dir=f.dir,sort=f.sort;
+  const keyf={level:c=>c.level,name:c=>c.name.toLowerCase(),kind:c=>c.kind,base:c=>Number(c.price||0)};
+  let kf=keyf[sort];if(!kf&&sort.startsWith('t')){const ti=Number(sort.slice(1));kf=c=>priceAt(c.price,tiers[ti]?tiers[ti].mult:0);}
+  list=list.slice().sort((a,b)=>{const x=kf(a),y=kf(b);return (x<y?-1:x>y?1:a.name.localeCompare(b.name))*dir;});
+  const sold=D.crafts.filter(c=>c.sells&&c.price>0);
+  const avg=sold.length?Math.round(sold.reduce((s,c)=>s+Number(c.price),0)/sold.length):0;
+  const top=sold.slice().sort((a,b)=>b.price-a.price)[0],low=sold.slice().sort((a,b)=>a.price-b.price)[0];
+  const th=(key,label,cls)=>`<th class="${cls||''} ${sort===key?'on':''}" data-act="sort" data-key="${key}">${label}${sort===key?(dir>0?' ↑':' ↓'):''}</th>`;
+  let rows='';let lastL=null;
+  list.forEach(c=>{
+    if(sort==='level'&&c.level!==lastL){lastL=c.level;rows+=`<tr class="band"><td colspan="${4+tiers.length}">${esc(lvLabel(c.level))}<small>${esc((D.levels.find(l=>l.level==c.level)||{}).opens||'')}</small></td></tr>`;}
+    const col=listColor('kinds',c.kind);
+    rows+=`<tr class="item"><td><div class="nm" data-act="open" data-type="craft" data-id="${c.id}">${esc(c.name)}${!c.sells?' <span class="badge plain">not sold</span>':''}</div>${c.improper?`<div class="sub"><b>Done badly:</b> ${esc(c.improper)}</div>`:''}</td>
+    <td>${lvBadge(c.level)}</td><td>${badge(c.kind,col)}</td>
+    <td class="p base r">${UI.edit?`<input class="num" type="number" min="0" step="1" value="${c.price==null?'':c.price}" data-act-input="price" data-id="${c.id}">`:(c.price==null?'<span class="dash">–</span>':money(c.price))}</td>
+    ${tiers.map(t=>{const v=priceAt(c.price,t.mult);const rm=Math.max(1,priceAt(c.price,Math.max(...tiers.map(x=>Number(x.mult)))));return `<td class="p" style="--w:${c.price==null||!v?0:Math.max(6,Math.round(v/rm*100))}%">${c.price==null?'<span class="dash">–</span>':v}</td>`;}).join('')}</tr>`;
+  });
+  return pageHead('goods','The Night Market · Price list')+`
+  <div class="stats" style="margin-top:0;margin-bottom:22px">
+    <div class="stat"><span class="k">Average base price</span><span class="v">${avg}</span></div>
+    <div class="stat"><span class="k">Dearest</span><span class="v">${top?top.price:'–'}</span><span class="sub" style="color:var(--muted)">${top?esc(top.name):''}</span></div>
+    <div class="stat"><span class="k">Cheapest</span><span class="v">${low?low.price:'–'}</span><span class="sub" style="color:var(--muted)">${low?esc(low.name):''}</span></div>
+    <div class="stat"><span class="k">Goods for sale</span><span class="v">${sold.length}</span></div></div>
+  <div class="toolbar">${fchips('goods','kind',D.lists.kinds,'Kind')}${fchips('goods','level',lvOpts(),'Level')}</div>
+  <div class="tablewrap"><table class="t"><thead><tr>${th('name','Item')}${th('level','Level')}${th('kind','Kind')}${th('base','Base','r')}${tiers.map((t,i)=>th('t'+i,esc(t.name),'r')).join('')}</tr></thead><tbody>${rows||`<tr><td colspan="${4+tiers.length}"><div class="empty" style="border:0">Nothing for sale matches.</div></td></tr>`}</tbody></table></div>
+  <p class="blurb" style="margin-top:16px;font-size:14px">Tier prices are the base price times the multiplier on the <a href="#" data-act="nav" data-val="rules">Rules</a> page. Done-badly notes and “sold” are edited per item.</p>`;
+}
+
+function pgRequests(){
+  const f=UI.f.requests;
+  const list=D.requests.filter(r=>(!f.kind||r.kind===f.kind)&&(!f.level||String(r.level)===String(f.level)));
+  const levels=[...new Set(list.map(r=>r.level))].sort((a,b)=>a-b);
+  const wm=tierMult('Improper',1);
+  const body=levels.map(l=>`<h2 class="sec">${esc(lvLabel(l))} <span class="l"></span><small>${list.filter(r=>r.level===l).length} customers</small></h2><div class="grid">${list.filter(r=>r.level===l).map(r=>reqCard(r,wm)).join('')}${UI.edit?addCard('request','New customer at level '+l).replace('data-type="request"','data-type="request" data-level="'+l+'"'):''}</div>`).join('');
+  return pageHead('requests','The Night Market · The counter')+`
+  <div class="toolbar">${fchips('requests','kind',D.lists.reqkinds,'Kind')}${fchips('requests','level',lvOpts(),'Level')}</div>
+  ${list.length?body:'<div class="empty">No requests match.</div>'}${UI.edit&&!list.length?`<div class="grid">${addCard('request','New customer')}</div>`:''}`;
+}
+function reqCard(r,wm){
+  const col=listColor('reqkinds',r.kind);
+  return `<div class="card" style="--c:${col}" data-act="open" data-type="request" data-id="${r.id}">${tools('request',r.id)}
+   <div class="row" style="gap:12px;flex-wrap:nowrap"><div class="avatar" style="--c:${col}">${esc((r.name.replace(/^(the|old|sister)\s+/i,'')[0]||'?').toUpperCase())}</div><div><h3 style="font-size:23px">${esc(r.name)}</h3><div class="row" style="margin-top:5px">${badge(r.kind,col)}</div></div></div>
+   <div class="quote" style="--c:${col}">${esc(r.ask)}</div>
+   <div><span class="lbl">Right answer</span>${ingChips(r.answer)}</div>
+   <div class="paybox"><div><span class="v">${money(r.pay)}</span><span class="k">Done right</span></div><div><span class="v w">${money(priceAt(r.pay,wm))}</span><span class="k">Rushed</span></div></div></div>`;
+}
+
+function pgUpgrades(){
+  return pageHead('upgrades','The Night Market · Stall 13')+`<div class="grid">${D.upgrades.map(u=>`<div class="card" style="--c:#e8a33d" data-act="open" data-type="upgrade" data-id="${u.id}">${tools('upgrade',u.id)}
+   <div class="row">${badge(u.stall||'Stall 13','#e8a33d')}</div><h3>${esc(u.name)}</h3>${u.effect?`<p>${esc(u.effect)}</p>`:''}${u.notes?`<p>${esc(u.notes)}</p>`:''}
+   <div><span class="lbl">Made from</span>${ingChips(u.ingredients)}</div></div>`).join('')}${addCard('upgrade','New upgrade')}</div>
+   ${!D.upgrades.length&&!UI.edit?'<div class="empty">No upgrades yet. Turn on Edit mode to add some.</div>':''}`;
+}
+
+function pgRules(){
+  return pageHead('rules','The Night Market · How it all adds up')+`
+  <h2 class="sec" style="margin-top:6px">Quality tiers <span class="l"></span><small>price multiplier</small></h2>
+  <div class="tiers">${D.tiers.map((t,i)=>`<div class="tier"><h4>${ed('tiers.'+i+'.name',t.name,'span')}</h4>
+   <div>${UI.edit?`<input class="num" type="number" step="0.05" min="0" value="${t.mult}" data-act-input="tier" data-i="${i}">`:`<span class="x">${t.mult}<small> ×</small></span>`}</div>
+   ${ed('tiers.'+i+'.desc',t.desc,'div','d')}</div>`).join('')}</div>
+  <h2 class="sec">Stall standing <span class="l"></span><small>levels</small></h2>
+  <div class="levels">${D.levels.map((l,i)=>`<div class="lv"><div class="num">${l.level}</div><div><small>Name</small>${ed('levels.'+i+'.name',l.name,'h4')}</div><div><small>Earn by</small>${ed('levels.'+i+'.earn',l.earn,'span')}</div><div><small>Opens</small>${ed('levels.'+i+'.opens',l.opens,'span')}</div></div>`).join('')}</div>
+  <p class="blurb" style="margin-top:22px;font-size:14px">Zones, kinds, moon phases, rarities and request types are managed from the <a href="#" data-act="cats">Categories</a> panel.</p>`;
+}
+
+function pgSearch(){
+  const q=UI.q.trim().toLowerCase();
+  const hit=(o,keys)=>keys.some(k=>String(o[k]||'').toLowerCase().includes(q));
+  const g=D.gathers.filter(x=>hit(x,['name','zone','notes','source','when']));
+  const c=D.crafts.filter(x=>hit(x,['name','kind','purpose','ingredients','method','notes','improper']));
+  const r=D.requests.filter(x=>hit(x,['name','ask','answer','wrong','notes']));
+  const u=D.upgrades.filter(x=>hit(x,['name','ingredients','notes','effect']));
+  const row=(t,e,sub)=>`<button class="resrow" data-act="open" data-type="${t}" data-id="${e.id}"><b>${esc(e.name)}</b><span>${esc(sub)}</span></button>`;
+  const grp=(title,arr)=>arr.length?`<h2 class="sec">${title} <span class="l"></span><small>${arr.length}</small></h2><div class="checks">${arr.join('')}</div>`:'';
+  const n=g.length+c.length+r.length+u.length;
+  return `<div class="pagehead"><div class="eyebrow">Search</div><h1 class="title">“${esc(UI.q)}”</h1><p class="blurb">${n} ${n===1?'match':'matches'} across the whole book.</p></div>`+
+   grp('Gathering',g.map(e=>row('gather',e,e.zone+' · '+e.rarity)))+grp('Recipes & spells',c.map(e=>row('craft',e,e.kind+' · '+lvLabel(e.level)+' · '+e.ingredients)))+grp('Requests',r.map(e=>row('request',e,e.kind+' · '+e.ask)))+grp('Upgrades',u.map(e=>row('upgrade',e,e.ingredients)))+(n?'':'<div class="empty">Nothing found. Try a shorter word.</div>');
+}
+
+/* ---------- shell ---------- */
+const PAGES={overview:pgOverview,gather:pgGather,recipes:pgRecipes,goods:pgGoods,requests:pgRequests,upgrades:pgUpgrades,rules:pgRules};
+function render(keepScroll){
+  buildIdx();
+  const y=window.scrollY;
+  const sec=UI.q.trim()?'search':UI.sec;
+  const nav=SECS.map(([k,l,i])=>`<button class="${UI.sec===k&&!UI.q.trim()?'on':''}" data-act="nav" data-val="${k}">${ico(i,20)}<span>${esc(k==='overview'?D.sections.overview.title:(D.sections[k]||{}).title||l)}</span>${secCount(k)!=null?`<span class="n">${secCount(k)}</span>`:''}</button>`).join('');
+  $('#app').innerHTML=`<div class="shell">
+   <aside class="side"><div class="brand">${BRANDMOON}<div><div class="t">${esc(D.meta.title)}</div><div class="s">${esc(D.meta.subtitle)}</div></div></div>
+    <nav class="nav">${nav}</nav>
+    <div class="foot" id="footstat"></div></aside>
+   <div class="main"><header class="top">
+     <label class="search">${ico('search',18)}<input id="q" type="search" placeholder="Search everything…" value="${esc(UI.q)}" autocomplete="off"><kbd>/</kbd></label>
+     <span class="sp"></span>
+     <button class="btn ${UI.edit?'on':''}" data-act="toggle-edit"><span class="switch"></span><span class="lbl-t">Edit mode</span></button>
+     <button class="btn" data-act="cats">${ico('gear',18)}<span class="lbl-t">Categories</span></button>
+     <button class="btn gold" data-act="publish">${ico('download',18)}<span class="lbl-t">Publish</span><span class="dot" id="pubdot" style="display:none;background:#2a1a08;box-shadow:none"></span></button>
+   </header>
+   <div class="page">${sec==='search'?pgSearch():PAGES[UI.sec]()}</div></div></div>`;
+  document.body.classList.toggle('edit',UI.edit);
+  updateFoot();
+  const qi=$('#q');
+  if(qi&&UI.q&&document.activeElement===document.body){qi.focus();qi.setSelectionRange(qi.value.length,qi.value.length);}
+  if(keepScroll)window.scrollTo(0,y);
+}
+
+/* ---------- modals ---------- */
+function openModal(html,cls,color){
+  $('#overlay').innerHTML=`<div class="scrim" data-act="scrim"><div class="modal ${cls||''}" style="--c:${color||'#f0c674'}">${html}</div></div>`;
+  document.body.style.overflow='hidden';
+}
+function closeModal(){$('#overlay').innerHTML='';document.body.style.overflow='';}
+const xbtn=`<span class="iconbtn x" data-act="close">${ico('x',16)}</span>`;
+
+function detail(type,id){
+  buildIdx();
+  const list={gather:D.gathers,craft:D.crafts,request:D.requests,upgrade:D.upgrades}[type];
+  const e=list.find(x=>x.id===id);if(!e){closeModal();return;}
+  let html='',color='#f0c674';
+  if(type==='gather'){
+    color=listColor('zones',e.zone);const u=usedIn(e.name);
+    html=`${xbtn}<div class="row" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${badge(e.zone,color)}${gems(e.rarity)}<span class="badge plain">${esc(e.rarity)}</span></div><h2>${esc(e.name)}</h2>
+    <div class="sect"><span class="lbl">Where and when</span><p>${esc(e.zone)} · ${esc(e.when)} · ${esc(e.source)}</p></div>
+    ${e.notes?`<div class="sect"><div class="note">${esc(e.notes)}</div></div>`:''}
+    <div class="sect"><span class="lbl">Goes into</span>${u.crafts.length||u.upgrades.length?`<div class="chips">${u.crafts.map(x=>chipFor({qty:1,name:x.name,r:{type:'craft',e:x}})).join('')}${u.upgrades.map(x=>`<span class="chip craft">${esc(x.name)}</span>`).join('')}</div>`:'<span class="dash">Nothing yet</span>'}</div>
+    ${u.requests.length?`<div class="sect"><span class="lbl">Customers who ask for it directly</span><div class="chips">${u.requests.map(r=>`<button class="chip" data-act="open" data-type="request" data-id="${r.id}">${esc(r.name)}</button>`).join('')}</div></div>`:''}`;
+  }else if(type==='craft'){
+    color=listColor('kinds',e.kind);const u=usedIn(e.name);const n=rawNeeds(e,'craft');
+    const tiers=D.tiers.filter(t=>Number(t.mult)>0);const mx=Math.max(1,...tiers.map(t=>priceAt(e.price,t.mult)));
+    html=`${xbtn}<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${badge(e.kind,color)}${lvBadge(e.level)}${moonChip(e.moon)}</div><h2>${esc(e.name)}</h2>
+    ${e.purpose?`<p style="font:italic 500 21px/1.35 var(--serif);color:#e6dcf3;margin:0">${esc(e.purpose)}</p>`:''}
+    <div class="sect"><span class="lbl">Ingredients</span>${ingChips(e.ingredients)}</div>
+    ${e.method?`<div class="sect"><span class="lbl">Method</span><div class="note">${esc(e.method)}</div></div>`:''}
+    <div class="sect"><span class="lbl">Everything to gather</span>${needChips(n.out)}${n.steps.size?`<div style="margin-top:10px"><span class="lbl">Made along the way</span>${needChips(n.steps)}</div>`:''}</div>
+    ${e.sells&&e.price!=null?`<div class="sect"><span class="lbl">What it sells for</span><div class="ladderbars">${tiers.map(t=>{const v=priceAt(e.price,t.mult);return `<div class="lb"><span class="nm">${esc(t.name)}</span><span class="bar"><i style="width:${Math.round(v/mx*100)}%"></i></span><span class="v">${v}</span></div>`;}).join('')}</div></div>`:''}
+    ${e.improper?`<div class="sect"><span class="lbl">Done badly</span><div class="callout">${esc(e.improper)}</div></div>`:''}
+    ${u.crafts.length||u.upgrades.length?`<div class="sect"><span class="lbl">Used in</span><div class="chips">${u.crafts.map(x=>chipFor({qty:1,name:x.name,r:{type:'craft',e:x}})).join('')}${u.upgrades.map(x=>`<span class="chip craft">${esc(x.name)}</span>`).join('')}</div></div>`:''}
+    ${u.requests.length?`<div class="sect"><span class="lbl">Asked for by</span><div class="chips">${u.requests.map(r=>`<button class="chip" data-act="open" data-type="request" data-id="${r.id}">${esc(r.name)}</button>`).join('')}</div></div>`:''}
+    ${e.notes?`<div class="sect"><span class="lbl">Notes</span><p>${esc(e.notes)}</p></div>`:''}`;
+  }else if(type==='request'){
+    color=listColor('reqkinds',e.kind);const n=requestNeeds(e);const wm=tierMult('Improper',1);
+    html=`${xbtn}<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${badge(e.kind,color)}${lvBadge(e.level)}</div><h2>${esc(e.name)}</h2>
+    <div class="quote" style="--c:${color};font-size:24px">${esc(e.ask)}</div>
+    <div class="sect"><span class="lbl">Right answer</span>${ingChips(e.answer)}</div>
+    <div class="sect"><span class="lbl">Gather first</span>${needChips(n.out)}${n.steps.size?`<div style="margin-top:10px"><span class="lbl">To make</span>${needChips(n.steps)}</div>`:''}</div>
+    <div class="sect"><div class="paybox" style="width:max-content;max-width:100%"><div><span class="v">${money(e.pay)}</span><span class="k">Done right</span></div><div><span class="v w">${money(priceAt(e.pay,wm))}</span><span class="k">Rushed or wrong moon</span></div></div></div>
+    ${e.wrong?`<div class="sect"><span class="lbl">If you give the wrong thing</span><div class="callout">${esc(e.wrong)}</div></div>`:''}
+    ${e.notes?`<div class="sect"><span class="lbl">Notes</span><div class="note">${esc(e.notes)}</div></div>`:''}`;
+  }else{
+    color='#e8a33d';const n=rawNeeds(e,'craft');
+    html=`${xbtn}<div>${badge(e.stall||'Stall 13',color)}</div><h2>${esc(e.name)}</h2>
+    ${e.effect?`<p>${esc(e.effect)}</p>`:''}
+    <div class="sect"><span class="lbl">Made from</span>${ingChips(e.ingredients)}</div>
+    <div class="sect"><span class="lbl">Everything to gather</span>${needChips(n.out)}${n.steps.size?`<div style="margin-top:10px"><span class="lbl">Made along the way</span>${needChips(n.steps)}</div>`:''}</div>
+    ${e.notes?`<div class="sect"><span class="lbl">Notes</span><div class="note">${esc(e.notes)}</div></div>`:''}`;
+  }
+  html+=`<div class="ft"><button class="btn gold sm" data-act="edit" data-type="${type}" data-id="${id}">${ico('edit',16)} Edit</button><span class="sp"></span><button class="btn sm ghost" data-act="close">Close</button></div>`;
+  openModal(html,'',color);
+}
+
+/* ---------- forms ---------- */
+const SCHEMA={
+ gather:[['name','Name','text',{req:1}],['zone','Zone','list','zones'],['when','When','text',{hint:'Day, Dusk only, Low tide… or Any.'}],['rarity','Rarity','list','rarities'],['source','Source','text',{hint:'Gather, Trade with Wren, Buy or trade in town…',dl:['Gather','Trade with Wren','Buy or trade in town','Scavenge in town','Gift']}],['notes','Notes','area']],
+ craft:[['name','Name','text',{req:1}],['kind','Kind','list','kinds'],['level','Level','level'],['moon','Best moon','list','moons'],['ingredients','Ingredients','ing','all'],['purpose','What it answers','area'],['method','Method','area'],['price','Base price (coins)','num'],['sells','Sold at Stall 13','bool'],['improper','Done badly it looks like','area'],['notes','Notes','area']],
+ request:[['name','Customer','text',{req:1}],['kind','Kind','list','reqkinds'],['level','Level','level'],['ask','What they say','area'],['answer','Right answer (recipes)','ing','crafts'],['pay','Pays, done right','num'],['wrong','If you give the wrong thing','area'],['notes','Notes','area']],
+ upgrade:[['name','Name','text',{req:1}],['stall','Stall','text'],['ingredients','Made from','ing','all'],['effect','What it does','area'],['notes','Notes','area']]
+};
+const TITLES={gather:'gathered thing',craft:'recipe',request:'customer',upgrade:'upgrade'};
+function field(type,def,val){
+  const [k,label,t,opt]=def;
+  let inner='';
+  if(t==='text')inner=`<input type="text" data-f="${k}" value="${esc(val)}" ${opt&&opt.dl?`list="dl-${k}"`:''} autocomplete="off">${opt&&opt.dl?`<datalist id="dl-${k}">${opt.dl.map(o=>`<option value="${esc(o)}">`).join('')}</datalist>`:''}`;
+  else if(t==='area')inner=`<textarea data-f="${k}">${esc(val)}</textarea>`;
+  else if(t==='num')inner=`<input type="number" step="1" min="0" data-f="${k}" value="${val==null?'':val}">`;
+  else if(t==='bool')return `<div class="fld"><label class="check-row"><input type="checkbox" data-f="${k}" ${val?'checked':''}> ${esc(label)}</label></div>`;
+  else if(t==='level')inner=`<select data-f="${k}">${D.levels.map(l=>`<option value="${l.level}" ${String(val)===String(l.level)?'selected':''}>Level ${l.level} · ${esc(l.name)}</option>`).join('')}</select>`;
+  else if(t==='list'){
+    const items=D.lists[opt];
+    inner=`<select data-f="${k}" data-list="${opt}" data-act-change="newcat">${items.map(i=>`<option ${i.name===val?'selected':''}>${esc(i.name)}</option>`).join('')}${val&&!items.find(i=>i.name===val)?`<option selected>${esc(val)}</option>`:''}<option value="__new__">+ New category…</option></select><input class="newcat" type="text" data-newcat="${k}" placeholder="Name the new category">`;
+  }else if(t==='ing'){
+    const rows=parseIng(val);if(!rows.length)rows.push({qty:1,name:''});
+    inner=`<div class="ingp" data-f="${k}" data-src="${opt}">${rows.map(r=>ingRow(r,opt)).join('')}<button type="button" class="btn sm" data-act="ing-add" style="justify-self:start">${ico('plus',14)} Add ingredient</button></div><datalist id="dl-${opt}">${(opt==='crafts'?D.crafts:D.gathers.concat(D.crafts)).map(x=>`<option value="${esc(x.name)}">`).join('')}</datalist>`;
+  }
+  return `<div class="fld"><label>${esc(label)}</label>${inner}${opt&&opt.hint?`<div class="hint">${esc(opt.hint)}</div>`:''}<div class="err" data-err="${k}"></div></div>`;
+}
+function ingRow(r,src){return `<div class="ingrow"><input type="number" min="1" step="1" value="${r.qty||1}" title="Quantity"><input type="text" list="dl-${src}" value="${esc(r.name)}" placeholder="${src==='crafts'?'A recipe in the book':'A gathered thing or recipe'}" autocomplete="off"><span class="iconbtn del" data-act="ing-del" title="Remove">${ico('x',14)}</span></div>`;}
+function openForm(type,id,preset){
+  buildIdx();
+  const isNew=!id;
+  const list={gather:D.gathers,craft:D.crafts,request:D.requests,upgrade:D.upgrades}[type];
+  let e;
+  if(isNew){
+    e=({gather:{name:'',zone:D.lists.zones[0].name,when:'Any',rarity:'Common',source:'Gather',notes:''},
+        craft:{name:'',kind:D.lists.kinds[0].name,level:1,moon:'Any',ingredients:'',purpose:'',method:'',price:null,sells:true,improper:'',notes:''},
+        request:{name:'',kind:D.lists.reqkinds[0].name,level:1,ask:'',answer:'',pay:0,wrong:'',notes:''},
+        upgrade:{name:'',stall:'Stall 13',ingredients:'',effect:'',notes:''}})[type];
+    Object.assign(e,preset||{});
+  }else e=list.find(x=>x.id===id);
+  const color={gather:'#4fb5a0',craft:'#f0c674',request:'#9fb4e8',upgrade:'#e8a33d'}[type];
+  openModal(`${xbtn}<div class="eyebrow">${isNew?'New':'Editing'} ${TITLES[type]}</div><h2 style="font-size:36px">${esc(isNew?'Add something':e.name)}</h2>
+   <form class="form" data-type="${type}" data-id="${id||''}" onsubmit="return false">
+   ${SCHEMA[type].map(d=>field(type,d,e[d[0]])).join('')}
+   <div class="ft" style="margin-top:8px">
+     <button type="button" class="btn gold" data-act="form-save">${ico('check',16)} ${isNew?'Add to the book':'Save changes'}</button>
+     <button type="button" class="btn ghost" data-act="close">Cancel</button><span class="sp"></span>
+     ${isNew?'':`<button type="button" class="btn danger sm" data-act="del" data-type="${type}" data-id="${id}">${ico('trash',15)} Delete</button>`}
+   </div></form>`,'',color);
+  const f=$('.modal input[data-f="name"]');if(f)f.focus();
+}
+function collectForm(form){
+  const out={};
+  $$('[data-f]',form).forEach(el=>{
+    const k=el.dataset.f;
+    if(el.classList.contains('ingp')){
+      out[k]=serIng($$('.ingrow',el).map(r=>{const i=$$('input',r);return {qty:Math.max(1,parseInt(i[0].value,10)||1),name:i[1].value};}));
+    }else if(k==='level')out[k]=Number(el.value);
+    else if(el.type==='checkbox')out[k]=el.checked;
+    else if(el.tagName==='SELECT'&&el.value==='__new__'){
+      const nv=$(`[data-newcat="${k}"]`,form).value.trim();out[k]=nv||null;out['__new_'+k]=nv;
+    }else if(el.type==='number')out[k]=el.value===''?null:Number(el.value);
+    else out[k]=el.value.trim();
+  });
+  return out;
+}
+function saveForm(form){
+  const type=form.dataset.type,id=form.dataset.id;
+  const v=collectForm(form);
+  const errs={};
+  if(!v.name)errs.name='A name is needed.';
+  if(type==='gather'||type==='craft'){
+    const clash=D.gathers.concat(D.crafts).find(x=>x.name.toLowerCase()===String(v.name||'').toLowerCase()&&x.id!==id);
+    if(clash)errs.name='Something called “'+clash.name+'” already exists. Names must be unique so recipes can find them.';
+  }
+  $$('[data-err]',form).forEach(e=>e.textContent=errs[e.dataset.err]||'');
+  if(Object.keys(errs).length)return;
+  // new categories
+  const listMap={zone:'zones',kind:type==='request'?'reqkinds':'kinds',moon:'moons',rarity:'rarities'};
+  const pal=['#4fb5a0','#c9a24a','#6c9bd8','#d98a5a','#b58be0','#e08fa0','#8bd3b0','#e6a86c','#9fb4e8','#f0c674'];
+  Object.keys(listMap).forEach(k=>{
+    if(v['__new_'+k]){const L=D.lists[listMap[k]];if(!L.find(i=>i.name===v['__new_'+k]))L.push({name:v['__new_'+k],color:pal[L.length%pal.length]});}
+    delete v['__new_'+k];
+  });
+  const list={gather:D.gathers,craft:D.crafts,request:D.requests,upgrade:D.upgrades}[type];
+  if(id){
+    const e=list.find(x=>x.id===id);
+    if((type==='gather'||type==='craft')&&e.name!==v.name)renameRefs(e.name,v.name);
+    Object.assign(e,v);
+  }else{
+    const p={gather:'g-',craft:'c-',request:'r-',upgrade:'u-'}[type];
+    list.push(Object.assign({id:uid(p)},v));
+  }
+  save();closeModal();render(true);
+}
+function renameRefs(oldN,newN){
+  buildIdx();
+  const target=resolve(oldN);if(!target)return;
+  const fix=str=>serIng(parseIng(str).map(p=>({qty:p.qty,name:(p.r&&p.r.e===target.e)?newN:p.name})));
+  D.crafts.forEach(c=>c.ingredients=fix(c.ingredients));
+  D.upgrades.forEach(c=>c.ingredients=fix(c.ingredients));
+  D.requests.forEach(r=>r.answer=fix(r.answer));
+}
+function confirmDelete(type,id){
+  const list={gather:D.gathers,craft:D.crafts,request:D.requests,upgrade:D.upgrades}[type];
+  const e=list.find(x=>x.id===id);if(!e)return;
+  buildIdx();
+  let warn='';
+  if(type==='gather'||type==='craft'){const u=usedIn(e.name);const n=u.crafts.length+u.upgrades.length+u.requests.length;if(n)warn=`<div class="callout" style="margin-top:14px">Used in <b>${n}</b> place${n===1?'':'s'}: ${u.crafts.concat(u.upgrades,u.requests).slice(0,6).map(x=>esc(x.name)).join(', ')}${n>6?'…':''}. They will show a red “not found” chip until you fix them.</div>`;}
+  openModal(`${xbtn}<div class="eyebrow">Delete</div><h2 style="font-size:36px">Remove “${esc(e.name)}”?</h2><p style="color:var(--muted);margin:0">This takes it out of the book. If you have not published, you can reset to the last downloaded file from the Publish panel.</p>${warn}
+   <div class="ft"><button class="btn danger" data-act="del-yes" data-type="${type}" data-id="${id}">${ico('trash',16)} Delete it</button><button class="btn ghost" data-act="close">Keep it</button></div>`,'narrow','#e58585');
+}
+
+/* ---------- categories drawer ---------- */
+const CATS=[['zones','Zones','Where gathered things are found','gathers','zone'],['kinds','Recipe kinds','Candle, Charm, Brew…','crafts','kind'],['moons','Moon phases','When a recipe is best','crafts','moon'],['rarities','Rarities','How hard something is to find','gathers','rarity'],['reqkinds','Request types','Ailment, Wish, Favor…','requests','kind']];
+function openCats(){
+  openModal(`${xbtn}<div class="eyebrow">Categories</div><h2 style="font-size:40px">Sort the book your way</h2><p style="color:var(--muted);margin:0 0 6px">Rename, recolor, add or remove. Renaming updates every item that uses it. A category in use can’t be removed until nothing uses it.</p>
+   ${CATS.map(([k,t,h,coll,fld])=>`<div class="sect"><span class="lbl">${t} <span style="text-transform:none;letter-spacing:0;font-weight:600">· ${h}</span></span><div class="catlist" data-list="${k}">
+     ${D.lists[k].map((i,ix)=>{const n=D[coll].filter(x=>x[fld]===i.name).length;return `<div class="catrow"><input type="color" value="${i.color}" data-act-input="catcolor" data-list="${k}" data-ix="${ix}"><input type="text" value="${esc(i.name)}" data-act-input="catname" data-list="${k}" data-ix="${ix}"><span class="cnt">${n} in use</span><span class="iconbtn del" data-act="cat-del" data-list="${k}" data-ix="${ix}" title="${n?'In use':'Remove'}" style="${n?'opacity:.35':''}">${ico('x',14)}</span></div>`;}).join('')}
+     <button class="btn sm" data-act="cat-add" data-list="${k}" style="justify-self:start">${ico('plus',14)} Add</button></div></div>`).join('')}
+   <div class="ft"><button class="btn gold" data-act="close">Done</button></div>`);
+}
+function catRename(k,ix,nv){
+  nv=nv.trim();const L=D.lists[k];const old=L[ix].name;if(!nv||nv===old)return;
+  if(L.find((i,j)=>j!==ix&&i.name===nv))return toast('That name is taken');
+  const [,,,coll,fld]=CATS.find(c=>c[0]===k);
+  D[coll].forEach(x=>{if(x[fld]===old)x[fld]=nv;});
+  L[ix].name=nv;save(true);
+}
+
+/* ---------- publish ---------- */
+function openPublish(){
+  openModal(`${xbtn}<div class="eyebrow">Publish</div><h2 style="font-size:40px">Keep your edits</h2>
+   <div class="note" style="margin-top:6px">Edits save in <b>this browser</b> as you go. To put them on GitHub, download the updated book and upload it over <b>index.html</b> in your repo. Then it is the same for everyone who visits.</div>
+   <div class="sect"><div style="display:grid;gap:12px">
+    <button class="btn gold" data-act="dl-html" style="height:54px;justify-content:center;font-size:16px">${ico('download',20)} Download updated Game Book (index.html)</button>
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" data-act="dl-json">${ico('download',16)} Export data (JSON)</button><label class="btn" style="cursor:pointer">${ico('up',16)} Import data (JSON)<input type="file" accept=".json,application/json" id="importf" hidden></label></div>
+   </div></div>
+   <div class="sect"><span class="lbl">Put it on GitHub</span><div class="note" style="line-height:1.8">1. Download the file above and name it <b>index.html</b>.<br>2. In your repo choose <b>Add file → Upload files</b>, drop it in, and commit.<br>3. In <b>Settings → Pages</b>, set the branch to <b>main</b> and the folder to <b>/ (root)</b>.<br>4. Your book lives at <b>https://your-name.github.io/your-repo/</b>.</div></div>
+   <div class="sect"><span class="lbl">Start over</span><p style="margin-bottom:10px">Throw away edits made in this browser and go back to the data inside this file.</p><button class="btn danger sm" data-act="reset">Discard browser edits</button></div>
+   <div class="ft"><button class="btn ghost" data-act="close">Close</button></div>`);
+}
+function buildHtml(){
+  const c=document.documentElement.cloneNode(true);
+  $('#app',c).innerHTML='';$('#overlay',c).innerHTML='';$('#flies',c).innerHTML='';$('#toast',c).textContent='';$('#toast',c).className='';
+  c.querySelector('body').className='';c.querySelector('body').removeAttribute('style');
+  D.rev=Date.now();
+  $('#bookdata',c).textContent=JSON.stringify(D).replace(/</g,'\\u003c');
+  return '<!doctype html>\n'+c.outerHTML;
+}
+function download(name,text,type){
+  const b=new Blob([text],{type});const a=document.createElement('a');
+  a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},400);
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click',ev=>{
+  const t=ev.target.closest('[data-act]');
+  if(!t)return;
+  const a=t.dataset.act;
+  if(a==='scrim'){if(ev.target===t)closeModal();return;}
+  if(t.closest('.tools')&&a==='open')return;
+  ev.preventDefault();
+  if(t.closest('.tools')||t.classList.contains('iconbtn'))ev.stopPropagation();
+  switch(a){
+    case'nav':UI.q='';UI.sec=t.dataset.val;closeModal();render();window.scrollTo(0,0);break;
+    case'filter':{const f=UI.f[t.dataset.sec];const v=t.dataset.val||null;f[t.dataset.key]=(f[t.dataset.key]==v?null:v);render(true);break;}
+    case'view':UI.f[t.dataset.sec].view=t.dataset.val;render(true);break;
+    case'sort':{const f=UI.f.goods;const k=t.dataset.key;if(f.sort===k)f.dir*=-1;else{f.sort=k;f.dir=(k==='name'||k==='level'||k==='kind')?1:-1;}render(true);break;}
+    case'goto-zone':UI.sec='gather';UI.f.gather.zone=t.dataset.val;UI.q='';render();window.scrollTo(0,0);break;
+    case'open':closeModal();detail(t.dataset.type,t.dataset.id);break;
+    case'close':closeModal();break;
+    case'toggle-edit':UI.edit=!UI.edit;render(true);break;
+    case'edit':closeModal();openForm(t.dataset.type,t.dataset.id);break;
+    case'new':{const p={};if(t.dataset.zone)p.zone=t.dataset.zone;if(t.dataset.level)p.level=Number(t.dataset.level);openForm(t.dataset.type,null,p);break;}
+    case'form-save':saveForm(t.closest('form'));break;
+    case'del':confirmDelete(t.dataset.type,t.dataset.id);break;
+    case'del-yes':{const L={gather:D.gathers,craft:D.crafts,request:D.requests,upgrade:D.upgrades}[t.dataset.type];const i=L.findIndex(x=>x.id===t.dataset.id);if(i>-1)L.splice(i,1);save();closeModal();render(true);break;}
+    case'ing-add':{const p=t.closest('.ingp');const row=document.createElement('div');row.className='ingrow';row.innerHTML=ingRow({qty:1,name:''},p.dataset.src).replace(/^<div class="ingrow">|<\/div>$/g,'');t.before(row);row.querySelector('input[type=text]').focus();break;}
+    case'ing-del':{const row=t.closest('.ingrow');const p=row.parentElement;if($$('.ingrow',p).length>1)row.remove();else $$('input',row).forEach((i,ix)=>i.value=ix?'':1);break;}
+    case'cats':closeModal();openCats();break;
+    case'cat-add':{const k=t.dataset.list;const pal=['#4fb5a0','#c9a24a','#6c9bd8','#d98a5a','#b58be0','#e08fa0','#8bd3b0','#e6a86c'];let n='New category',i=2;while(D.lists[k].find(x=>x.name===n))n='New category '+(i++);D.lists[k].push({name:n,color:pal[D.lists[k].length%pal.length]});save(true);openCats();render(true);break;}
+    case'cat-del':{const k=t.dataset.list,ix=+t.dataset.ix;const [,,,coll,fld]=CATS.find(c=>c[0]===k);const n=D[coll].filter(x=>x[fld]===D.lists[k][ix].name).length;if(n)return toast('Still in use by '+n+'. Move those first.');D.lists[k].splice(ix,1);save(true);openCats();render(true);break;}
+    case'publish':closeModal();openPublish();break;
+    case'dl-html':download('index.html',buildHtml(),'text/html');EMB_REV=D.rev;try{localStorage.setItem(STORE,JSON.stringify(D));}catch(e){}updateFoot();toast('Downloaded. Upload it as index.html');break;
+    case'dl-json':download('night-market-game-book-data.json',JSON.stringify(D,null,1),'application/json');break;
+    case'reset':{try{localStorage.removeItem(STORE);}catch(e){}D=JSON.parse($('#bookdata').textContent);EMB_REV=D.rev||0;closeModal();render();toast('Back to the file’s data');break;}
+  }
+});
+document.addEventListener('change',ev=>{
+  const t=ev.target;
+  if(t.dataset.actChange==='newcat'){const inp=$(`[data-newcat="${t.dataset.f}"]`,t.closest('form'));if(inp){inp.style.display=t.value==='__new__'?'block':'none';if(t.value==='__new__')inp.focus();}}
+  if(t.id==='importf'&&t.files[0]){
+    const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);if(!j.gathers||!j.crafts)throw 0;D=j;save();closeModal();render();toast('Imported');}catch(e){toast('That file is not a Game Book export');}};
+    r.readAsText(t.files[0]);
+  }
+  if(t.dataset.actInput==='price'){const c=D.crafts.find(x=>x.id===t.dataset.id);c.price=t.value===''?null:Number(t.value);save(true);render(true);}
+  if(t.dataset.actInput==='tier'){D.tiers[+t.dataset.i].mult=Number(t.value)||0;save(true);render(true);}
+  if(t.dataset.actInput==='catname')catRename(t.dataset.list,+t.dataset.ix,t.value);
+  if(t.dataset.actInput==='catcolor'){D.lists[t.dataset.list][+t.dataset.ix].color=t.value;save(true);render(true);}
+});
+document.addEventListener('input',ev=>{
+  const t=ev.target;
+  if(t.id==='q'){UI.q=t.value;const was=UI.q.trim();render();const qi=$('#q');qi.focus();qi.setSelectionRange(qi.value.length,qi.value.length);}
+});
+/* inline text editing */
+document.addEventListener('paste',ev=>{const t=ev.target.closest&&ev.target.closest('[data-edit]');if(!t)return;ev.preventDefault();const tx=(ev.clipboardData||window.clipboardData).getData('text/plain').replace(/\s+/g,' ');document.execCommand('insertText',false,tx);});
+document.addEventListener('focusout',ev=>{
+  const t=ev.target.closest&&ev.target.closest('[data-edit]');
+  if(!t)return;
+  const v=t.textContent.replace(/\s+/g,' ').trim();
+  const path=t.dataset.edit;
+  if(getPath(path)!==v&&v){setPath(path,v);save(true);
+    if(path.startsWith('meta.')||path.startsWith('sections.')||path.startsWith('levels.')||path.startsWith('tiers.'))setTimeout(()=>render(true),0);}
+  else if(!v)t.textContent=getPath(path);
+});
+document.addEventListener('keydown',ev=>{
+  const t=ev.target;
+  if(ev.key==='Enter'&&t.dataset&&t.dataset.edit&&!/^(P|DIV)$/.test(t.tagName)){ev.preventDefault();t.blur();}
+  if(ev.key==='Enter'&&t.dataset&&t.dataset.edit&&/^(P|DIV)$/.test(t.tagName)){ev.preventDefault();t.blur();}
+  if(ev.key==='Escape'){if($('#overlay').firstChild)closeModal();else if(UI.q){UI.q='';render();}}
+  if(ev.key==='/'&&!/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)&&!t.isContentEditable){ev.preventDefault();const q=$('#q');if(q)q.focus();}
+  if(ev.key==='Enter'&&t.tagName==='INPUT'&&t.closest('form.form')){ev.preventDefault();}
+});
+
+/* ---------- fireflies ---------- */
+function flies(){
+  const f=$('#flies');let h='';
+  for(let i=0;i<16;i++){h+=`<span class="fly" style="left:${Math.random()*100}%;top:${Math.random()*100}%;--x:${(Math.random()*120-60)|0}px;--y:${(Math.random()*-110-20)|0}px;--d:${9+Math.random()*9}s;--dl:${-Math.random()*14}s"></span>`;}
+  f.innerHTML=h;
+}
+
+loadData();
+flies();
+render();
+window.__book={get data(){return D;},UI,render,save};
+})();
+</script>
+</body>
+</html>
