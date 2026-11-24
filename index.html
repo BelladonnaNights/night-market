@@ -1548,16 +1548,68 @@ let saveTimer=null;
 function save(quiet){
   D.rev=Date.now();
   try{localStorage.setItem(STORE,JSON.stringify(D));}catch(e){}
-  updateFoot();
-  if(!quiet)toast('Saved in this browser');
+  updateFoot();push();
+  if(!quiet)toast(FB.user?'Saved to the cloud':'Saved in this browser');
 }
 function isDirty(){return (D.rev||0)>EMB_REV;}
 function updateFoot(){
-  const f=$('#footstat'); if(f) f.innerHTML=isDirty()?'<span class="dot" style="display:inline-block;margin-right:8px"></span><b>Unpublished edits.</b> Download to keep them.':'All changes are in this file.';
+  const f=$('#footstat'); if(f&&FB.state==='live'){f.innerHTML=`<span class="dot" style="display:inline-block;margin-right:8px;background:${FB.msg.startsWith('Could')?'#e58585':'#7fc8a0'};box-shadow:0 0 8px currentColor"></span><b>${FB.msg||(FB.user?'Live. Edits sync to the cloud.':'Live from the cloud.')}</b>${FB.user?' <a href="#" data-act="signout">Sign out</a>':''}`;} else if(f) f.innerHTML=isDirty()?'<span class="dot" style="display:inline-block;margin-right:8px"></span><b>Unpublished edits.</b> Download to keep them.':'All changes are in this file.';
   const pd=$('#pubdot'); if(pd) pd.style.display=isDirty()?'inline-block':'none';
 }
 let toastT;
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),1800);}
+
+
+/* ---------- Firebase sync ---------- */
+const FBCFG={apiKey:"AIzaSyDi4joN3MsIFuNHiPmcuhVu2cyurYNHHuQ",authDomain:"night-market-7d13a.firebaseapp.com",databaseURL:"https://night-market-7d13a-default-rtdb.firebaseio.com",projectId:"night-market-7d13a",storageBucket:"night-market-7d13a.firebasestorage.app",messagingSenderId:"196309625300",appId:"1:196309625300:web:98131f8fbe0f3fd8ae0e41"};
+const FB={state:'loading',user:null,msg:'',timer:null};
+function fbBusy(){return $('#overlay').firstChild||(document.activeElement&&document.activeElement.isContentEditable);}
+function normalize(){
+  ['gathers','crafts','requests','upgrades','tiers','levels'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[];});
+  D.lists=D.lists||{};['zones','kinds','moons','rarities','reqkinds'].forEach(k=>{if(!Array.isArray(D.lists[k]))D.lists[k]=[];});
+}
+async function fbInit(){
+  try{
+    const base='https://www.gstatic.com/firebasejs/10.14.1/';
+    const [A,DB,AU]=await Promise.all([import(base+'firebase-app.js'),import(base+'firebase-database.js'),import(base+'firebase-auth.js')]);
+    const app=A.initializeApp(FBCFG);
+    FB.DB=DB;FB.AU=AU;FB.db=DB.getDatabase(app);FB.auth=AU.getAuth(app);FB.ref=DB.ref(FB.db,'gamebook');
+    AU.onAuthStateChanged(FB.auth,u=>{FB.user=u;if(!u&&UI.edit)UI.edit=false;if(u&&FB.state==='live')push();render(true);});
+    DB.onValue(FB.ref,snap=>{
+      const v=snap.val();FB.state='live';
+      if(v&&v.json){
+        if((v.rev||0)>(D.rev||0)){
+          try{D=JSON.parse(v.json);normalize();D.rev=v.rev;try{localStorage.setItem(STORE,JSON.stringify(D));}catch(e){}
+            if(!fbBusy())render(true);}catch(e){}
+        }else if((v.rev||0)<(D.rev||0)&&FB.user)push();
+      }else if(FB.user)push();
+      updateFoot();
+    },err=>{FB.state='offline';FB.msg=err.message;updateFoot();});
+  }catch(e){FB.state='offline';FB.msg=String(e.message||e);updateFoot();}
+}
+function push(){
+  if(!FB.user||FB.state!=='live')return;
+  clearTimeout(FB.timer);FB.msg='Saving…';updateFoot();
+  FB.timer=setTimeout(async()=>{
+    try{await FB.DB.set(FB.ref,{rev:D.rev,json:JSON.stringify(D)});FB.msg='';}
+    catch(e){FB.msg='Could not save: '+(e.code||e.message);toast('Could not save to Firebase');}
+    updateFoot();
+  },500);
+}
+function openSignin(err){
+  openModal(`${xbtn}<div class="eyebrow">Keeper sign-in</div><h2 style="font-size:38px">Unlock editing</h2>
+   <p style="color:var(--muted);margin:0">Anyone can read the book. Only the signed-in keeper can change it, and changes save to the cloud for everyone.</p>
+   <form class="form" onsubmit="return false"><div class="fld"><label>Email</label><input type="text" id="si-email" autocomplete="username"></div>
+   <div class="fld"><label>Password</label><input type="password" id="si-pass" autocomplete="current-password" style="width:100%;padding:11px 14px;border-radius:12px;background:rgba(14,9,22,.6);border:1px solid var(--line);outline:0"></div>
+   <div class="err" style="color:var(--bad);font-weight:700">${esc(err||'')}</div>
+   <div class="ft" style="margin-top:4px"><button type="button" class="btn gold" data-act="signin">Sign in</button><button type="button" class="btn ghost" data-act="close">Cancel</button></div></form>`,'narrow');
+  const e=$('#si-email');if(e)e.focus();
+}
+async function doSignin(){
+  const em=$('#si-email').value.trim(),pw=$('#si-pass').value;
+  try{await FB.AU.signInWithEmailAndPassword(FB.auth,em,pw);closeModal();UI.edit=true;render(true);toast('Signed in. Editing is on.');}
+  catch(e){openSignin(/invalid|wrong|credential|user-not-found/.test(e.code||'')?'That email or password is not right.':(e.code||e.message));}
+}
 
 /* ---------- lookups ---------- */
 let IDX=null;
@@ -2041,7 +2093,7 @@ function openPublish(){
     <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" data-act="dl-json">${ico('download',16)} Export data (JSON)</button><label class="btn" style="cursor:pointer">${ico('up',16)} Import data (JSON)<input type="file" accept=".json,application/json" id="importf" hidden></label></div>
    </div></div>
    <div class="sect"><span class="lbl">Put it on GitHub</span><div class="note" style="line-height:1.8">1. Download the file above and name it <b>index.html</b>.<br>2. In your repo choose <b>Add file → Upload files</b>, drop it in, and commit.<br>3. In <b>Settings → Pages</b>, set the branch to <b>main</b> and the folder to <b>/ (root)</b>.<br>4. Your book lives at <b>https://your-name.github.io/your-repo/</b>.</div></div>
-   <div class="sect"><span class="lbl">Start over</span><p style="margin-bottom:10px">Throw away edits made in this browser and go back to the data inside this file.</p><button class="btn danger sm" data-act="reset">Discard browser edits</button></div>
+   <div class="sect"><span class="lbl">Start over</span><p style="margin-bottom:10px">Throw away this browser's local copy. If the cloud has a newer book, it loads again on refresh.</p><button class="btn danger sm" data-act="reset">Discard browser edits</button></div>
    <div class="ft"><button class="btn ghost" data-act="close">Close</button></div>`);
 }
 function buildHtml(){
@@ -2075,7 +2127,9 @@ document.addEventListener('click',ev=>{
     case'goto-zone':UI.sec='gather';UI.f.gather.zone=t.dataset.val;UI.q='';render();window.scrollTo(0,0);break;
     case'open':closeModal();detail(t.dataset.type,t.dataset.id);break;
     case'close':closeModal();break;
-    case'toggle-edit':UI.edit=!UI.edit;render(true);break;
+    case'toggle-edit':if(!UI.edit&&FB.state==='loading'){toast('Connecting to the cloud… try again in a moment');break;}if(!UI.edit&&FB.state==='live'&&!FB.user){openSignin();break;}UI.edit=!UI.edit;render(true);break;
+    case'signin':doSignin();break;
+    case'signout':FB.AU.signOut(FB.auth);toast('Signed out');break;
     case'edit':closeModal();openForm(t.dataset.type,t.dataset.id);break;
     case'new':{const p={};if(t.dataset.zone)p.zone=t.dataset.zone;if(t.dataset.level)p.level=Number(t.dataset.level);openForm(t.dataset.type,null,p);break;}
     case'form-save':saveForm(t.closest('form'));break;
@@ -2125,7 +2179,7 @@ document.addEventListener('keydown',ev=>{
   if(ev.key==='Enter'&&t.dataset&&t.dataset.edit&&/^(P|DIV)$/.test(t.tagName)){ev.preventDefault();t.blur();}
   if(ev.key==='Escape'){if($('#overlay').firstChild)closeModal();else if(UI.q){UI.q='';render();}}
   if(ev.key==='/'&&!/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)&&!t.isContentEditable){ev.preventDefault();const q=$('#q');if(q)q.focus();}
-  if(ev.key==='Enter'&&t.tagName==='INPUT'&&t.closest('form.form')){ev.preventDefault();}
+  if(ev.key==='Enter'&&t.tagName==='INPUT'&&t.closest('form.form')){ev.preventDefault();if(t.id==='si-pass'||t.id==='si-email')doSignin();}
 });
 
 /* ---------- fireflies ---------- */
@@ -2135,9 +2189,9 @@ function flies(){
   f.innerHTML=h;
 }
 
-loadData();
+loadData();normalize();
 flies();
-render();
+render();fbInit();
 window.__book={get data(){return D;},UI,render,save};
 })();
 </script>
