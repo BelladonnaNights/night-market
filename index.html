@@ -81,6 +81,8 @@ header.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:
 .eyebrow{font:800 11px var(--sans);letter-spacing:.3em;color:var(--gold);text-transform:uppercase;display:flex;align-items:center;gap:10px}
 .eyebrow::after{content:"";height:1px;width:56px;background:linear-gradient(90deg,var(--gold),transparent)}
 h1.title{font:700 clamp(40px,5.2vw,64px)/1.02 var(--serif);margin:10px 0 8px;letter-spacing:-.005em;background:linear-gradient(180deg,#fff3d6,#f0c674 70%,#d99a3e);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block}
+.latin{font:italic 500 16px var(--serif);color:var(--faint);margin-top:-6px;position:relative;z-index:1}
+.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .blurb{color:var(--muted);font-size:17px;max-width:720px;margin:0}
 h2.sec{font:700 30px/1.1 var(--serif);margin:42px 0 16px;display:flex;align-items:center;gap:14px;color:var(--text)}
 h2.sec .l{flex:1;height:1px;background:linear-gradient(90deg,var(--line2),transparent)}
@@ -306,11 +308,12 @@ body.edit .hide-edit{display:none!important}
 <div id="overlay"></div>
 <div id="toast"></div>
 <script type="application/json" id="bookdata">{
- "rev": 1795498537834,
+ "rev": 1795499770918,
  "meta": {
   "title": "The Night Market",
   "subtitle": "Game Book",
-  "tagline": "Everything we gather, brew, bind and sell. Edit anything. It is all yours."
+  "tagline": "Everything we gather, brew, bind and sell, rooted in real folklore and old herbal craft.",
+  "disclaimer": "Everything here follows real folklore and traditional herbal use as closely as we can. It is for the game and for storytelling, not medical advice. Some plants here are toxic or interact with medicines, and each entry says so."
  },
  "sections": {
   "overview": {
@@ -347,6 +350,10 @@ body.edit .hide-edit{display:none!important}
    {
     "name": "Marsh",
     "color": "#4fb5a0"
+   },
+   {
+    "name": "Garden and hedgerow",
+    "color": "#9ac46a"
    },
    {
     "name": "Woods",
@@ -460,6 +467,20 @@ body.edit .hide-edit{display:none!important}
     "name": "Haunting",
     "color": "#b58be0"
    }
+  ],
+  "accuracy": [
+   {
+    "name": "Traditional",
+    "color": "#7fc8a0"
+   },
+   {
+    "name": "Inspired",
+    "color": "#e6c06a"
+   },
+   {
+    "name": "Game-only",
+    "color": "#c9a0dc"
+   }
   ]
  },
  "tiers": [
@@ -500,13 +521,13 @@ body.edit .hide-edit{display:none!important}
    "level": 2,
    "name": "Regular Hours",
    "earn": "Help 3 customers and sell 10 goods",
-   "opens": "Tier 2: steeps, salves, Hush and Hearth candles, lanterns"
+   "opens": "Tier 2: salves, syrups, charms, candles and lanterns"
   },
   {
    "level": 3,
    "name": "Known Name",
    "earn": "Help 8 different customers and finish one favor",
-   "opens": "Tier 3: lockets, fog incense, finder's thread, the Duchess favor"
+   "opens": "Tier 3: tonics, saining, pendulums, lockets, the Duchess favor"
   },
   {
    "level": 4,
@@ -525,290 +546,660 @@ body.edit .hide-edit{display:none!important}
   {
    "id": "g-reed",
    "name": "Reed",
+   "latin": "Phragmites australis",
    "zone": "Marsh",
    "when": "Any",
    "rarity": "Common",
    "source": "Gather",
+   "corr": "Water",
+   "lore": "Marsh reeds and rushes were peeled, dried and dipped in fat to make rushlights, the cheap candle of old cottages.",
+   "safety": "",
+   "accuracy": "Inspired",
    "notes": ""
   },
   {
    "id": "g-bog-moss",
    "name": "Bog Moss",
+   "latin": "Sphagnum",
    "zone": "Marsh",
    "when": "Any",
    "rarity": "Common",
    "source": "Gather",
+   "corr": "Water",
+   "lore": "Sphagnum soaks up many times its weight in water and was used as a wound dressing as late as the First World War.",
+   "safety": "Never actually brewed. The tea is a game-only comfort.",
+   "accuracy": "Traditional",
    "notes": ""
   },
   {
    "id": "g-glowcap",
    "name": "Glowcap",
-   "zone": "Marsh",
-   "when": "Any",
-   "rarity": "Common",
-   "source": "Gather",
-   "notes": "Glows faintly"
-  },
-  {
-   "id": "g-marsh-lily",
-   "name": "Marsh Lily",
-   "zone": "Marsh",
-   "when": "Any",
-   "rarity": "Rare",
-   "source": "Gather",
-   "notes": ""
-  },
-  {
-   "id": "g-pine-resin",
-   "name": "Pine Resin",
-   "zone": "Woods",
-   "when": "Any",
-   "rarity": "Common",
-   "source": "Gather",
-   "notes": ""
-  },
-  {
-   "id": "g-hazelnut",
-   "name": "Hazelnut",
-   "zone": "Woods",
-   "when": "Any",
-   "rarity": "Common",
-   "source": "Gather",
-   "notes": ""
-  },
-  {
-   "id": "g-thistle",
-   "name": "Thistle",
-   "zone": "Woods",
-   "when": "Any",
-   "rarity": "Common",
-   "source": "Gather",
-   "notes": ""
-  },
-  {
-   "id": "g-fern",
-   "name": "Fern",
-   "zone": "Woods",
-   "when": "Any",
-   "rarity": "Common",
-   "source": "Gather",
-   "notes": ""
-  },
-  {
-   "id": "g-raven-feather",
-   "name": "Raven Feather",
-   "zone": "Woods",
-   "when": "Any",
-   "rarity": "Common",
-   "source": "Gather",
-   "notes": ""
-  },
-  {
-   "id": "g-moonbark",
-   "name": "Moonbark",
-   "zone": "Woods",
-   "when": "Any",
-   "rarity": "Rare",
-   "source": "Gather",
-   "notes": ""
-  },
-  {
-   "id": "g-smooth-stone",
-   "name": "Smooth Stone",
-   "zone": "Canal and shore",
-   "when": "Any",
-   "rarity": "Common",
-   "source": "Gather",
-   "notes": ""
-  },
-  {
-   "id": "g-sea-glass",
-   "name": "Sea Glass",
-   "zone": "Canal and shore",
-   "when": "Any",
-   "rarity": "Common",
-   "source": "Gather",
-   "notes": ""
-  },
-  {
-   "id": "g-driftwood",
-   "name": "Driftwood",
-   "zone": "Canal and shore",
-   "when": "Any",
-   "rarity": "Common",
-   "source": "Gather",
-   "notes": ""
-  },
-  {
-   "id": "g-clay",
-   "name": "Clay",
-   "zone": "Canal and shore",
-   "when": "Any",
-   "rarity": "Common",
-   "source": "Gather",
-   "notes": ""
-  },
-  {
-   "id": "g-canal-pearl",
-   "name": "Canal Pearl",
-   "zone": "Canal and shore",
-   "when": "Any",
-   "rarity": "Rare",
-   "source": "Gather",
-   "notes": ""
-  },
-  {
-   "id": "g-wax-ends",
-   "name": "Wax Ends",
-   "zone": "Town",
-   "when": "Any",
-   "rarity": "Common",
-   "source": "Trade with Wren",
-   "notes": ""
-  },
-  {
-   "id": "g-copper-wire",
-   "name": "Copper Wire",
-   "zone": "Town",
-   "when": "Any",
-   "rarity": "Common",
-   "source": "Buy or trade in town",
-   "notes": ""
-  },
-  {
-   "id": "g-ribbon",
-   "name": "Ribbon",
-   "zone": "Town",
-   "when": "Any",
-   "rarity": "Common",
-   "source": "Buy or trade in town",
-   "notes": ""
-  },
-  {
-   "id": "g-ink-bottle",
-   "name": "Ink Bottle",
-   "zone": "Town",
-   "when": "Any",
-   "rarity": "Common",
-   "source": "Buy or trade in town",
-   "notes": ""
-  },
-  {
-   "id": "g-scrap-iron",
-   "name": "Scrap Iron",
-   "zone": "Town",
-   "when": "Any",
-   "rarity": "Common",
-   "source": "Scavenge in town",
-   "notes": ""
-  },
-  {
-   "id": "g-lullwort",
-   "name": "Lullwort",
-   "zone": "Marsh",
-   "when": "Dusk only",
-   "rarity": "Uncommon",
-   "source": "Gather",
-   "notes": "Closes at dawn. Gather before it does."
-  },
-  {
-   "id": "g-dusk-violet",
-   "name": "Dusk Violet",
+   "latin": "Armillaria (foxfire)",
    "zone": "Marsh",
    "when": "Night only",
+   "rarity": "Uncommon",
+   "source": "Gather",
+   "corr": "Moon · Water",
+   "lore": "Foxfire is the real glow of some rotting-wood fungi. Marsh folk took it for will-o'-the-wisps and spirit lights.",
+   "safety": "Never eat wild fungi.",
+   "accuracy": "Inspired",
+   "notes": ""
+  },
+  {
+   "id": "g-meadowsweet",
+   "name": "Meadowsweet",
+   "latin": "Filipendula ulmaria",
+   "zone": "Marsh",
+   "when": "Summer",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Venus · Water",
+   "lore": "Strewn on floors for its sweet scent and held sacred in old Celtic lands. It contains salicylates, aspirin's chemical family, and was brewed for aches and fevers.",
+   "safety": "Avoid if allergic to aspirin or pregnant.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-marshmallow-root",
+   "name": "Marshmallow Root",
+   "latin": "Althaea officinalis",
+   "zone": "Marsh",
+   "when": "Autumn root",
+   "rarity": "Uncommon",
+   "source": "Gather",
+   "corr": "Venus · Water",
+   "lore": "Its slippery mucilage has soothed coughs and sore throats for centuries.",
+   "safety": "May slow the absorption of other medicines taken with it.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-valerian",
+   "name": "Valerian",
+   "latin": "Valeriana officinalis",
+   "zone": "Marsh",
+   "when": "Autumn root, dug at dusk",
+   "rarity": "Uncommon",
+   "source": "Gather",
+   "corr": "Venus · Water",
+   "lore": "A sleep and calm herb since ancient Greece. Cats love the smell. Folklore links the root to love and harmony.",
+   "safety": "Causes drowsiness. Do not combine with sedatives.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-sweet-violet",
+   "name": "Sweet Violet",
+   "latin": "Viola odorata",
+   "zone": "Marsh",
+   "when": "Spring, at dusk",
    "rarity": "Rare",
    "source": "Gather",
-   "notes": "Smells faintly like someone's name."
+   "corr": "Venus · Water",
+   "lore": "Candied and steeped for centuries. A flower of modesty and remembrance, and an old remedy for coughs.",
+   "safety": "Only the flowers and leaves are used.",
+   "accuracy": "Traditional",
+   "notes": ""
   },
   {
-   "id": "g-ember-berry",
-   "name": "Ember Berry",
-   "zone": "Woods",
-   "when": "Day",
+   "id": "g-rosemary",
+   "name": "Rosemary",
+   "latin": "Salvia rosmarinus",
+   "zone": "Garden and hedgerow",
+   "when": "Any",
    "rarity": "Common",
    "source": "Gather",
-   "notes": "Scorches if left in the sun on the counter."
+   "corr": "Sun · Fire",
+   "lore": "Rosemary for remembrance: worn at weddings and funerals, burned to cleanse sickrooms, tucked under pillows against bad dreams.",
+   "safety": "Avoid large amounts in pregnancy.",
+   "accuracy": "Traditional",
+   "notes": ""
   },
   {
-   "id": "g-wild-mint",
-   "name": "Wild Mint",
-   "zone": "Woods",
-   "when": "Day",
+   "id": "g-lavender",
+   "name": "Lavender",
+   "latin": "Lavandula angustifolia",
+   "zone": "Garden and hedgerow",
+   "when": "Summer",
    "rarity": "Common",
    "source": "Gather",
+   "corr": "Mercury · Air",
+   "lore": "Sewn into pillows and linen for calm and sleep, and hung in doorways to cleanse and welcome.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-chamomile",
+   "name": "Chamomile",
+   "latin": "Matricaria chamomilla",
+   "zone": "Garden and hedgerow",
+   "when": "Summer",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Sun · Water",
+   "lore": "One of the Anglo-Saxon Nine Herbs, called maythen. A gentle herb for the stomach, nerves and sleep.",
+   "safety": "Avoid if allergic to daisies or ragweed.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-mint",
+   "name": "Mint",
+   "latin": "Mentha",
+   "zone": "Garden and hedgerow",
+   "when": "Summer",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Mercury · Air",
+   "lore": "Settles the stomach and clears the head. Rubbed on tables to welcome guests and carried for luck.",
+   "safety": "Strong mint can aggravate heartburn.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-sage",
+   "name": "Sage",
+   "latin": "Salvia officinalis",
+   "zone": "Garden and hedgerow",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Jupiter · Air",
+   "lore": "The name means to save. Old herbals prize it for wisdom and long life, and a sage gargle for sore throats is still common.",
+   "safety": "Avoid in pregnancy and in large doses.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-thyme",
+   "name": "Thyme",
+   "latin": "Thymus vulgaris",
+   "zone": "Garden and hedgerow",
+   "when": "Summer",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Venus · Air",
+   "lore": "Roman soldiers bathed in thyme for courage and medieval ladies embroidered thyme sprigs for their knights. A sprig under the pillow is said to keep nightmares off.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-calendula",
+   "name": "Calendula",
+   "latin": "Calendula officinalis",
+   "zone": "Garden and hedgerow",
+   "when": "Summer",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Sun · Fire",
+   "lore": "The marigold opens and closes with the sun. Flowers steeped in oil soothe dry, cracked skin.",
+   "safety": "Avoid if allergic to the daisy family.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-comfrey",
+   "name": "Comfrey",
+   "latin": "Symphytum officinale",
+   "zone": "Garden and hedgerow",
+   "when": "Summer",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Saturn · Water",
+   "lore": "Called knitbone for its old use on bruises and sprains.",
+   "safety": "External use only, on unbroken skin. Never eaten.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-plantain",
+   "name": "Plantain",
+   "latin": "Plantago major",
+   "zone": "Garden and hedgerow",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Venus · Earth",
+   "lore": "Waybread grows beside every path. Bruised leaves were pressed on stings and scrapes, and it is one of the Anglo-Saxon Nine Herbs.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-mugwort",
+   "name": "Mugwort",
+   "latin": "Artemisia vulgaris",
+   "zone": "Garden and hedgerow",
+   "when": "Summer",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Venus · Earth",
+   "lore": "The eldest of the Nine Herbs. Travelers put it in their shoes against weariness, and it is stuffed into pillows for vivid dreams.",
+   "safety": "Avoid in pregnancy. Bitter, so use small amounts.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-elderflower",
+   "name": "Elderflower",
+   "latin": "Sambucus nigra",
+   "zone": "Garden and hedgerow",
+   "when": "Late spring",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Venus · Water",
+   "lore": "The elder was thought to be guarded by the Elder Mother, and you asked leave before cutting. Flowers are brewed for colds and fevers.",
+   "safety": "Raw berries, leaves and bark are toxic. Use flowers only.",
+   "accuracy": "Traditional",
    "notes": ""
   },
   {
    "id": "g-yarrow",
    "name": "Yarrow",
-   "zone": "Woods",
-   "when": "Day",
+   "latin": "Achillea millefolium",
+   "zone": "Garden and hedgerow",
+   "when": "Summer",
    "rarity": "Common",
    "source": "Gather",
+   "corr": "Venus · Water",
+   "lore": "Named for Achilles, who used it on wounds. Also carried for courage and used in divination.",
+   "safety": "Avoid in pregnancy. Allergy risk for the daisy family.",
+   "accuracy": "Traditional",
    "notes": ""
   },
   {
    "id": "g-rosehip",
    "name": "Rosehip",
-   "zone": "Woods",
-   "when": "Day, after rain",
-   "rarity": "Uncommon",
+   "latin": "Rosa canina",
+   "zone": "Garden and hedgerow",
+   "when": "Autumn",
+   "rarity": "Common",
    "source": "Gather",
+   "corr": "Venus · Water",
+   "lore": "Rich in vitamin C. The rose is the old flower of love and the heart.",
+   "safety": "Remove the irritating seed hairs.",
+   "accuracy": "Traditional",
    "notes": ""
   },
   {
-   "id": "g-spider-silk",
-   "name": "Spider Silk",
-   "zone": "Woods",
-   "when": "Dawn dew",
+   "id": "g-hawthorn-berry",
+   "name": "Hawthorn Berry",
+   "latin": "Crataegus monogyna",
+   "zone": "Garden and hedgerow",
+   "when": "Autumn",
    "rarity": "Uncommon",
    "source": "Gather",
-   "notes": "Gone by midmorning."
+   "corr": "Mars · Fire",
+   "lore": "A faerie tree, unlucky to cut or to bring blossom indoors. The berries have been used for the heart since the Middle Ages.",
+   "safety": "Can interact with heart and blood-pressure medicines.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-st-john-s-wort",
+   "name": "St John's Wort",
+   "latin": "Hypericum perforatum",
+   "zone": "Garden and hedgerow",
+   "when": "Midsummer",
+   "rarity": "Uncommon",
+   "source": "Gather",
+   "corr": "Sun · Fire",
+   "lore": "Picked on St John's Eve against evil. Flowers steeped in oil turn blood red and were used on burns and sore skin.",
+   "safety": "Interacts with many medicines and makes skin sun-sensitive.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-pine-resin",
+   "name": "Pine Resin",
+   "latin": "Pinus",
+   "zone": "Woods",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Sun · Fire",
+   "lore": "Burned as incense for cleansing and purification, and used as a sticky sealer for small wounds.",
+   "safety": "Burn only on charcoal, with a window open.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-hazel-twig",
+   "name": "Hazel Twig",
+   "latin": "Corylus avellana",
+   "zone": "Woods",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Mercury · Air",
+   "lore": "Hazel is the classic wood for dowsing rods and wands. In Irish myth, hazelnuts held all wisdom.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-thistle",
+   "name": "Thistle",
+   "latin": "Cirsium",
+   "zone": "Woods",
+   "when": "Summer",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Mars · Fire",
+   "lore": "A prickly guardian, planted and hung for protection.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-fern",
+   "name": "Fern",
+   "latin": "Dryopteris",
+   "zone": "Woods",
+   "when": "Midsummer night",
+   "rarity": "Rare",
+   "source": "Gather",
+   "corr": "Mercury · Earth",
+   "lore": "Ferns bear no visible flowers or seeds, so folk said the seed appears only on Midsummer Eve and gives invisibility to whoever catches it.",
+   "safety": "Do not eat ferns. Bracken is toxic.",
+   "accuracy": "Inspired",
+   "notes": ""
+  },
+  {
+   "id": "g-raven-feather",
+   "name": "Raven Feather",
+   "latin": "Corvus corax",
+   "zone": "Woods",
+   "when": "Any, found only",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Saturn · Air",
+   "lore": "Ravens are old omen birds. Shed feathers go into witch's ladders and make quills.",
+   "safety": "Only take feathers you find. In many places it is illegal to keep wild bird feathers.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-birch-bark",
+   "name": "Birch Bark",
+   "latin": "Betula pendula",
+   "zone": "Woods",
+   "when": "Any",
+   "rarity": "Uncommon",
+   "source": "Gather",
+   "corr": "Venus · Water",
+   "lore": "Birch is the tree of new beginnings and cleansing, source of besoms. Its papery bark has been written on.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-rowan-twig",
+   "name": "Rowan Twig",
+   "latin": "Sorbus aucuparia",
+   "zone": "Woods",
+   "when": "Any",
+   "rarity": "Uncommon",
+   "source": "Gather",
+   "corr": "Sun · Fire",
+   "lore": "Each berry carries a tiny pentagram. Twigs bound with red thread were hung over doors against witchcraft.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-juniper",
+   "name": "Juniper",
+   "latin": "Juniperus communis",
+   "zone": "Woods",
+   "when": "Any",
+   "rarity": "Uncommon",
+   "source": "Gather",
+   "corr": "Sun · Fire",
+   "lore": "In Scottish saining, juniper was burned through house and byre on New Year's morning to cleanse and protect.",
+   "safety": "Avoid in pregnancy.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-oak-gall",
+   "name": "Oak Gall",
+   "latin": "Quercus",
+   "zone": "Woods",
+   "when": "Autumn",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Jupiter · Fire",
+   "lore": "The marble-like growths on oak. Crushed galls and iron make iron gall ink, used for most medieval manuscripts.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
   },
   {
    "id": "g-willow-bark",
    "name": "Willow Bark",
+   "latin": "Salix alba",
+   "zone": "Canal and shore",
+   "when": "Spring",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Moon · Water",
+   "lore": "White willow bark contains salicin, an ancestor of aspirin. Willow is also the moon's tree and a tree of mourning.",
+   "safety": "Avoid with aspirin allergy. Not for children.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-hag-stone",
+   "name": "Hag Stone",
+   "latin": "",
+   "zone": "Canal and shore",
+   "when": "Any",
+   "rarity": "Uncommon",
+   "source": "Gather",
+   "corr": "Moon · Water",
+   "lore": "A stone worn through by water with a natural hole. Hung over doors and beds against nightmares and hags; looking through one is said to show what is hidden.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-sea-glass",
+   "name": "Sea Glass",
+   "latin": "",
    "zone": "Canal and shore",
    "when": "Any",
    "rarity": "Common",
    "source": "Gather",
+   "corr": "Moon · Water",
+   "lore": "Glass smoothed by the tide and tucked into charms as mermaid's tears or sea luck.",
+   "safety": "",
+   "accuracy": "Inspired",
    "notes": ""
   },
   {
-   "id": "g-salt-crystal",
-   "name": "Salt Crystal",
+   "id": "g-driftwood",
+   "name": "Driftwood",
+   "latin": "",
+   "zone": "Canal and shore",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Water · Moon",
+   "lore": "Sea-washed wood, prized for wands, altars and amulets.",
+   "safety": "",
+   "accuracy": "Inspired",
+   "notes": ""
+  },
+  {
+   "id": "g-clay",
+   "name": "Clay",
+   "latin": "",
+   "zone": "Canal and shore",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Saturn · Earth",
+   "lore": "Earth clay for pots and poppets, the oldest craft there is.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-freshwater-pearl",
+   "name": "Freshwater Pearl",
+   "latin": "",
+   "zone": "Canal and shore",
+   "when": "Any",
+   "rarity": "Rare",
+   "source": "Gather",
+   "corr": "Moon · Water",
+   "lore": "Pearls are the moon's own gem in old lore, for love, purity and wisdom.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-sea-salt",
+   "name": "Sea Salt",
+   "latin": "",
    "zone": "Canal and shore",
    "when": "Low tide",
    "rarity": "Common",
    "source": "Gather",
-   "notes": "Only shows when the canal drops at night."
+   "corr": "Earth · Water",
+   "lore": "Salt lines on thresholds, salt thrown over the shoulder, salt in protective bottles. One of the most widespread protective materials in folk belief.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
   },
   {
-   "id": "g-honey",
-   "name": "Honey",
+   "id": "g-wax-ends",
+   "name": "Wax Ends",
+   "latin": "",
    "zone": "Town",
    "when": "Any",
    "rarity": "Common",
-   "source": "Buy or trade in town",
+   "source": "Trade with Wren",
+   "corr": "Sun · Fire",
+   "lore": "Leftover candle ends, melted down and poured again.",
+   "safety": "",
+   "accuracy": "Inspired",
    "notes": ""
   },
   {
    "id": "g-beeswax",
    "name": "Beeswax",
+   "latin": "",
    "zone": "Town",
    "when": "Any",
    "rarity": "Uncommon",
    "source": "Trade with Wren",
-   "notes": "Using it lifts a candle toward Fine."
+   "corr": "Sun · Fire",
+   "lore": "Beeswax was the church candle, burning clean and sweet. Also the base of old salves.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-copper-wire",
+   "name": "Copper Wire",
+   "latin": "",
+   "zone": "Town",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Buy or trade in town",
+   "corr": "Venus · Earth",
+   "lore": "Copper is Venus's metal in alchemy, used in love charms and wands.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-ribbon",
+   "name": "Ribbon",
+   "latin": "",
+   "zone": "Town",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Buy or trade in town",
+   "corr": "Venus · Air",
+   "lore": "Ribbons tie charms shut and mark them as yours.",
+   "safety": "",
+   "accuracy": "Inspired",
+   "notes": ""
+  },
+  {
+   "id": "g-red-thread",
+   "name": "Red Thread",
+   "latin": "",
+   "zone": "Town",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Buy or trade in town",
+   "corr": "Mars · Fire",
+   "lore": "Red wool thread tied in knots is an old protective charm in Britain and Ireland, often paired with rowan.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-iron-nail",
+   "name": "Iron Nail",
+   "latin": "",
+   "zone": "Town",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Scavenge in town",
+   "corr": "Mars · Fire",
+   "lore": "Cold iron is said to turn faerie folk and spirits. Horseshoe nails were kept and nails put in witch bottles.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-honey",
+   "name": "Honey",
+   "latin": "",
+   "zone": "Town",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Buy or trade in town",
+   "corr": "Sun · Water",
+   "lore": "The oldest sweetener, mildly antibacterial and used in cough remedies. Also sweetens jars and spells.",
+   "safety": "Never give to babies under one year old.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-olive-oil",
+   "name": "Olive Oil",
+   "latin": "",
+   "zone": "Town",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Buy or trade in town",
+   "corr": "Sun · Fire",
+   "lore": "The old base oil for herb infusions, and an anointing oil in many traditions.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
   },
   {
    "id": "g-glow-moth-scale",
    "name": "Glow Moth Scale",
+   "latin": "",
    "zone": "Reward",
    "when": "Given by the moth-winged visitor",
    "rarity": "Rare",
    "source": "Gift",
-   "notes": "Only once the visitor trusts you (Level 4)."
+   "corr": "Moon · Air",
+   "lore": "A scale that holds a faint light. Invented for the game.",
+   "safety": "",
+   "accuracy": "Game-only",
+   "notes": ""
   }
  ],
  "crafts": [
@@ -824,49 +1215,61 @@ body.edit .hide-edit{display:none!important}
    "price": 6,
    "improper": "Crooked wick, smoky flame, sputters out in a draught.",
    "sells": true,
-   "notes": "Opening ware"
+   "accuracy": "Game-only",
+   "lore": "Real rushlights used dried reeds dipped in fat. This wax version is for fun.",
+   "safety": "",
+   "notes": ""
   },
   {
    "id": "c-resin-incense",
    "name": "Resin Incense",
    "kind": "Incense",
    "level": 1,
-   "ingredients": "Pine Resin + Fern",
-   "method": "Crush, dry on the counter, burn one pinch.",
+   "ingredients": "Pine Resin + Rosemary",
+   "method": "Crush the resin with the rosemary and burn a pinch on a charcoal disc.",
    "moon": "Any",
-   "purpose": "Calms a house. Base for Fog Incense.",
+   "purpose": "Cleansing a room.",
    "price": 7,
-   "improper": "Too much resin: acrid, waters the eyes instead of calming.",
+   "improper": "Too much resin: acrid smoke that waters the eyes.",
    "sells": true,
-   "notes": "Opening ware"
+   "accuracy": "Traditional",
+   "lore": "Burning resin and herbs to cleanse air and ritual space is one of the oldest practices there is.",
+   "safety": "Ventilate. Never leave burning unattended.",
+   "notes": ""
   },
   {
-   "id": "c-moss-pouch",
-   "name": "Moss Pouch",
+   "id": "c-rowan-cross",
+   "name": "Rowan Cross",
    "kind": "Charm",
    "level": 1,
-   "ingredients": "Bog Moss + Ribbon",
-   "method": "Pack dry, tie with three turns.",
+   "ingredients": "Rowan Twig + Red Thread",
+   "method": "Bind two twigs in an equal-armed cross with red thread, wrapping over and under.",
    "moon": "Any",
-   "purpose": "A small comfort and a light ward.",
+   "purpose": "Keeping ill luck and witching from the door.",
    "price": 5,
-   "improper": "Packed damp: goes musty in a day.",
+   "improper": "Thread tied in the wrong colour, or twigs cut without asking: no protection.",
    "sells": true,
-   "notes": "Opening ware"
+   "accuracy": "Traditional",
+   "lore": "A Scottish and Irish house charm, hung over the door or byre.",
+   "safety": "",
+   "notes": ""
   },
   {
-   "id": "c-pocket-stone",
-   "name": "Pocket Stone",
+   "id": "c-hag-stone-charm",
+   "name": "Hag Stone Charm",
    "kind": "Charm",
    "level": 1,
-   "ingredients": "Smooth Stone + Ribbon",
-   "method": "Warm by the hearth for an hour, tie it, hold your wish.",
-   "moon": "Waxing",
-   "purpose": "Luck: a good week, a rising loaf.",
-   "price": 5,
-   "improper": "Stone not warmed by the hearth first: cold, plain, no luck in it.",
+   "ingredients": "Hag Stone + Red Thread",
+   "method": "Thread the stone on red cord, tie nine knots, hang it by the bed or door.",
+   "moon": "Any",
+   "purpose": "Luck, and a ward against bad dreams.",
+   "price": 6,
+   "improper": "A stone with no hole: just a stone on a string.",
    "sells": true,
-   "notes": "Opening ware"
+   "accuracy": "Traditional",
+   "lore": "Holed stones were hung in stables and bedrooms to keep nightmares and hags away.",
+   "safety": "",
+   "notes": ""
   },
   {
    "id": "c-bog-moss-tea",
@@ -874,12 +1277,49 @@ body.edit .hide-edit{display:none!important}
    "kind": "Brew",
    "level": 1,
    "ingredients": "Bog Moss",
-   "method": "Steep in hot water 3 minutes. Never boil.",
+   "method": "Steep in hot water, never boil.",
    "moon": "Any",
    "purpose": "Chest cough, river fog.",
    "price": 6,
    "improper": "Boiled instead of steeped: bitter, and it does not clear a chest.",
    "sells": true,
+   "accuracy": "Game-only",
+   "lore": "A comforting invention. Real sphagnum is a wound dressing, not a tea.",
+   "safety": "Game only. Do not brew real sphagnum.",
+   "notes": ""
+  },
+  {
+   "id": "c-mint-tea",
+   "name": "Mint Tea",
+   "kind": "Brew",
+   "level": 1,
+   "ingredients": "Mint + Honey",
+   "method": "Pour hot water over fresh leaves, cover, steep five minutes, stir in honey.",
+   "moon": "Any",
+   "purpose": "Upset stomach and heavy meals.",
+   "price": 5,
+   "improper": "Steeped too long and uncovered: weak and grassy.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Mint has been served after meals to settle digestion since ancient Greece.",
+   "safety": "Strong mint can aggravate heartburn.",
+   "notes": ""
+  },
+  {
+   "id": "c-chamomile-tisane",
+   "name": "Chamomile Tisane",
+   "kind": "Brew",
+   "level": 1,
+   "ingredients": "Chamomile + Honey",
+   "method": "Steep the flowers covered for ten minutes so the oils stay in the cup.",
+   "moon": "Any",
+   "purpose": "Calm, easy sleep.",
+   "price": 5,
+   "improper": "Uncovered and over-steeped: bitter, no calm.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "A classic bedtime herb for nerves and sleep.",
+   "safety": "Avoid if allergic to daisies or ragweed.",
    "notes": ""
   },
   {
@@ -888,54 +1328,304 @@ body.edit .hide-edit{display:none!important}
    "kind": "Craft",
    "level": 2,
    "ingredients": "Clay",
-   "method": "Shape, dry a day, fire.",
+   "method": "Pinch the clay, shape the walls, dry in shade, then fire.",
    "moon": "Any",
-   "purpose": "Holds brews. An ingredient in many things.",
+   "purpose": "Holds salves, syrups and brews.",
    "price": 8,
-   "improper": "Underfired: hairline cracks, weeps when filled.",
+   "improper": "Cracks in the firing: leaks.",
    "sells": true,
-   "notes": "Ingredient"
-  },
-  {
-   "id": "c-wild-mint-steep",
-   "name": "Wild Mint Steep",
-   "kind": "Brew",
-   "level": 2,
-   "ingredients": "Wild Mint + Honey + Clay Jar",
-   "method": "Steep 2 minutes. Stop when it smells sweet.",
-   "moon": "Any",
-   "purpose": "Stomach and nerves.",
-   "price": 8,
-   "improper": "Steeped too long: grassy and harsh, upsets the stomach.",
-   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Clay vessels held remedies and charms in every old culture.",
+   "safety": "",
    "notes": ""
   },
   {
-   "id": "c-brave-jar",
-   "name": "Brave Jar",
+   "id": "c-sage-honey-throat-tea",
+   "name": "Sage & Honey Throat Tea",
+   "kind": "Brew",
+   "level": 2,
+   "ingredients": "Sage + Honey + Clay Jar",
+   "method": "Steep a few leaves, cool a little, and stir in honey. May also be gargled.",
+   "moon": "Any",
+   "purpose": "A raw or sore throat.",
+   "price": 10,
+   "improper": "Too strong: bitter and drying.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Sage gargles are a long-standing remedy for sore throats.",
+   "safety": "Avoid in pregnancy and large amounts.",
+   "notes": ""
+  },
+  {
+   "id": "c-marshmallow-cough-syrup",
+   "name": "Marshmallow Cough Syrup",
+   "kind": "Brew",
+   "level": 2,
+   "ingredients": "Marshmallow Root + Honey + Clay Jar",
+   "method": "Soak the root in cold water overnight, strain, and warm gently with honey.",
+   "moon": "Any",
+   "purpose": "A dry, tickling cough.",
+   "price": 14,
+   "improper": "Boiled hard: loses its slippery, soothing quality.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "The cold-water soak is the traditional way to draw out the soothing mucilage.",
+   "safety": "Not for babies under one year old because of the honey.",
+   "notes": ""
+  },
+  {
+   "id": "c-elderflower-fever-tea",
+   "name": "Elderflower Fever Tea",
+   "kind": "Brew",
+   "level": 2,
+   "ingredients": "Elderflower + Yarrow + Mint",
+   "method": "Steep equal parts hot and covered for ten minutes, sip warm and sweat it out.",
+   "moon": "Any",
+   "purpose": "Colds and fevers.",
+   "price": 15,
+   "improper": "Brewed from the wrong part of the elder: unwell, not well.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Elderflower, yarrow and peppermint is the classic old composition for colds and fevers.",
+   "safety": "Avoid yarrow in pregnancy. Use flowers only, never raw berries.",
+   "notes": ""
+  },
+  {
+   "id": "c-willow-pain-draught",
+   "name": "Willow Pain Draught",
+   "kind": "Brew",
+   "level": 2,
+   "ingredients": "Willow Bark + Meadowsweet + Clay Jar",
+   "method": "Simmer the bark gently for fifteen minutes, add meadowsweet off the heat, strain.",
+   "moon": "Waning",
+   "purpose": "Aches, sore joints and low fevers.",
+   "price": 15,
+   "improper": "Not simmered: weak, with no ease in it.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Both plants contain salicylates, the chemical family behind aspirin.",
+   "safety": "Avoid with aspirin allergy. Not for children.",
+   "notes": ""
+  },
+  {
+   "id": "c-plantain-poultice",
+   "name": "Plantain Poultice",
+   "kind": "Salve",
+   "level": 2,
+   "ingredients": "Plantain + Honey",
+   "method": "Bruise fresh leaves, press on the spot with a dab of honey, cover with cloth.",
+   "moon": "Any",
+   "purpose": "Scrapes, stings and bites.",
+   "price": 9,
+   "improper": "Wilted leaves: no use.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Chewed or bruised waybread leaves were pressed on stings and scrapes in country medicine.",
+   "safety": "For small scrapes only. See a healer for deep wounds.",
+   "notes": ""
+  },
+  {
+   "id": "c-yarrow-salve",
+   "name": "Yarrow Salve",
+   "kind": "Salve",
+   "level": 2,
+   "ingredients": "Yarrow + Beeswax + Olive Oil + Clay Jar",
+   "method": "Warm the oil with yarrow, strain, melt in beeswax, pour into the jar.",
+   "moon": "Any",
+   "purpose": "Cuts and grazes.",
+   "price": 11,
+   "improper": "Oil too hot: scorched herb, brown and bitter.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Yarrow was the soldier's wound herb, named for Achilles.",
+   "safety": "Avoid yarrow in pregnancy.",
+   "notes": ""
+  },
+  {
+   "id": "c-calendula-salve",
+   "name": "Calendula Salve",
+   "kind": "Salve",
+   "level": 2,
+   "ingredients": "Calendula + Beeswax + Olive Oil + Clay Jar",
+   "method": "Infuse petals in warm oil for hours, strain, melt in beeswax, pour.",
+   "moon": "Any",
+   "purpose": "Dry, cracked and sore skin.",
+   "price": 12,
+   "improper": "Damp petals in the oil: it spoils.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Calendula-infused oil and salve is a long-standing skin remedy.",
+   "safety": "Avoid if allergic to the daisy family.",
+   "notes": ""
+  },
+  {
+   "id": "c-comfrey-salve",
+   "name": "Comfrey Salve",
+   "kind": "Salve",
+   "level": 2,
+   "ingredients": "Comfrey + Beeswax + Olive Oil + Clay Jar",
+   "method": "Infuse leaf in warm oil, strain, melt in beeswax, pour.",
+   "moon": "Waning",
+   "purpose": "Bruises and sprains.",
+   "price": 12,
+   "improper": "Used on a broken-skinned wound: not for that.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Called knitbone, comfrey was used for bruises and sprains.",
+   "safety": "External use only, on unbroken skin, short-term.",
+   "notes": ""
+  },
+  {
+   "id": "c-st-john-s-wort-oil",
+   "name": "St John's Wort Oil",
+   "kind": "Salve",
+   "level": 2,
+   "ingredients": "St John's Wort + Olive Oil + Clay Jar",
+   "method": "Pack the flowers in oil, leave in the sun for weeks until it turns red.",
+   "moon": "Waxing",
+   "purpose": "Burns and sore skin.",
+   "price": 16,
+   "improper": "Pressed too soon: not red, not ready.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "The blood-red oil from Midsummer flowers was a traditional burn remedy.",
+   "safety": "Makes skin sun-sensitive. Interacts with many medicines.",
+   "notes": ""
+  },
+  {
+   "id": "c-hush-candle",
+   "name": "Hush Candle",
+   "kind": "Candle",
+   "level": 2,
+   "ingredients": "Beeswax + Lavender + Reed",
+   "method": "Press dried lavender into the wax as it sets.",
+   "moon": "Waning",
+   "purpose": "Calms a restless room.",
+   "price": 16,
+   "improper": "Wet lavender: it sputters and smells scorched.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Lavender has been used for calm and sleep since Roman times.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-hearth-candle",
+   "name": "Hearth Candle",
+   "kind": "Candle",
+   "level": 2,
+   "ingredients": "Beeswax + Rosemary + Pine Resin",
+   "method": "Melt, stir in crushed rosemary and a little resin, pour while warm.",
+   "moon": "Waxing",
+   "purpose": "A blessing for a home and its fire.",
+   "price": 15,
+   "improper": "Too much resin: spits and smokes.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Rosemary and resin have long been burned in homes for cleansing and welcome.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-courage-sachet",
+   "name": "Courage Sachet",
    "kind": "Charm",
    "level": 2,
-   "ingredients": "Glowcap + Clay Jar",
-   "method": "Seal it the same day you gather the glowcap.",
+   "ingredients": "Thyme + Yarrow + Ribbon",
+   "method": "Dry the herbs, tie them in cloth with a ribbon, carry it near the heart.",
    "moon": "Waxing",
-   "purpose": "Stage fright, shaking hands.",
+   "purpose": "Steadies a shaking nerve.",
    "price": 12,
-   "improper": "Jar not sealed the same day: the glow leaks out, and the courage with it.",
+   "improper": "Damp herbs: musty by morning.",
    "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Thyme was the herb of courage for Roman soldiers and medieval knights.",
+   "safety": "",
    "notes": ""
   },
   {
-   "id": "c-hazelnut-tonic",
-   "name": "Hazelnut Tonic",
+   "id": "c-dream-pillow",
+   "name": "Dream Pillow",
+   "kind": "Charm",
+   "level": 2,
+   "ingredients": "Lavender + Mugwort + Chamomile + Ribbon",
+   "method": "Stuff a small pillow with dried herbs and tie it with a ribbon.",
+   "moon": "New",
+   "purpose": "Sleep with good dreams.",
+   "price": 16,
+   "improper": "Fresh, damp herbs: musty, restless sleep.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Herb pillows for sleep and vivid dreams are an old tradition.",
+   "safety": "Mugwort should be avoided in pregnancy.",
+   "notes": ""
+  },
+  {
+   "id": "c-witch-bottle",
+   "name": "Witch Bottle",
+   "kind": "Charm",
+   "level": 2,
+   "ingredients": "Clay Jar + Iron Nail + Thistle + Sea Salt",
+   "method": "Fill the jar with nail, thorn and salt, seal it, bury by the threshold.",
+   "moon": "Waning",
+   "purpose": "Guards a doorstep from harm.",
+   "price": 18,
+   "improper": "Not sealed: the ward leaks away.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Witch bottles were buried under hearths and doorways in 17th century England.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-witch-s-ladder",
+   "name": "Witch's Ladder",
+   "kind": "Charm",
+   "level": 2,
+   "ingredients": "Red Thread + Raven Feather",
+   "method": "Tie nine knots in a cord, setting a feather into each as you go.",
+   "moon": "Any",
+   "purpose": "Holds a tangle or a bad run of luck.",
+   "price": 14,
+   "improper": "Knots slip: the luck unravels.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "A knotted cord with feathers, used for binding and for wishes.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-plain-speaking-tea",
+   "name": "Plain Speaking Tea",
    "kind": "Brew",
    "level": 2,
-   "ingredients": "Hazelnut + Thistle + Clay Jar",
-   "method": "Crack the nuts fresh, steep 5 minutes.",
-   "moon": "Waxing",
-   "purpose": "Tiredness, low strength.",
-   "price": 14,
-   "improper": "Nuts not cracked fresh: flat, tastes of dust.",
+   "ingredients": "Sage + Mint + Honey",
+   "method": "Steep the leaves together, sweeten to taste.",
+   "moon": "Any",
+   "purpose": "Clears the throat and steadies speech.",
+   "price": 15,
+   "improper": "Over-steeped: bitter and dry.",
    "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Sage was the herb of wisdom and good speech, mint of a clear head.",
+   "safety": "Avoid sage in pregnancy.",
+   "notes": ""
+  },
+  {
+   "id": "c-oak-gall-ink",
+   "name": "Oak Gall Ink",
+   "kind": "Craft",
+   "level": 2,
+   "ingredients": "Oak Gall + Iron Nail",
+   "method": "Crush the galls, steep, add rust from the iron, strain.",
+   "moon": "Any",
+   "purpose": "Dark, lasting ink.",
+   "price": 10,
+   "improper": "No iron: grey and fades.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Iron gall ink was the standard writing ink for over a thousand years.",
+   "safety": "",
    "notes": ""
   },
   {
@@ -943,27 +1633,33 @@ body.edit .hide-edit{display:none!important}
    "name": "Feather Quill",
    "kind": "Craft",
    "level": 2,
-   "ingredients": "Raven Feather + Ink Bottle",
-   "method": "Cure the feather by the lamp overnight, then cut the nib.",
+   "ingredients": "Raven Feather + Oak Gall Ink",
+   "method": "Cut the shaft at an angle, shape the nib, dip.",
    "moon": "Any",
-   "purpose": "Letters, ledgers, anyone who writes.",
+   "purpose": "A writing quill.",
    "price": 12,
-   "improper": "Feather not cured: splays and blots the ink.",
+   "improper": "Poor cut: it blots and tears the page.",
    "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Quills were the writing pens of the medieval world.",
+   "safety": "Only use found feathers.",
    "notes": ""
   },
   {
-   "id": "c-driftwood-frame",
-   "name": "Driftwood Frame",
+   "id": "c-hazel-wand",
+   "name": "Hazel Wand",
    "kind": "Craft",
    "level": 2,
-   "ingredients": "Driftwood + Copper Wire",
-   "method": "Dry the wood fully, bind the corners with wire.",
+   "ingredients": "Hazel Twig + Copper Wire",
+   "method": "Cut a straight, thumb-thick twig, peel it, wrap the copper at the handle.",
    "moon": "Any",
-   "purpose": "Frames for pictures and keepsakes.",
+   "purpose": "A wand or dowsing rod.",
    "price": 13,
-   "improper": "Wood still damp: warps, and the corners open.",
+   "improper": "Cut green and bent: it warps.",
    "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Hazel was the classic wand and dowsing wood.",
+   "safety": "",
    "notes": ""
   },
   {
@@ -972,153 +1668,135 @@ body.edit .hide-edit{display:none!important}
    "kind": "Lantern",
    "level": 2,
    "ingredients": "Glowcap + Sea Glass + Copper Wire",
-   "method": "Seal the glowcap behind the glass the same day.",
+   "method": "Set the glowcap in a glass cage and wire it shut.",
    "moon": "Waxing",
-   "purpose": "A steady light. Base for Story and Calling Lanterns.",
+   "purpose": "A soft light that does not burn.",
    "price": 18,
-   "improper": "Glowcap a day old: glows grey and sulks.",
+   "improper": "Glowcap left to dry: it dims.",
    "sells": true,
+   "accuracy": "Inspired",
+   "lore": "Foxfire is a real faint glow of rotting wood fungus. The lantern is the game's own.",
+   "safety": "",
    "notes": ""
   },
   {
-   "id": "c-hush-candle",
-   "name": "Hush Candle",
-   "kind": "Candle",
-   "level": 2,
-   "ingredients": "Beeswax + Lullwort + Reed",
-   "method": "Pour at dusk. Say the sleeper's name once.",
-   "moon": "Waning",
-   "purpose": "Sleeplessness and bad dreams.",
-   "price": 16,
-   "improper": "Poured under a waxing moon: keeps the sleeper awake.",
-   "sells": true,
-   "notes": ""
-  },
-  {
-   "id": "c-hearth-candle",
-   "name": "Hearth Candle",
-   "kind": "Candle",
-   "level": 2,
-   "ingredients": "Beeswax + Ember Berry + Pine Resin",
-   "method": "Warm the berry gently. Do not scorch it.",
-   "moon": "Waxing",
-   "purpose": "Homesickness, cold rooms, hens off the lay.",
-   "price": 15,
-   "improper": "Ember Berry scorched: smells of burnt toast, gives no warmth.",
-   "sells": true,
-   "notes": ""
-  },
-  {
-   "id": "c-yarrow-salve",
-   "name": "Yarrow Salve",
-   "kind": "Salve",
-   "level": 2,
-   "ingredients": "Yarrow + Beeswax + Clay Jar",
-   "method": "Melt the wax low, stir the yarrow in off the heat.",
-   "moon": "Any",
-   "purpose": "Cuts, scrapes, small burns.",
-   "price": 10,
-   "improper": "Wax too hot: the yarrow cooks out and it stings.",
-   "sells": true,
-   "notes": ""
-  },
-  {
-   "id": "c-thaw-salve",
-   "name": "Thaw Salve",
-   "kind": "Salve",
-   "level": 2,
-   "ingredients": "Ember Berry + Beeswax + Clay Jar",
-   "method": "Equal parts, warmed through.",
-   "moon": "Any",
-   "purpose": "Cold hands, stiff joints.",
-   "price": 12,
-   "improper": "Too little beeswax: slides off, hands stay cold.",
-   "sells": true,
-   "notes": ""
-  },
-  {
-   "id": "c-willow-fever-draught",
-   "name": "Willow Fever Draught",
-   "kind": "Brew",
-   "level": 2,
-   "ingredients": "Willow Bark + Wild Mint + Clay Jar",
-   "method": "Steep long and cool. Do not boil.",
-   "moon": "Waning",
-   "purpose": "Fever and aches.",
-   "price": 15,
-   "improper": "Boiled: all the bitter, none of the cure.",
-   "sells": true,
-   "notes": ""
-  },
-  {
-   "id": "c-salt-ward-bundle",
-   "name": "Salt Ward Bundle",
-   "kind": "Charm",
-   "level": 2,
-   "ingredients": "Salt Crystal + Reed + Ribbon",
-   "method": "Bind tight and tie nine knots.",
-   "moon": "New",
-   "purpose": "Bad dreams, uninvited visitors.",
-   "price": 14,
-   "improper": "Tied loose: the salt spills and the ward leaks.",
-   "sells": true,
-   "notes": ""
-  },
-  {
-   "id": "c-mending-knot",
-   "name": "Mending Knot",
-   "kind": "Charm",
-   "level": 2,
-   "ingredients": "Spider Silk + Ribbon",
-   "method": "Pull slowly. Tie the broken ends while you say what broke.",
-   "moon": "Any",
-   "purpose": "Quarrels and torn things.",
-   "price": 12,
-   "improper": "Silk pulled tight too fast: snaps and frays at the join.",
-   "sells": true,
-   "notes": ""
-  },
-  {
-   "id": "c-plain-speaking-tea",
-   "name": "Plain Speaking Tea",
-   "kind": "Brew",
-   "level": 2,
-   "ingredients": "Wild Mint + Honey + Thistle",
-   "method": "One thistle leaf only.",
-   "moon": "Any",
-   "purpose": "Helps someone say the true thing, gently. Does not make them say it.",
-   "price": 15,
-   "improper": "Too much thistle: they say true things, all of them, loudly.",
-   "sells": true,
-   "notes": ""
-  },
-  {
-   "id": "c-moonbark-tea",
-   "name": "Moonbark Tea",
+   "id": "c-valerian-sleep-draught",
+   "name": "Valerian Sleep Draught",
    "kind": "Brew",
    "level": 3,
-   "ingredients": "Moonbark + Marsh Lily + Clay Jar",
-   "method": "Steep under a dim moon.",
+   "ingredients": "Valerian + Chamomile + Honey + Clay Jar",
+   "method": "Steep the root a long time, covered. Add chamomile and honey.",
    "moon": "New",
-   "purpose": "Lost names. Grief that wants remembering.",
-   "price": 40,
-   "improper": "Steeped under a bright moon: just woody tea.",
+   "purpose": "Deep sleep after hard nights.",
+   "price": 28,
+   "improper": "Short steep: no effect.",
    "sells": true,
-   "notes": "Favors and special orders"
+   "accuracy": "Traditional",
+   "lore": "Valerian is one of the oldest sleep herbs.",
+   "safety": "Drowsiness. Do not combine with sedatives.",
+   "notes": ""
+  },
+  {
+   "id": "c-mugwort-dream-tea",
+   "name": "Mugwort Dream Tea",
+   "kind": "Brew",
+   "level": 3,
+   "ingredients": "Mugwort + Chamomile + Honey",
+   "method": "Steep a small pinch, covered. The taste is bitter, so sweeten.",
+   "moon": "New",
+   "purpose": "Vivid dreams.",
+   "price": 32,
+   "improper": "Too much mugwort: bitter, restless nights.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Mugwort is the herb of dreams and travelers.",
+   "safety": "Avoid in pregnancy.",
+   "notes": ""
+  },
+  {
+   "id": "c-hawthorn-heart-cordial",
+   "name": "Hawthorn Heart Cordial",
+   "kind": "Brew",
+   "level": 3,
+   "ingredients": "Hawthorn Berry + Rosehip + Honey + Clay Jar",
+   "method": "Simmer berries and hips gently, strain, stir in honey, jar it.",
+   "moon": "Full",
+   "purpose": "Heaviness of heart, grief and heartache.",
+   "price": 34,
+   "improper": "Boiled hard: loses its sweetness.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Hawthorn has been the heart herb since the Middle Ages.",
+   "safety": "Can interact with heart medicines.",
+   "notes": ""
+  },
+  {
+   "id": "c-saining-bundle",
+   "name": "Saining Bundle",
+   "kind": "Incense",
+   "level": 3,
+   "ingredients": "Juniper + Rosemary + Red Thread",
+   "method": "Tie the sprigs with red thread, dry, and burn one end, carrying it through every room.",
+   "moon": "New",
+   "purpose": "Clears a heavy house.",
+   "price": 30,
+   "improper": "Damp sprigs: smoulder and fail.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Scottish saining with juniper cleansed home and byre at New Year.",
+   "safety": "Avoid in pregnancy. Never leave burning unattended.",
+   "notes": ""
+  },
+  {
+   "id": "c-finder-s-pendulum",
+   "name": "Finder's Pendulum",
+   "kind": "Charm",
+   "level": 3,
+   "ingredients": "Copper Wire + Red Thread + Hag Stone",
+   "method": "Thread the stone on a cord of red thread, wire the top, hold steady over a map.",
+   "moon": "Waxing",
+   "purpose": "Finds what is lost.",
+   "price": 40,
+   "improper": "Held with a shaking hand: it spins on its own.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Pendulums and dowsing are old methods for finding lost things and water.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-fern-seed-charm",
+   "name": "Fern Seed Charm",
+   "kind": "Charm",
+   "level": 3,
+   "ingredients": "Fern + Red Thread + Rowan Twig",
+   "method": "Catch the fern frond at midnight on Midsummer, wrap in cloth, tie with red thread.",
+   "moon": "Full",
+   "purpose": "Slipping past unseen.",
+   "price": 55,
+   "improper": "Not caught at midnight: it does nothing.",
+   "sells": true,
+   "accuracy": "Inspired",
+   "lore": "Midsummer folklore said fern seed made its holder invisible.",
+   "safety": "",
+   "notes": ""
   },
   {
    "id": "c-pearl-locket",
    "name": "Pearl Locket",
    "kind": "Keepsake",
    "level": 3,
-   "ingredients": "Canal Pearl + Copper Wire + Ribbon",
-   "method": "Wire the pearl. Never glue it.",
+   "ingredients": "Freshwater Pearl + Copper Wire + Ribbon",
+   "method": "Wire the pearl into a setting and hang it on a ribbon.",
    "moon": "Full",
-   "purpose": "Weddings and promises.",
+   "purpose": "A keepsake for someone loved.",
    "price": 55,
-   "improper": "Pearl glued instead of wired: falls out of the setting.",
+   "improper": "Loose wire: the pearl slips away.",
    "sells": true,
-   "notes": "Favors and special orders"
+   "accuracy": "Traditional",
+   "lore": "Pearls are the moon's gem for love and purity.",
+   "safety": "",
+   "notes": ""
   },
   {
    "id": "c-story-lantern",
@@ -1126,54 +1804,15 @@ body.edit .hide-edit{display:none!important}
    "kind": "Lantern",
    "level": 3,
    "ingredients": "Glowcap Lantern + Sea Glass + Raven Feather",
-   "method": "Set the feather in the glass before you seal it.",
+   "method": "Add sea glass and a feather to the lantern.",
    "moon": "Full",
-   "purpose": "The Duchess's favor. Reading aloud.",
+   "purpose": "Tells a story in light.",
    "price": 60,
-   "improper": "Glass chipped or feather scorched: the story gutters mid-line.",
+   "improper": "Too many pieces crowd the light.",
    "sells": true,
-   "notes": "Favor for the Duchess"
-  },
-  {
-   "id": "c-fog-incense",
-   "name": "Fog Incense",
-   "kind": "Incense",
-   "level": 3,
-   "ingredients": "Resin Incense + Salt Crystal",
-   "method": "Grind the salt fine. Burn it on the doorstep.",
-   "moon": "New",
-   "purpose": "Fog-sickness in a house.",
-   "price": 30,
-   "improper": "Salt too coarse: crackles and spits, and the fog stays.",
-   "sells": true,
-   "notes": ""
-  },
-  {
-   "id": "c-finder-s-thread",
-   "name": "Finder's Thread",
-   "kind": "Charm",
-   "level": 3,
-   "ingredients": "Spider Silk + Copper Wire + Smooth Stone",
-   "method": "Knot it while you hold the lost thing's name in mind.",
-   "moon": "Waxing",
-   "purpose": "Lost things.",
-   "price": 40,
-   "improper": "Knotted off the waxing moon: it finds things, just not yours.",
-   "sells": true,
-   "notes": ""
-  },
-  {
-   "id": "c-rosehip-heart-tonic",
-   "name": "Rosehip Heart Tonic",
-   "kind": "Brew",
-   "level": 3,
-   "ingredients": "Rosehip + Marsh Lily + Honey + Clay Jar",
-   "method": "Honey goes in last, off the heat.",
-   "moon": "Full",
-   "purpose": "Heartache, and the courage to let go.",
-   "price": 28,
-   "improper": "Honey added hot: turns bitter and sweetens nothing.",
-   "sells": true,
+   "accuracy": "Inspired",
+   "lore": "The game's own, built on real foxfire and feather folklore.",
+   "safety": "",
    "notes": ""
   },
   {
@@ -1181,14 +1820,17 @@ body.edit .hide-edit{display:none!important}
    "name": "Wren's Key",
    "kind": "Story",
    "level": 3,
-   "ingredients": "3 Scrap Iron + Moonbark + Copper Wire",
-   "method": "Wren shows you the forge. One time only.",
+   "ingredients": "3 Iron Nail + Birch Bark + Copper Wire",
+   "method": "Weave nail, bark and wire into a key.",
    "moon": "Any",
-   "purpose": "Opens Wren's trunk. Not for sale.",
+   "purpose": "Opens Wren's door.",
    "price": null,
    "improper": "",
    "sells": false,
-   "notes": "Goal 3. Story item."
+   "accuracy": "Game-only",
+   "lore": "Invented for the game.",
+   "safety": "",
+   "notes": ""
   },
   {
    "id": "c-calling-lantern",
@@ -1196,12 +1838,15 @@ body.edit .hide-edit{display:none!important}
    "kind": "Lantern",
    "level": 4,
    "ingredients": "Glowcap Lantern + Glow Moth Scale",
-   "method": "Open the shutter only at full dark.",
+   "method": "Hang the scale from the lantern.",
    "moon": "Full",
-   "purpose": "Draws moths and visitors. Fenn's survey.",
+   "purpose": "Calls the lost.",
    "price": 45,
-   "improper": "Moth scale cracked: calls the wrong visitors, or none.",
+   "improper": "Hung crooked: the light wavers.",
    "sells": true,
+   "accuracy": "Game-only",
+   "lore": "Invented for the game.",
+   "safety": "",
    "notes": ""
   },
   {
@@ -1209,13 +1854,16 @@ body.edit .hide-edit{display:none!important}
    "name": "Memory Candle",
    "kind": "Candle",
    "level": 4,
-   "ingredients": "Beeswax + Moonbark + Dusk Violet",
-   "method": "Pour under the full moon. Light it for the one remembered.",
+   "ingredients": "Beeswax + Rosemary + Sweet Violet",
+   "method": "Press rosemary and violet into the wax as it sets.",
    "moon": "Full",
-   "purpose": "The hauntings. The market wanting to be remembered.",
+   "purpose": "Remembers the dead.",
    "price": 80,
-   "improper": "Poured off the full moon: the memory comes back wrong.",
+   "improper": "Wet petals: the wax spoils.",
    "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Rosemary for remembrance and violets for modest love, both old mourning herbs.",
+   "safety": "",
    "notes": ""
   },
   {
@@ -1223,13 +1871,16 @@ body.edit .hide-edit{display:none!important}
    "name": "Keeper's Lantern",
    "kind": "Lantern",
    "level": 5,
-   "ingredients": "Calling Lantern + Pearl Locket + Moonbark",
-   "method": "Wren sets it with you. It only sets once.",
+   "ingredients": "Calling Lantern + Pearl Locket + Birch Bark",
+   "method": "Set the locket in the lantern's frame.",
    "moon": "Full",
-   "purpose": "The market's own requests.",
+   "purpose": "The market's own light.",
    "price": 150,
-   "improper": "Not sold improperly. Done badly it counts as Ruined and costs the market's goodwill.",
+   "improper": "",
    "sells": true,
+   "accuracy": "Game-only",
+   "lore": "Invented for the game.",
+   "safety": "",
    "notes": ""
   }
  ],
@@ -1240,7 +1891,7 @@ body.edit .hide-edit{display:none!important}
    "stall": "Stall 13",
    "ingredients": "Ribbon + Driftwood",
    "effect": "",
-   "notes": "Stall upgrade"
+   "notes": ""
   },
   {
    "id": "u-display-shelves",
@@ -1248,15 +1899,15 @@ body.edit .hide-edit{display:none!important}
    "stall": "Stall 13",
    "ingredients": "Driftwood + Copper Wire",
    "effect": "",
-   "notes": "Stall upgrade"
+   "notes": ""
   },
   {
    "id": "u-lantern-string",
    "name": "Lantern String",
    "stall": "Stall 13",
-   "ingredients": "3 Glowcap Lanterns",
+   "ingredients": "3 Glowcap Lantern",
    "effect": "",
-   "notes": "Stall upgrade"
+   "notes": ""
   }
  ],
  "requests": [
@@ -1268,8 +1919,8 @@ body.edit .hide-edit{display:none!important}
    "ask": "Three weeks of river fog and this cough will not quit. Got anything for the chest?",
    "answer": "Bog Moss Tea",
    "pay": 8,
-   "wrong": "Glowcap steeped in water: pretty, does nothing (pays 2). A bare reed: he keeps it (pays 0).",
-   "notes": ""
+   "wrong": "A bare reed: he keeps it (pays 0).",
+   "notes": "A fun pick. For a real cough, see Marshmallow Cough Syrup."
   },
   {
    "id": "r-maribel-the-baker",
@@ -1277,10 +1928,10 @@ body.edit .hide-edit{display:none!important}
    "kind": "Wish",
    "level": 1,
    "ask": "Luck for the oven this week. The loaves keep falling.",
-   "answer": "Pocket Stone",
+   "answer": "Hag Stone Charm",
    "pay": 9,
-   "wrong": "A Moss Pouch comforts her but carries no luck (pays 3).",
-   "notes": ""
+   "wrong": "A plain stone: no luck.",
+   "notes": "Holed stones were hung in kitchens for luck."
   },
   {
    "id": "r-the-moth-winged-visitor",
@@ -1290,18 +1941,40 @@ body.edit .hide-edit{display:none!important}
    "ask": "A candle, at full dark. They will not say what it is for.",
    "answer": "Reed Wick Candle",
    "pay": 30,
-   "wrong": "A candle from another moon is taken at a discount, and they say nothing.",
-   "notes": "Any candle will do, but it has to be poured under tonight's moon."
+   "wrong": "Any other candle: they leave it on the counter.",
+   "notes": ""
+  },
+  {
+   "id": "r-bess-the-ferry-cook",
+   "name": "Bess the ferry cook",
+   "kind": "Ailment",
+   "level": 1,
+   "ask": "My stomach turns every time the barge rocks. Something to settle it?",
+   "answer": "Mint Tea",
+   "pay": 7,
+   "wrong": "Tea without mint: she thanks you and stays queasy.",
+   "notes": ""
+  },
+  {
+   "id": "r-marta-the-weaver",
+   "name": "Marta the weaver",
+   "kind": "Ailment",
+   "level": 1,
+   "ask": "I lie awake counting threads. Something to help me rest?",
+   "answer": "Chamomile Tisane",
+   "pay": 7,
+   "wrong": "Strong mint: wakes her further.",
+   "notes": ""
   },
   {
    "id": "r-dov-the-fiddler",
    "name": "Dov the fiddler",
    "kind": "Worry",
    "level": 2,
-   "ask": "My hands will not stop shaking. I play the square tonight.",
-   "answer": "Brave Jar",
+   "ask": "I freeze every time I play for the room. My hands shake.",
+   "answer": "Courage Sachet",
    "pay": 15,
-   "wrong": "Bog Moss in a jar calms him but is not courage (pays 3). A reed in a jar is a reed in a jar (pays 1).",
+   "wrong": "A candle: nice, no help.",
    "notes": ""
   },
   {
@@ -1309,10 +1982,10 @@ body.edit .hide-edit{display:none!important}
    "name": "Sister Alder",
    "kind": "Ailment",
    "level": 2,
-   "ask": "My stomach turns every time I have to speak before the congregation.",
-   "answer": "Wild Mint Steep",
-   "pay": 11,
-   "wrong": "Hazelnut Tonic is too heavy. She thanks you and does not finish it (pays 3).",
+   "ask": "My throat is raw from the hymns.",
+   "answer": "Sage & Honey Throat Tea",
+   "pay": 12,
+   "wrong": "Mint tea: kind but not enough.",
    "notes": ""
   },
   {
@@ -1320,10 +1993,10 @@ body.edit .hide-edit{display:none!important}
    "name": "Tobias the ferry-boy",
    "kind": "Ailment",
    "level": 2,
-   "ask": "Skinned my knee on the landing. Mam says to ask you.",
-   "answer": "Yarrow Salve",
-   "pay": 13,
-   "wrong": "A Moss Pouch is a kind thought and does nothing for a knee (pays 2).",
+   "ask": "Skinned my knee on the landing.",
+   "answer": "Plantain Poultice",
+   "pay": 10,
+   "wrong": "A salve with beeswax, not needed for a scrape.",
    "notes": ""
   },
   {
@@ -1331,10 +2004,10 @@ body.edit .hide-edit{display:none!important}
    "name": "Rook the blacksmith",
    "kind": "Ailment",
    "level": 2,
-   "ask": "Burned my hand on the forge. Do not make a fuss.",
-   "answer": "Yarrow Salve",
-   "pay": 14,
-   "wrong": "Thaw Salve warms a burn, which is the opposite of help. He leaves it on the counter (pays 0).",
+   "ask": "Burned my forearm on the forge.",
+   "answer": "St John's Wort Oil",
+   "pay": 18,
+   "wrong": "A poultice of mint: no.",
    "notes": ""
   },
   {
@@ -1342,10 +2015,10 @@ body.edit .hide-edit{display:none!important}
    "name": "Corin the cooper",
    "kind": "Ailment",
    "level": 2,
-   "ask": "My hands lock up in the cold. I cannot hold the mallet.",
-   "answer": "Thaw Salve",
-   "pay": 16,
-   "wrong": "Yarrow Salve soothes but does not loosen (pays 5).",
+   "ask": "A barrel rolled over my shin and it is black and blue.",
+   "answer": "Comfrey Salve",
+   "pay": 14,
+   "wrong": "Calendula salve: soothes, no mending.",
    "notes": ""
   },
   {
@@ -1353,10 +2026,10 @@ body.edit .hide-edit{display:none!important}
    "name": "Brannoch the hen-wife",
    "kind": "Worry",
    "level": 2,
-   "ask": "The hens have gone off the lay. Something is wrong in the coop.",
+   "ask": "The house has felt cold and unlucky since the frost.",
    "answer": "Hearth Candle",
    "pay": 20,
-   "wrong": "A Hush Candle puts the hens to sleep and does nothing else (pays 4).",
+   "wrong": "A Hush Candle: she loses her fire.",
    "notes": ""
   },
   {
@@ -1364,10 +2037,10 @@ body.edit .hide-edit{display:none!important}
    "name": "Old Ines",
    "kind": "Ailment",
    "level": 2,
-   "ask": "I have not slept a full night since spring.",
-   "answer": "Hush Candle",
-   "pay": 22,
-   "wrong": "A Hearth Candle warms the room and she sits up reading by it (pays 6).",
+   "ask": "I cannot sleep. Not since the spring.",
+   "answer": "Dream Pillow",
+   "pay": 20,
+   "wrong": "Strong mint tea keeps her awake.",
    "notes": ""
   },
   {
@@ -1375,54 +2048,109 @@ body.edit .hide-edit{display:none!important}
    "name": "Garrick the dockhand",
    "kind": "Worry",
    "level": 2,
-   "ask": "The sea keeps coming into my dreams. I wake up wet.",
-   "answer": "Salt Ward Bundle + Hush Candle",
+   "ask": "Something follows the boats. I want it kept off my doorstep.",
+   "answer": "Witch Bottle",
    "pay": 30,
-   "wrong": "Only one of the two: it helps for half the night (pays 12).",
-   "notes": "Asks for both."
+   "wrong": "Only a salt pouch: not enough.",
+   "notes": ""
   },
   {
    "id": "r-hale-the-lamplighter",
    "name": "Hale the lamplighter",
    "kind": "Worry",
    "level": 2,
-   "ask": "There is someone I cannot say a whole sentence to. I have tried.",
+   "ask": "I freeze when I must speak at the guild.",
    "answer": "Plain Speaking Tea",
    "pay": 20,
-   "wrong": "Too much thistle and he says everything at once, to the wrong person (pays 8).",
-   "notes": "Romance-cast starting point (the gangly one)."
+   "wrong": "Chamomile: he stays calm and still silent.",
+   "notes": ""
   },
   {
    "id": "r-teodor-the-net-mender",
    "name": "Teodor the net-mender",
    "kind": "Worry",
    "level": 2,
-   "ask": "My brother and I have not spoken since the funeral. I want to mend it and do not know how to start.",
-   "answer": "Mending Knot",
+   "ask": "Everything tangles and no knot holds. Bad luck.",
+   "answer": "Witch's Ladder",
    "pay": 16,
-   "wrong": "Pulled too tight too fast: it snaps, and so does the talk (pays 6).",
-   "notes": "Romance-cast starting point."
+   "wrong": "A plain cord: no luck in it.",
+   "notes": ""
+  },
+  {
+   "id": "r-mags-the-fishwife",
+   "name": "Mags the fishwife",
+   "kind": "Ailment",
+   "level": 2,
+   "ask": "A fever since yesterday. Aching and hot.",
+   "answer": "Elderflower Fever Tea",
+   "pay": 18,
+   "wrong": "A cold compress: no.",
+   "notes": ""
+  },
+  {
+   "id": "r-nell-the-washerwoman",
+   "name": "Nell the washerwoman",
+   "kind": "Ailment",
+   "level": 2,
+   "ask": "A dry cough that keeps me up at night.",
+   "answer": "Marshmallow Cough Syrup",
+   "pay": 18,
+   "wrong": "Mint tea: no.",
+   "notes": ""
+  },
+  {
+   "id": "r-hob-the-ploughman",
+   "name": "Hob the ploughman",
+   "kind": "Ailment",
+   "level": 2,
+   "ask": "My joints ache before every rain.",
+   "answer": "Willow Pain Draught",
+   "pay": 18,
+   "wrong": "A plain tea: no.",
+   "notes": ""
+  },
+  {
+   "id": "r-pru-the-dairymaid",
+   "name": "Pru the dairymaid",
+   "kind": "Ailment",
+   "level": 2,
+   "ask": "My hands are cracked and raw from winter.",
+   "answer": "Calendula Salve",
+   "pay": 14,
+   "wrong": "A comfrey salve: wrong for skin.",
+   "notes": ""
+  },
+  {
+   "id": "r-edric-the-scribe",
+   "name": "Edric the scribe",
+   "kind": "Wish",
+   "level": 2,
+   "ask": "I need a quill and ink that will not fade.",
+   "answer": "Feather Quill + Oak Gall Ink",
+   "pay": 28,
+   "wrong": "Shop ink: fades.",
+   "notes": ""
   },
   {
    "id": "r-bryn-the-tanner-s-daughter",
    "name": "Bryn the tanner's daughter",
    "kind": "Wish",
    "level": 3,
-   "ask": "I lost my mother's ring somewhere on the canal path.",
-   "answer": "Finder's Thread",
+   "ask": "I lost my mother's ring. I cannot find it anywhere.",
+   "answer": "Finder's Pendulum",
    "pay": 50,
-   "wrong": "A Pocket Stone finds her nothing but a better mood (pays 5).",
-   "notes": "Romance-cast starting point."
+   "wrong": "A wand: he waves it, nothing.",
+   "notes": ""
   },
   {
    "id": "r-linnet",
    "name": "Linnet",
    "kind": "Ailment",
    "level": 3,
-   "ask": "It has been a year and I still set out two cups. I want to stop and I cannot.",
-   "answer": "Rosehip Heart Tonic",
-   "pay": 36,
-   "wrong": "Moonbark Tea brings it all back instead of easing it (pays 10).",
+   "ask": "My heart feels heavy since he left.",
+   "answer": "Hawthorn Heart Cordial",
+   "pay": 40,
+   "wrong": "Honey alone: sweet, nothing more.",
    "notes": ""
   },
   {
@@ -1430,10 +2158,43 @@ body.edit .hide-edit{display:none!important}
    "name": "The Marsh Cottage family",
    "kind": "Ailment",
    "level": 3,
-   "ask": "Fog has got into the walls. The children cough and the lamp will not stay lit.",
-   "answer": "Fog Incense",
+   "ask": "The house has felt heavy since the flood. We want it cleared.",
+   "answer": "Saining Bundle",
    "pay": 38,
-   "wrong": "Resin Incense alone smells lovely and clears nothing (pays 8).",
+   "wrong": "A candle: no.",
+   "notes": ""
+  },
+  {
+   "id": "r-anwen-the-midwife",
+   "name": "Anwen the midwife",
+   "kind": "Ailment",
+   "level": 3,
+   "ask": "Broken sleep after long births. Chamomile is not enough.",
+   "answer": "Valerian Sleep Draught",
+   "pay": 36,
+   "wrong": "Chamomile: not enough.",
+   "notes": ""
+  },
+  {
+   "id": "r-sorrel-the-seer",
+   "name": "Sorrel the seer",
+   "kind": "Wish",
+   "level": 3,
+   "ask": "I want to dream true.",
+   "answer": "Mugwort Dream Tea",
+   "pay": 36,
+   "wrong": "Chamomile: calm but dull.",
+   "notes": ""
+  },
+  {
+   "id": "r-fenwick-the-apprentice",
+   "name": "Fenwick the apprentice",
+   "kind": "Wish",
+   "level": 3,
+   "ask": "I need to slip past the master unseen tonight.",
+   "answer": "Fern Seed Charm",
+   "pay": 55,
+   "wrong": "A ribbon: he gets caught.",
    "notes": ""
   },
   {
@@ -1441,10 +2202,10 @@ body.edit .hide-edit{display:none!important}
    "name": "Isolde",
    "kind": "Favor",
    "level": 3,
-   "ask": "A wedding gift for my sister, something she can keep and wear.",
+   "ask": "Something to wear for the one I love.",
    "answer": "Pearl Locket",
    "pay": 70,
-   "wrong": "A Driftwood Frame is lovely and is not a locket (pays 15).",
+   "wrong": "A ribbon: she waits.",
    "notes": ""
   },
   {
@@ -1452,10 +2213,10 @@ body.edit .hide-edit{display:none!important}
    "name": "The Duchess",
    "kind": "Favor",
    "level": 3,
-   "ask": "Bring me a lantern that can tell a story.",
+   "ask": "A lantern that tells a story.",
    "answer": "Story Lantern",
    "pay": 80,
-   "wrong": "A plain Glowcap Lantern is pretty, but she wanted the story (pays 20).",
+   "wrong": "A plain lantern: she is unimpressed.",
    "notes": ""
   },
   {
@@ -1463,10 +2224,10 @@ body.edit .hide-edit{display:none!important}
    "name": "Fenn",
    "kind": "Favor",
    "level": 4,
-   "ask": "I need a light the moths will come to. For the survey, not the jar.",
+   "ask": "A light to call across the marsh.",
    "answer": "Calling Lantern",
    "pay": 55,
-   "wrong": "A Glowcap Lantern draws gnats and nothing else (pays 8).",
+   "wrong": "A candle: it blows out in the reeds.",
    "notes": ""
   },
   {
@@ -1474,10 +2235,10 @@ body.edit .hide-edit{display:none!important}
    "name": "The shade at the edge of the lamplight",
    "kind": "Haunting",
    "level": 4,
-   "ask": "(It holds out a small book and cannot say why it came.)",
+   "ask": "Light something for what I have lost.",
    "answer": "Memory Candle",
    "pay": 110,
-   "wrong": "Any other candle: the book stays closed (pays 0).",
+   "wrong": "Any other candle: the shade turns away.",
    "notes": ""
   }
  ]
@@ -1566,7 +2327,7 @@ const FB={state:'loading',user:null,msg:'',timer:null};
 function fbBusy(){return $('#overlay').firstChild||(document.activeElement&&document.activeElement.isContentEditable);}
 function normalize(){
   ['gathers','crafts','requests','upgrades','tiers','levels'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[];});
-  D.lists=D.lists||{};['zones','kinds','moons','rarities','reqkinds'].forEach(k=>{if(!Array.isArray(D.lists[k]))D.lists[k]=[];});
+  D.lists=D.lists||{};['zones','kinds','moons','rarities','reqkinds','accuracy'].forEach(k=>{if(!Array.isArray(D.lists[k]))D.lists[k]=[];});
 }
 async function fbInit(){
   try{
@@ -1673,7 +2434,7 @@ function usedIn(name){
 
 /* ---------- ui state ---------- */
 const UI={sec:'overview',prev:'overview',q:'',edit:false,
-  f:{gather:{zone:null,rarity:null,view:'cards'},recipes:{kind:null,level:null,moon:null},
+  f:{gather:{zone:null,rarity:null,accuracy:null,view:'cards'},recipes:{kind:null,level:null,moon:null,accuracy:null},
      goods:{kind:null,level:null,sort:'level',dir:1},requests:{kind:null,level:null}}};
 const SECS=[['overview','Overview','overview'],['gather','Gathering','gather'],['recipes','Recipes & Spells','recipes'],['goods','Stall Goods','goods'],['requests','Requests','requests'],['upgrades','Stall Upgrades','upgrades'],['rules','Rules','rules']];
 const secCount=k=>({gather:D.gathers.length,recipes:D.crafts.length,goods:D.crafts.filter(c=>c.sells).length,requests:D.requests.length,upgrades:D.upgrades.length})[k];
@@ -1687,6 +2448,8 @@ function setPath(path,val){const ks=path.split('.');const last=ks.pop();ks.reduc
 function badge(text,color,cls){return `<span class="badge ${cls||''}" style="--c:${color||'#f0c674'}"><i></i>${esc(text)}</span>`;}
 function lvBadge(n){return `<span class="badge lvl" style="--c:#c8b6e8">${esc(lvLabel(n))}</span>`;}
 function moonChip(m){return `<span class="moonchip">${moonSvg(m)} ${m==='Any'?'Any moon':esc(m)+' moon'}</span>`;}
+const accBadge=a=>a?badge(a,listColor('accuracy',a)):'';
+const CI=c=>c==='both'?D.gathers.concat(D.crafts):D[c];
 function gems(r){const n={Common:1,Uncommon:2,Rare:3}[r]||1;return `<span class="gems" title="${esc(r)}">${gem(1)}${gem(n>1)}${gem(n>2)}</span>`;}
 function chipFor(p){
   if(!p.r)return `<span class="chip bad" title="Not found in the book. Check the spelling or add it.">${p.qty>1?`<span class="q">${p.qty}×</span>`:''}${esc(p.name)}</span>`;
@@ -1733,6 +2496,7 @@ function pgOverview(){
     ${ed('meta.title',m.title,'h1')}
     ${ed('meta.tagline',m.tagline,'p')}
   </section>
+  <div class="note" style="margin-top:18px;display:flex;gap:12px;align-items:flex-start">${ico('warn',18)}${ed('meta.disclaimer',m.disclaimer||'','div')}</div>
   <div class="stats">
     ${[['gather','Things to gather',D.gathers.length],['recipes','Recipes & spells',D.crafts.length],['goods','Goods for sale',D.crafts.filter(c=>c.sells).length],['requests','Customer requests',D.requests.length]].map(([k,l,v])=>`<button class="stat" data-act="nav" data-val="${k}">${ico(k,24)}<span class="v">${v}</span><span class="k">${l}</span></button>`).join('')}
   </div>
@@ -1746,14 +2510,14 @@ function pgOverview(){
 
 function pgGather(){
   const f=UI.f.gather;
-  let list=D.gathers.filter(g=>(!f.zone||g.zone===f.zone)&&(!f.rarity||g.rarity===f.rarity));
+  let list=D.gathers.filter(g=>(!f.zone||g.zone===f.zone)&&(!f.rarity||g.rarity===f.rarity)&&(!f.accuracy||g.accuracy===f.accuracy));
   const body=f.view==='table'?gatherTable(list):D.lists.zones.concat(D.gathers.filter(g=>!D.lists.zones.find(z=>z.name===g.zone)).map(g=>({name:g.zone,color:'#a99bbd'})).filter((z,i,a)=>a.findIndex(y=>y.name===z.name)===i)).map(z=>{
     const gs=list.filter(g=>g.zone===z.name);
     if(!gs.length&&!(UI.edit&&!f.zone))return '';
     return `<h2 class="sec" style="color:${z.color}">${esc(z.name)} <span class="l"></span><small>${gs.length}</small></h2><div class="grid">${gs.map(g=>gatherCard(g)).join('')}${UI.edit?addCard('gather','Add to '+z.name).replace('data-type="gather"','data-type="gather" data-zone="'+esc(z.name)+'"'):''}</div>`;
   }).join('');
   return pageHead('gather','The Night Market · Field guide')+`
-  <div class="toolbar">${fchips('gather','zone',D.lists.zones,'Zone')}${fchips('gather','rarity',D.lists.rarities,'Rarity')}
+  <div class="toolbar">${fchips('gather','zone',D.lists.zones,'Zone')}${fchips('gather','rarity',D.lists.rarities,'Rarity')}${fchips('gather','accuracy',D.lists.accuracy,'Lore')}
   <span class="sp"></span><div class="seg"><button class="${f.view==='cards'?'on':''}" data-act="view" data-sec="gather" data-val="cards">Cards</button><button class="${f.view==='table'?'on':''}" data-act="view" data-sec="gather" data-val="table">Table</button></div></div>
   ${list.length||UI.edit?body:'<div class="empty">Nothing matches those filters.</div>'}`;
 }
@@ -1761,31 +2525,31 @@ function gatherCard(g){
   const c=listColor('zones',g.zone),u=usedIn(g.name);
   const uses=u.crafts.concat(u.upgrades);
   return `<div class="card" style="--c:${c}" data-act="open" data-type="gather" data-id="${g.id}">${tools('gather',g.id)}
-   <div class="row">${badge(g.zone,c)}${gems(g.rarity)}</div>
-   <h3>${esc(g.name)}</h3>
+   <div class="row">${badge(g.zone,c)}${gems(g.rarity)}${accBadge(g.accuracy)}</div>
+   <h3>${esc(g.name)}</h3>${g.latin?`<div class="latin">${esc(g.latin)}</div>`:''}
    <div class="row">${g.when&&g.when!=='Any'?`<span class="badge plain">${esc(g.when)}</span>`:''}<span class="badge plain">${esc(g.source)}</span></div>
-   ${g.notes?`<p>${esc(g.notes)}</p>`:''}
+   ${(g.lore||g.notes)?`<p class="clamp">${esc(g.lore||g.notes)}</p>`:''}
    <div class="cardfoot"><span class="lbl" style="margin:0">Goes into</span><div class="chips">${uses.length?uses.slice(0,3).map(x=>`<span class="chip craft" style="--c:${listColor('kinds',x.kind||'Craft')}">${esc(x.name)}</span>`).join('')+(uses.length>3?`<span class="chip">+${uses.length-3}</span>`:''):'<span class="dash">Nothing yet</span>'}</div></div></div>`;
 }
 function gatherTable(list){
   return `<div class="tablewrap"><table class="t"><thead><tr><th>Name</th><th>Zone</th><th>When</th><th>Rarity</th><th>Source</th><th>Goes into</th></tr></thead><tbody>${list.map(g=>{
     const u=usedIn(g.name);const uses=u.crafts.concat(u.upgrades);
-    return `<tr class="item"><td><div class="nm" data-act="open" data-type="gather" data-id="${g.id}">${esc(g.name)}</div>${g.notes?`<div class="sub">${esc(g.notes)}</div>`:''}</td><td>${badge(g.zone,listColor('zones',g.zone))}</td><td>${esc(g.when)}</td><td>${gems(g.rarity)} <span class="sub">${esc(g.rarity)}</span></td><td>${esc(g.source)}</td><td><div class="chips">${uses.map(x=>`<span class="chip craft">${esc(x.name)}</span>`).join('')||'<span class="dash">–</span>'}</div></td></tr>`;}).join('')}</tbody></table></div>`;
+    return `<tr class="item"><td><div class="nm" data-act="open" data-type="gather" data-id="${g.id}">${esc(g.name)}</div>${g.latin?`<div class="sub"><i>${esc(g.latin)}</i></div>`:''}</td><td>${badge(g.zone,listColor('zones',g.zone))}</td><td>${esc(g.when)}</td><td>${gems(g.rarity)} <span class="sub">${esc(g.rarity)}</span></td><td>${esc(g.source)}</td><td><div class="chips">${uses.map(x=>`<span class="chip craft">${esc(x.name)}</span>`).join('')||'<span class="dash">–</span>'}</div></td></tr>`;}).join('')}</tbody></table></div>`;
 }
 
 function pgRecipes(){
   const f=UI.f.recipes;
-  const list=D.crafts.filter(c=>(!f.kind||c.kind===f.kind)&&(!f.level||String(c.level)===String(f.level))&&(!f.moon||c.moon===f.moon));
+  const list=D.crafts.filter(c=>(!f.kind||c.kind===f.kind)&&(!f.level||String(c.level)===String(f.level))&&(!f.moon||c.moon===f.moon)&&(!f.accuracy||c.accuracy===f.accuracy));
   const levels=[...new Set(list.map(c=>c.level))].sort((a,b)=>a-b);
   const body=levels.map(l=>`<h2 class="sec">${esc(lvLabel(l))} <span class="l"></span><small>${list.filter(c=>c.level===l).length} recipes</small></h2><div class="grid">${list.filter(c=>c.level===l).map(recipeCard).join('')}${UI.edit?addCard('craft','New recipe at level '+l).replace('data-type="craft"','data-type="craft" data-level="'+l+'"'):''}</div>`).join('');
   return pageHead('recipes','The Night Market · Recipe book')+`
-  <div class="toolbar">${fchips('recipes','kind',D.lists.kinds,'Kind')}${fchips('recipes','level',lvOpts(),'Level')}${fchips('recipes','moon',D.lists.moons.map(m=>m),'Moon')}</div>
+  <div class="toolbar">${fchips('recipes','kind',D.lists.kinds,'Kind')}${fchips('recipes','level',lvOpts(),'Level')}${fchips('recipes','moon',D.lists.moons.map(m=>m),'Moon')}${fchips('recipes','accuracy',D.lists.accuracy,'Lore')}</div>
   ${list.length?body:'<div class="empty">No recipes match those filters.</div>'}${UI.edit&&!list.length?`<div class="grid">${addCard('craft','New recipe')}</div>`:''}`;
 }
 function recipeCard(c){
   const col=listColor('kinds',c.kind);
   return `<div class="card" style="--c:${col}" data-act="open" data-type="craft" data-id="${c.id}">${tools('craft',c.id)}
-   <div class="row">${badge(c.kind,col)}${moonChip(c.moon)}</div>
+   <div class="row">${badge(c.kind,col)}${moonChip(c.moon)}${accBadge(c.accuracy)}</div>
    <h3>${esc(c.name)}</h3>
    ${c.purpose?`<p>${esc(c.purpose)}</p>`:''}
    ${ingChips(c.ingredients)}
@@ -1859,14 +2623,18 @@ function pgRules(){
    ${ed('tiers.'+i+'.desc',t.desc,'div','d')}</div>`).join('')}</div>
   <h2 class="sec">Stall standing <span class="l"></span><small>levels</small></h2>
   <div class="levels">${D.levels.map((l,i)=>`<div class="lv"><div class="num">${l.level}</div><div><small>Name</small>${ed('levels.'+i+'.name',l.name,'h4')}</div><div><small>Earn by</small>${ed('levels.'+i+'.earn',l.earn,'span')}</div><div><small>Opens</small>${ed('levels.'+i+'.opens',l.opens,'span')}</div></div>`).join('')}</div>
+  <h2 class="sec">Accuracy tags <span class="l"></span><small>how true is it</small></h2>
+  <div class="tiers">${[['Traditional','Real folklore and traditional herbal or occult use, kept as faithful as we can.'],['Inspired','A real basis, simplified or stretched for the game.'],['Game-only','Invented for fun.']].map(([a,t])=>`<div class="tier" style="grid-template-columns:150px 1fr"><div>${accBadge(a)}</div><div class="d">${esc(t)}</div></div>`).join('')}</div>
+  <h2 class="sec">Reference shelf <span class="l"></span><small>check against these</small></h2>
+  <div class="note" style="line-height:1.8">Cunningham's Encyclopedia of Magical Herbs · The Good Witch's Guide (Robbins and Bedell) · Encyclopedia of Witchcraft and Encyclopedia of 5,000 Spells (Illes) · Llewellyn's Complete Book of Correspondences (Kynes) · The Wheel of the Year (Cook and Roux) · Encyclopedia of Witches, Witchcraft and Wicca (Guiley). Correspondences differ between authors, so edit any entry to match your preferred book.</div>
   <p class="blurb" style="margin-top:22px;font-size:14px">Zones, kinds, moon phases, rarities and request types are managed from the <a href="#" data-act="cats">Categories</a> panel.</p>`;
 }
 
 function pgSearch(){
   const q=UI.q.trim().toLowerCase();
   const hit=(o,keys)=>keys.some(k=>String(o[k]||'').toLowerCase().includes(q));
-  const g=D.gathers.filter(x=>hit(x,['name','zone','notes','source','when']));
-  const c=D.crafts.filter(x=>hit(x,['name','kind','purpose','ingredients','method','notes','improper']));
+  const g=D.gathers.filter(x=>hit(x,['name','latin','zone','lore','notes','source','when','corr']));
+  const c=D.crafts.filter(x=>hit(x,['name','kind','purpose','ingredients','method','lore','notes','improper']));
   const r=D.requests.filter(x=>hit(x,['name','ask','answer','wrong','notes']));
   const u=D.upgrades.filter(x=>hit(x,['name','ingredients','notes','effect']));
   const row=(t,e,sub)=>`<button class="resrow" data-act="open" data-type="${t}" data-id="${e.id}"><b>${esc(e.name)}</b><span>${esc(sub)}</span></button>`;
@@ -1917,15 +2685,19 @@ function detail(type,id){
   let html='',color='#f0c674';
   if(type==='gather'){
     color=listColor('zones',e.zone);const u=usedIn(e.name);
-    html=`${xbtn}<div class="row" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${badge(e.zone,color)}${gems(e.rarity)}<span class="badge plain">${esc(e.rarity)}</span></div><h2>${esc(e.name)}</h2>
+    html=`${xbtn}<div class="row" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${badge(e.zone,color)}${gems(e.rarity)}<span class="badge plain">${esc(e.rarity)}</span>${accBadge(e.accuracy)}</div><h2>${esc(e.name)}</h2>
+    ${e.latin?`<div class="latin" style="margin:-6px 0 0;font-size:20px">${esc(e.latin)}</div>`:''}
     <div class="sect"><span class="lbl">Where and when</span><p>${esc(e.zone)} · ${esc(e.when)} · ${esc(e.source)}</p></div>
-    ${e.notes?`<div class="sect"><div class="note">${esc(e.notes)}</div></div>`:''}
+    ${e.corr?`<div class="sect"><span class="lbl">Correspondences</span><p>${esc(e.corr)}</p></div>`:''}
+    ${e.lore?`<div class="sect"><span class="lbl">Real-world lore</span><div class="note">${esc(e.lore)}</div></div>`:''}
+    ${e.safety?`<div class="sect"><span class="lbl">Safety</span><div class="callout">${esc(e.safety)}</div></div>`:''}
+    ${e.notes?`<div class="sect"><span class="lbl">Notes</span><p>${esc(e.notes)}</p></div>`:''}
     <div class="sect"><span class="lbl">Goes into</span>${u.crafts.length||u.upgrades.length?`<div class="chips">${u.crafts.map(x=>chipFor({qty:1,name:x.name,r:{type:'craft',e:x}})).join('')}${u.upgrades.map(x=>`<span class="chip craft">${esc(x.name)}</span>`).join('')}</div>`:'<span class="dash">Nothing yet</span>'}</div>
     ${u.requests.length?`<div class="sect"><span class="lbl">Customers who ask for it directly</span><div class="chips">${u.requests.map(r=>`<button class="chip" data-act="open" data-type="request" data-id="${r.id}">${esc(r.name)}</button>`).join('')}</div></div>`:''}`;
   }else if(type==='craft'){
     color=listColor('kinds',e.kind);const u=usedIn(e.name);const n=rawNeeds(e,'craft');
     const tiers=D.tiers.filter(t=>Number(t.mult)>0);const mx=Math.max(1,...tiers.map(t=>priceAt(e.price,t.mult)));
-    html=`${xbtn}<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${badge(e.kind,color)}${lvBadge(e.level)}${moonChip(e.moon)}</div><h2>${esc(e.name)}</h2>
+    html=`${xbtn}<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${badge(e.kind,color)}${lvBadge(e.level)}${moonChip(e.moon)}${accBadge(e.accuracy)}</div><h2>${esc(e.name)}</h2>
     ${e.purpose?`<p style="font:italic 500 21px/1.35 var(--serif);color:#e6dcf3;margin:0">${esc(e.purpose)}</p>`:''}
     <div class="sect"><span class="lbl">Ingredients</span>${ingChips(e.ingredients)}</div>
     ${e.method?`<div class="sect"><span class="lbl">Method</span><div class="note">${esc(e.method)}</div></div>`:''}
@@ -1934,6 +2706,8 @@ function detail(type,id){
     ${e.improper?`<div class="sect"><span class="lbl">Done badly</span><div class="callout">${esc(e.improper)}</div></div>`:''}
     ${u.crafts.length||u.upgrades.length?`<div class="sect"><span class="lbl">Used in</span><div class="chips">${u.crafts.map(x=>chipFor({qty:1,name:x.name,r:{type:'craft',e:x}})).join('')}${u.upgrades.map(x=>`<span class="chip craft">${esc(x.name)}</span>`).join('')}</div></div>`:''}
     ${u.requests.length?`<div class="sect"><span class="lbl">Asked for by</span><div class="chips">${u.requests.map(r=>`<button class="chip" data-act="open" data-type="request" data-id="${r.id}">${esc(r.name)}</button>`).join('')}</div></div>`:''}
+    ${e.lore?`<div class="sect"><span class="lbl">Real-world basis</span><div class="note">${esc(e.lore)}</div></div>`:''}
+    ${e.safety?`<div class="sect"><span class="lbl">Safety</span><div class="callout">${esc(e.safety)}</div></div>`:''}
     ${e.notes?`<div class="sect"><span class="lbl">Notes</span><p>${esc(e.notes)}</p></div>`:''}`;
   }else if(type==='request'){
     color=listColor('reqkinds',e.kind);const n=requestNeeds(e);const wm=tierMult('Improper',1);
@@ -1958,8 +2732,8 @@ function detail(type,id){
 
 /* ---------- forms ---------- */
 const SCHEMA={
- gather:[['name','Name','text',{req:1}],['zone','Zone','list','zones'],['when','When','text',{hint:'Day, Dusk only, Low tide… or Any.'}],['rarity','Rarity','list','rarities'],['source','Source','text',{hint:'Gather, Trade with Wren, Buy or trade in town…',dl:['Gather','Trade with Wren','Buy or trade in town','Scavenge in town','Gift']}],['notes','Notes','area']],
- craft:[['name','Name','text',{req:1}],['kind','Kind','list','kinds'],['level','Level','level'],['moon','Best moon','list','moons'],['ingredients','Ingredients','ing','all'],['purpose','What it answers','area'],['method','Method','area'],['price','Base price (coins)','num'],['sells','Sold at Stall 13','bool'],['improper','Done badly it looks like','area'],['notes','Notes','area']],
+ gather:[['name','Name','text',{req:1}],['zone','Zone','list','zones'],['when','When','text',{hint:'Day, Dusk only, Low tide… or Any.'}],['rarity','Rarity','list','rarities'],['source','Source','text',{hint:'Gather, Trade with Wren, Buy or trade in town…',dl:['Gather','Trade with Wren','Buy or trade in town','Scavenge in town','Gift']}],['latin','Latin name','text'],['corr','Correspondences','text',{hint:'Planet · Element, as in your reference book.'}],['accuracy','Accuracy','list','accuracy'],['lore','Real-world lore','area'],['safety','Safety note','area'],['notes','Notes','area']],
+ craft:[['name','Name','text',{req:1}],['kind','Kind','list','kinds'],['level','Level','level'],['moon','Best moon','list','moons'],['ingredients','Ingredients','ing','all'],['purpose','What it answers','area'],['method','Method','area'],['price','Base price (coins)','num'],['sells','Sold at Stall 13','bool'],['improper','Done badly it looks like','area'],['accuracy','Accuracy','list','accuracy'],['lore','Real-world basis','area'],['safety','Safety note','area'],['notes','Notes','area']],
  request:[['name','Customer','text',{req:1}],['kind','Kind','list','reqkinds'],['level','Level','level'],['ask','What they say','area'],['answer','Right answer (recipes)','ing','crafts'],['pay','Pays, done right','num'],['wrong','If you give the wrong thing','area'],['notes','Notes','area']],
  upgrade:[['name','Name','text',{req:1}],['stall','Stall','text'],['ingredients','Made from','ing','all'],['effect','What it does','area'],['notes','Notes','area']]
 };
@@ -1988,8 +2762,8 @@ function openForm(type,id,preset){
   const list={gather:D.gathers,craft:D.crafts,request:D.requests,upgrade:D.upgrades}[type];
   let e;
   if(isNew){
-    e=({gather:{name:'',zone:D.lists.zones[0].name,when:'Any',rarity:'Common',source:'Gather',notes:''},
-        craft:{name:'',kind:D.lists.kinds[0].name,level:1,moon:'Any',ingredients:'',purpose:'',method:'',price:null,sells:true,improper:'',notes:''},
+    e=({gather:{name:'',zone:D.lists.zones[0].name,when:'Any',rarity:'Common',source:'Gather',latin:'',corr:'',accuracy:'Traditional',lore:'',safety:'',notes:''},
+        craft:{name:'',kind:D.lists.kinds[0].name,level:1,moon:'Any',ingredients:'',purpose:'',method:'',price:null,sells:true,improper:'',accuracy:'Traditional',lore:'',safety:'',notes:''},
         request:{name:'',kind:D.lists.reqkinds[0].name,level:1,ask:'',answer:'',pay:0,wrong:'',notes:''},
         upgrade:{name:'',stall:'Stall 13',ingredients:'',effect:'',notes:''}})[type];
     Object.assign(e,preset||{});
@@ -2032,7 +2806,7 @@ function saveForm(form){
   $$('[data-err]',form).forEach(e=>e.textContent=errs[e.dataset.err]||'');
   if(Object.keys(errs).length)return;
   // new categories
-  const listMap={zone:'zones',kind:type==='request'?'reqkinds':'kinds',moon:'moons',rarity:'rarities'};
+  const listMap={zone:'zones',kind:type==='request'?'reqkinds':'kinds',moon:'moons',rarity:'rarities',accuracy:'accuracy'};
   const pal=['#4fb5a0','#c9a24a','#6c9bd8','#d98a5a','#b58be0','#e08fa0','#8bd3b0','#e6a86c','#9fb4e8','#f0c674'];
   Object.keys(listMap).forEach(k=>{
     if(v['__new_'+k]){const L=D.lists[listMap[k]];if(!L.find(i=>i.name===v['__new_'+k]))L.push({name:v['__new_'+k],color:pal[L.length%pal.length]});}
@@ -2068,11 +2842,11 @@ function confirmDelete(type,id){
 }
 
 /* ---------- categories drawer ---------- */
-const CATS=[['zones','Zones','Where gathered things are found','gathers','zone'],['kinds','Recipe kinds','Candle, Charm, Brew…','crafts','kind'],['moons','Moon phases','When a recipe is best','crafts','moon'],['rarities','Rarities','How hard something is to find','gathers','rarity'],['reqkinds','Request types','Ailment, Wish, Favor…','requests','kind']];
+const CATS=[['zones','Zones','Where gathered things are found','gathers','zone'],['kinds','Recipe kinds','Candle, Charm, Brew…','crafts','kind'],['moons','Moon phases','When a recipe is best','crafts','moon'],['rarities','Rarities','How hard something is to find','gathers','rarity'],['accuracy','Accuracy','How true to real folklore','both','accuracy'],['reqkinds','Request types','Ailment, Wish, Favor…','requests','kind']];
 function openCats(){
   openModal(`${xbtn}<div class="eyebrow">Categories</div><h2 style="font-size:40px">Sort the book your way</h2><p style="color:var(--muted);margin:0 0 6px">Rename, recolor, add or remove. Renaming updates every item that uses it. A category in use can’t be removed until nothing uses it.</p>
    ${CATS.map(([k,t,h,coll,fld])=>`<div class="sect"><span class="lbl">${t} <span style="text-transform:none;letter-spacing:0;font-weight:600">· ${h}</span></span><div class="catlist" data-list="${k}">
-     ${D.lists[k].map((i,ix)=>{const n=D[coll].filter(x=>x[fld]===i.name).length;return `<div class="catrow"><input type="color" value="${i.color}" data-act-input="catcolor" data-list="${k}" data-ix="${ix}"><input type="text" value="${esc(i.name)}" data-act-input="catname" data-list="${k}" data-ix="${ix}"><span class="cnt">${n} in use</span><span class="iconbtn del" data-act="cat-del" data-list="${k}" data-ix="${ix}" title="${n?'In use':'Remove'}" style="${n?'opacity:.35':''}">${ico('x',14)}</span></div>`;}).join('')}
+     ${D.lists[k].map((i,ix)=>{const n=CI(coll).filter(x=>x[fld]===i.name).length;return `<div class="catrow"><input type="color" value="${i.color}" data-act-input="catcolor" data-list="${k}" data-ix="${ix}"><input type="text" value="${esc(i.name)}" data-act-input="catname" data-list="${k}" data-ix="${ix}"><span class="cnt">${n} in use</span><span class="iconbtn del" data-act="cat-del" data-list="${k}" data-ix="${ix}" title="${n?'In use':'Remove'}" style="${n?'opacity:.35':''}">${ico('x',14)}</span></div>`;}).join('')}
      <button class="btn sm" data-act="cat-add" data-list="${k}" style="justify-self:start">${ico('plus',14)} Add</button></div></div>`).join('')}
    <div class="ft"><button class="btn gold" data-act="close">Done</button></div>`);
 }
@@ -2080,7 +2854,7 @@ function catRename(k,ix,nv){
   nv=nv.trim();const L=D.lists[k];const old=L[ix].name;if(!nv||nv===old)return;
   if(L.find((i,j)=>j!==ix&&i.name===nv))return toast('That name is taken');
   const [,,,coll,fld]=CATS.find(c=>c[0]===k);
-  D[coll].forEach(x=>{if(x[fld]===old)x[fld]=nv;});
+  CI(coll).forEach(x=>{if(x[fld]===old)x[fld]=nv;});
   L[ix].name=nv;save(true);
 }
 
@@ -2090,6 +2864,7 @@ function openPublish(){
    <div class="note" style="margin-top:6px">Edits save in <b>this browser</b> as you go. To put them on GitHub, download the updated book and upload it over <b>index.html</b> in your repo. Then it is the same for everyone who visits.</div>
    <div class="sect"><div style="display:grid;gap:12px">
     <button class="btn gold" data-act="dl-html" style="height:54px;justify-content:center;font-size:16px">${ico('download',20)} Download updated Game Book (index.html)</button>
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" data-act="dl-xlsx">${ico('download',16)} Export Excel (color coded)</button><button class="btn" data-act="dl-csv">${ico('download',16)} Export CSV</button></div>
     <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" data-act="dl-json">${ico('download',16)} Export data (JSON)</button><label class="btn" style="cursor:pointer">${ico('up',16)} Import data (JSON)<input type="file" accept=".json,application/json" id="importf" hidden></label></div>
    </div></div>
    <div class="sect"><span class="lbl">Put it on GitHub</span><div class="note" style="line-height:1.8">1. Download the file above and name it <b>index.html</b>.<br>2. In your repo choose <b>Add file → Upload files</b>, drop it in, and commit.<br>3. In <b>Settings → Pages</b>, set the branch to <b>main</b> and the folder to <b>/ (root)</b>.<br>4. Your book lives at <b>https://your-name.github.io/your-repo/</b>.</div></div>
@@ -2108,6 +2883,75 @@ function download(name,text,type){
   const b=new Blob([text],{type});const a=document.createElement('a');
   a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},400);
+}
+
+
+/* ---------- export (xlsx with colors, csv) ---------- */
+const CRC=(()=>{const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0;}return t;})();
+const crc32=u=>{let c=0xFFFFFFFF;for(let i=0;i<u.length;i++)c=CRC[(c^u[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0;};
+function makeZip(files){
+  const enc=new TextEncoder(),parts=[],cd=[];let off=0;
+  const u16=n=>[n&255,(n>>8)&255],u32=n=>[n&255,(n>>8)&255,(n>>16)&255,(n>>>24)&255];
+  files.forEach(f=>{
+    const name=enc.encode(f.name),data=enc.encode(f.data),crc=crc32(data);
+    const lh=new Uint8Array([...u32(0x04034b50),...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(33),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0)]);
+    parts.push(lh,name,data);
+    cd.push(new Uint8Array([...u32(0x02014b50),...u16(20),...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(33),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(off)]),name);
+    off+=lh.length+name.length+data.length;
+  });
+  let cdSize=0;cd.forEach(c=>cdSize+=c.length);
+  const end=new Uint8Array([...u32(0x06054b50),...u16(0),...u16(0),...u16(files.length),...u16(files.length),...u32(cdSize),...u32(off),...u16(0)]);
+  return new Blob([...parts,...cd,end],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+const xe=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,'');
+const colL=i=>{let s='';i++;while(i>0){const m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26);}return s;};
+function buildXlsx(){
+  buildIdx();
+  const fills=[],fmap={};
+  const xfOf=hex=>{hex=(hex||'').replace('#','').toUpperCase();if(!/^[0-9A-F]{6}$/.test(hex))return 2;if(fmap[hex]==null){fills.push(hex);fmap[hex]=3+fills.length-1;}return fmap[hex];};
+  const L=(list,n)=>xfOf(listColor(list,n));
+  const sheets=[];
+  const sheet=(name,headers,widths,rows)=>sheets.push({name,headers,widths,rows});
+  sheet('Gathering',['Name','Latin name','Zone','When','Rarity','Source','Correspondences','Accuracy','Real-world lore','Safety','Notes'],[24,24,20,22,12,22,18,14,70,44,30],
+    D.gathers.map(g=>[g.name,g.latin,{v:g.zone,s:L('zones',g.zone)},g.when,{v:g.rarity,s:L('rarities',g.rarity)},g.source,g.corr,{v:g.accuracy,s:L('accuracy',g.accuracy)},g.lore,g.safety,g.notes]));
+  sheet('Recipes and Spells',['Name','Kind','Level','Level name','Best moon','Ingredients','Method','What it answers','Base price','Sold at Stall 13','Accuracy','Real-world basis','Safety','Done badly','Notes'],[26,12,8,16,12,44,50,36,11,12,14,60,40,44,30],
+    D.crafts.map(c=>[c.name,{v:c.kind,s:L('kinds',c.kind)},{v:c.level,s:xfOf('C8B6E8')},lvName(c.level),{v:c.moon,s:L('moons',c.moon)},c.ingredients,c.method,c.purpose,c.price,c.sells?'Yes':'No',{v:c.accuracy,s:L('accuracy',c.accuracy)},c.lore,c.safety,c.improper,c.notes]));
+  const tiers=D.tiers.filter(t=>Number(t.mult)>0);
+  sheet('Stall Goods',['Item','Level','Kind','Base price',...tiers.map(t=>t.name+' price'),'Done badly'],[26,8,12,11,...tiers.map(()=>14),50],
+    D.crafts.filter(c=>c.sells&&c.price!=null).sort((a,b)=>a.level-b.level||a.name.localeCompare(b.name)).map(c=>[c.name,{v:c.level,s:xfOf('C8B6E8')},{v:c.kind,s:L('kinds',c.kind)},c.price,...tiers.map(t=>priceAt(c.price,t.mult)),c.improper]));
+  sheet('Requests',['Customer','Kind','Level','What they say','Right answer','Pays, done right','Pays, rushed','If wrong','Notes'],[28,12,8,56,36,14,12,40,40],
+    D.requests.map(r=>[r.name,{v:r.kind,s:L('reqkinds',r.kind)},{v:r.level,s:xfOf('C8B6E8')},r.ask,r.answer,r.pay,priceAt(r.pay,tierMult('Improper',1)),r.wrong,r.notes]));
+  sheet('Stall Upgrades',['Name','Stall','Made from','What it does','Notes'],[24,14,40,40,30],D.upgrades.map(u=>[u.name,u.stall,u.ingredients,u.effect,u.notes]));
+  sheet('Rules',['Quality tier','Multiplier','Meaning'],[18,12,70],D.tiers.map(t=>[t.name,t.mult,t.desc]).concat([['','',''],['Level','Name','Earn by','Opens']].map(r=>r)).concat(D.levels.map(l=>[l.level,l.name,l.earn,l.opens])));
+  const files=[];
+  files.push({name:'[Content_Types].xml',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'+sheets.map((_,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')+'</Types>'});
+  files.push({name:'_rels/.rels',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'});
+  files.push({name:'xl/workbook.xml',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>'+sheets.map((s,i)=>`<sheet name="${xe(s.name)}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join('')+'</sheets></workbook>'});
+  files.push({name:'xl/_rels/workbook.xml.rels',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+sheets.map((_,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('')+`<Relationship Id="rId${sheets.length+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`});
+  sheets.forEach((sh,i)=>{
+    const rows=[sh.headers.map(h=>({v:h,s:1}))].concat(sh.rows.map(r=>r.map(c=>(c&&typeof c==='object')?c:{v:c,s:2})));
+    const sd=rows.map((r,ri)=>`<row r="${ri+1}">`+r.map((c,ci)=>{
+      if(c.v==null||c.v==='')return c.s>2||c.s===1?`<c r="${colL(ci)}${ri+1}" s="${c.s}"/>`:'';
+      const ref=`${colL(ci)}${ri+1}`;
+      return typeof c.v==='number'?`<c r="${ref}" s="${c.s}"><v>${c.v}</v></c>`:`<c r="${ref}" s="${c.s}" t="inlineStr"><is><t xml:space="preserve">${xe(c.v)}</t></is></c>`;
+    }).join('')+'</row>').join('');
+    files.push({name:`xl/worksheets/sheet${i+1}.xml`,data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols>${sh.widths.map((w,j)=>`<col min="${j+1}" max="${j+1}" width="${w}" customWidth="1"/>`).join('')}</cols><sheetData>${sd}</sheetData></worksheet>`});
+  });
+  const fillXml='<fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFF0C674"/></patternFill></fill>'+fills.map(h=>`<fill><patternFill patternType="solid"><fgColor rgb="FF${h}"/></patternFill></fill>`).join('');
+  const xfs='<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"><alignment vertical="center"/></xf><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>'+fills.map((_,i)=>`<xf numFmtId="0" fontId="0" fillId="${3+i}" borderId="0" xfId="0" applyFill="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>`).join('');
+  files.push({name:'xl/styles.xml',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><color rgb="FF1B1327"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FF1B1327"/><name val="Calibri"/></font></fonts><fills count="${3+fills.length}">${fillXml}</fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="${3+fills.length}">${xfs}</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`});
+  return makeZip(files);
+}
+function buildCsv(){
+  buildIdx();
+  const cols=['Section','Name','Latin name','Category','Category color','Level','Moon','Rarity','When','Source','Ingredients','Method','Purpose','Base price','Sold','Accuracy','Correspondences','Real-world lore','Safety','Done badly','Customer says','Pays','Wrong answer','Notes'];
+  const q=v=>{v=v==null?'':String(v);return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+  const rows=[];
+  D.gathers.forEach(g=>rows.push(['Gather',g.name,g.latin,g.zone,listColor('zones',g.zone),'','',g.rarity,g.when,g.source,'','','','','',g.accuracy,g.corr,g.lore,g.safety,'','','','',g.notes]));
+  D.crafts.forEach(c=>rows.push(['Recipe',c.name,'',c.kind,listColor('kinds',c.kind),c.level,c.moon,'','','',c.ingredients,c.method,c.purpose,c.price,c.sells?'Yes':'No',c.accuracy,'',c.lore,c.safety,c.improper,'','','',c.notes]));
+  D.requests.forEach(r=>rows.push(['Request',r.name,'',r.kind,listColor('reqkinds',r.kind),r.level,'','','','',r.answer,'','','','','','','','','',r.ask,r.pay,r.wrong,r.notes]));
+  D.upgrades.forEach(u=>rows.push(['Upgrade',u.name,'',u.stall,'','','','','','',u.ingredients,'',u.effect,'','','','','','','','','','',u.notes]));
+  return '﻿'+[cols].concat(rows).map(r=>r.map(q).join(',')).join('\r\n');
 }
 
 /* ---------- events ---------- */
@@ -2139,9 +2983,11 @@ document.addEventListener('click',ev=>{
     case'ing-del':{const row=t.closest('.ingrow');const p=row.parentElement;if($$('.ingrow',p).length>1)row.remove();else $$('input',row).forEach((i,ix)=>i.value=ix?'':1);break;}
     case'cats':closeModal();openCats();break;
     case'cat-add':{const k=t.dataset.list;const pal=['#4fb5a0','#c9a24a','#6c9bd8','#d98a5a','#b58be0','#e08fa0','#8bd3b0','#e6a86c'];let n='New category',i=2;while(D.lists[k].find(x=>x.name===n))n='New category '+(i++);D.lists[k].push({name:n,color:pal[D.lists[k].length%pal.length]});save(true);openCats();render(true);break;}
-    case'cat-del':{const k=t.dataset.list,ix=+t.dataset.ix;const [,,,coll,fld]=CATS.find(c=>c[0]===k);const n=D[coll].filter(x=>x[fld]===D.lists[k][ix].name).length;if(n)return toast('Still in use by '+n+'. Move those first.');D.lists[k].splice(ix,1);save(true);openCats();render(true);break;}
+    case'cat-del':{const k=t.dataset.list,ix=+t.dataset.ix;const [,,,coll,fld]=CATS.find(c=>c[0]===k);const n=CI(coll).filter(x=>x[fld]===D.lists[k][ix].name).length;if(n)return toast('Still in use by '+n+'. Move those first.');D.lists[k].splice(ix,1);save(true);openCats();render(true);break;}
     case'publish':closeModal();openPublish();break;
     case'dl-html':download('index.html',buildHtml(),'text/html');EMB_REV=D.rev;try{localStorage.setItem(STORE,JSON.stringify(D));}catch(e){}updateFoot();toast('Downloaded. Upload it as index.html');break;
+    case'dl-xlsx':download('night-market-game-book.xlsx',buildXlsx(),'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');toast('Excel file downloaded');break;
+    case'dl-csv':download('night-market-game-book.csv',buildCsv(),'text/csv');toast('CSV downloaded');break;
     case'dl-json':download('night-market-game-book-data.json',JSON.stringify(D,null,1),'application/json');break;
     case'reset':{try{localStorage.removeItem(STORE);}catch(e){}D=JSON.parse($('#bookdata').textContent);EMB_REV=D.rev||0;closeModal();render();toast('Back to the file’s data');break;}
   }
@@ -2192,7 +3038,7 @@ function flies(){
 loadData();normalize();
 flies();
 render();fbInit();
-window.__book={get data(){return D;},UI,render,save};
+window.__book={get data(){return D;},UI,render,save,exportX:buildXlsx,exportC:buildCsv};
 })();
 </script>
 </body>
