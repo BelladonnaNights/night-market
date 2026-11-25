@@ -300,6 +300,57 @@ body.edit .hide-edit{display:none!important}
   .modal{padding:26px 22px 22px}
   .btn .lbl-t{display:none}
 }
+
+/* ---- stage (scene layers) ---- */
+.stage{position:absolute;inset:0;overflow:hidden}
+.stage .st{position:absolute;left:50%;top:50%;width:1920px;height:1080px;overflow:hidden}
+.stage.edit{position:relative;inset:auto;margin:auto;box-shadow:0 0 0 1px var(--line2),0 20px 60px rgba(0,0,0,.5)}
+.stage.edit .st{left:0;top:0}
+.ly{position:absolute;transform-origin:center}
+.ly .lyi{display:block;transform-origin:center;max-width:none}
+.stage.edit .ly{cursor:grab}.stage.edit .ly.sel{outline:2px solid #f0c674;outline-offset:2px}
+.stage.edit .guide{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(240,198,116,.25)}
+@keyframes fxpulse{0%,100%{opacity:calc(1 - var(--a)*.65);transform:scale(calc(1 - var(--a)*.1))}50%{opacity:1;transform:scale(calc(1 + var(--a)*.14))}}
+@keyframes fxflick{0%,100%{opacity:1}8%{opacity:calc(1 - var(--a)*.4)}14%{opacity:1}26%{opacity:calc(1 - var(--a)*.7)}38%{opacity:.95}52%{opacity:calc(1 - var(--a)*.5)}70%{opacity:1}84%{opacity:calc(1 - var(--a)*.6)}}
+@keyframes fxsway{0%,100%{transform:rotate(calc(var(--a)*-7deg))}50%{transform:rotate(calc(var(--a)*7deg))}}
+@keyframes fxfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(calc(var(--a)*-26px))}}
+@keyframes fxspin{to{transform:rotate(360deg)}}
+@keyframes fxtwk{0%,100%{opacity:1;transform:scale(1)}50%{opacity:calc(1 - var(--a)*.9);transform:scale(calc(1 - var(--a)*.3))}}
+.fx-pulse{animation:fxpulse var(--d) ease-in-out infinite}.fx-flicker{animation:fxflick calc(var(--d)*1.4) linear infinite}
+.fx-sway{animation:fxsway var(--d) ease-in-out infinite;transform-origin:50% 0!important}.fx-float{animation:fxfloat calc(var(--d)*1.5) ease-in-out infinite}
+.fx-spin{animation:fxspin calc(var(--d)*8) linear infinite}.fx-twinkle{animation:fxtwk calc(var(--d)*.6) ease-in-out infinite}
+.flies{position:relative}.flies i{position:absolute;width:7px;height:7px;border-radius:50%;background:var(--c);box-shadow:0 0 14px 5px var(--c);animation:ffd 8s ease-in-out infinite,ffb 3s ease-in-out infinite}
+@keyframes ffd{0%,100%{transform:translate(0,0)}25%{transform:translate(40px,-30px)}50%{transform:translate(-20px,-60px)}75%{transform:translate(-45px,-20px)}}
+@keyframes ffb{0%,100%{opacity:.15}50%{opacity:1}}
+/* ---- asset manager ---- */
+#asm{position:relative;height:100%;background:#0b0712;display:flex;flex-direction:column;color:var(--text);font-family:var(--sans);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.asm-host{height:calc(100vh - 190px);min-height:560px}
+.page.asmpage{max-width:none}
+.am-top{display:flex;gap:8px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}.am-t{font:700 20px var(--serif);color:var(--gold)}.am-sp{flex:1}
+.am-body{flex:1;display:grid;grid-template-columns:minmax(250px,310px) 1fr minmax(250px,310px);min-height:0}
+.am-tree,.am-right{overflow:auto;padding:8px;background:rgba(20,13,32,.6)}.am-tree{border-right:1px solid var(--line)}.am-right{border-left:1px solid var(--line)}
+.am-mid{display:flex;flex-direction:column;min-width:0;min-height:0;padding:10px;gap:8px}
+.am-stagewrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;background:#05030a;border-radius:12px;overflow:hidden}
+.am-prev{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;background:#05030a;border-radius:12px;padding:12px}
+.am-sbar{display:flex;gap:10px;align-items:center;font-size:13px}.am-empty{color:var(--muted);font-size:13px;padding:10px}.am-empty.big{font-size:16px;text-align:center;margin:auto;max-width:420px}
+.tr{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:9px;cursor:pointer;font-size:13.5px;border:1px solid transparent;position:relative}
+.tr:hover{background:rgba(240,198,116,.07)}.tr.on{background:rgba(240,198,116,.16);border-color:var(--line2)}.tr.cur{background:rgba(201,160,220,.12)}
+.tr .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tr .cnt,.tr .tag{font-size:11px;color:var(--muted)}.tr .th{width:28px;height:28px;object-fit:contain;border-radius:5px;background:#05030a}.tr .ico{width:28px;text-align:center;color:var(--gold);font-style:normal}
+.tr .car{width:14px;cursor:pointer}.tr .tact{display:none;gap:3px}.tr.f:hover .tact{display:flex}.tr .tact button{font:700 10.5px var(--sans);padding:2px 6px;border-radius:6px;background:rgba(255,255,255,.08);color:inherit;border:0;cursor:pointer}.tr .tact button:hover{background:var(--gold);color:#1a1226}
+.tr.dropt{outline:2px solid var(--gold);background:rgba(240,198,116,.18)}.tr.dropb{box-shadow:0 2px 0 0 var(--gold)}.tr.root{font-weight:700;color:var(--gold)}
+.am-p{padding:6px}.am-p h3{font:700 17px var(--serif);color:var(--gold);margin:12px 0 6px}.am-p p{font-size:13px;color:var(--muted);line-height:1.5}.am-p code{background:rgba(255,255,255,.08);padding:1px 5px;border-radius:5px}
+.am-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.am-grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.am-p .fld{margin:8px 0}.am-p .fld label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.am-p input[type=text],.am-p input[type=number],.am-p input:not([type]),.am-p select{width:100%;padding:6px 9px;border-radius:9px;background:rgba(14,9,22,.7);border:1px solid var(--line);color:inherit;font:inherit;outline:0}
+.rng{display:flex;gap:8px;align-items:center}.rng input[type=range]{flex:1}.rng input[type=number]{width:74px!important}
+.lrows{max-height:200px;overflow:auto}.lrow{display:flex;align-items:center;gap:5px;padding:5px 8px;border-radius:8px;cursor:pointer;font-size:13px}.lrow.on{background:rgba(240,198,116,.16)}.lrow .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lrow button{background:none;border:0;color:inherit;cursor:pointer;opacity:.7;font-size:14px}
+@media(max-width:900px){.am-body{grid-template-columns:1fr}.am-tree{max-height:30vh}.am-right{max-height:34vh}}
+
+#asm .tab{padding:6px 14px;border-radius:99px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);font-weight:800;font-size:13px;cursor:pointer}#asm .tab.on{background:var(--gold);color:#2a1a08;border-color:transparent}#asm .tabs{display:inline-flex;gap:6px}
+#asm .chip{display:inline-flex;gap:6px;align-items:center;padding:5px 11px;border-radius:99px;border:1px solid var(--line);font-size:12.5px;cursor:pointer}
+#asm .actions{display:flex;gap:8px;flex-wrap:wrap}
+.modal.cut{width:min(900px,96vw)}
+
 </style>
 </head>
 <body>
@@ -2272,6 +2323,7 @@ const IC={
  plus:'<path d="M12 5v14M5 12h14"/>',
  x:'<path d="M6 6l12 12M18 6L6 18"/>',
  download:'<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>',
+ assets:'<rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m21 16-5-5-8 8"/>',
  gear:'<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2.2"/><circle cx="8" cy="17" r="2.2"/>',
  coin:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5v9M9.6 10c0-.9 1-1.4 2.4-1.4s2.4.5 2.4 1.4-1 1.2-2.4 1.6-2.4.7-2.4 1.6 1 1.4 2.4 1.4 2.4-.5 2.4-1.4"/>',
  warn:'<path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17.5v.2"/>',
@@ -2436,7 +2488,7 @@ function usedIn(name){
 const UI={sec:'overview',prev:'overview',q:'',edit:false,
   f:{gather:{zone:null,rarity:null,accuracy:null,view:'cards'},recipes:{kind:null,level:null,moon:null,accuracy:null},
      goods:{kind:null,level:null,sort:'level',dir:1},requests:{kind:null,level:null}}};
-const SECS=[['overview','Overview','overview'],['gather','Gathering','gather'],['recipes','Recipes & Spells','recipes'],['goods','Stall Goods','goods'],['requests','Requests','requests'],['upgrades','Stall Upgrades','upgrades'],['rules','Rules','rules']];
+const SECS=[['overview','Overview','overview'],['gather','Gathering','gather'],['recipes','Recipes & Spells','recipes'],['goods','Stall Goods','goods'],['requests','Requests','requests'],['upgrades','Stall Upgrades','upgrades'],['rules','Rules','rules'],['assets','Assets & Images','assets']];
 const secCount=k=>({gather:D.gathers.length,recipes:D.crafts.length,goods:D.crafts.filter(c=>c.sells).length,requests:D.requests.length,upgrades:D.upgrades.length})[k];
 
 /* editable text helper */
@@ -2645,7 +2697,7 @@ function pgSearch(){
 }
 
 /* ---------- shell ---------- */
-const PAGES={overview:pgOverview,gather:pgGather,recipes:pgRecipes,goods:pgGoods,requests:pgRequests,upgrades:pgUpgrades,rules:pgRules};
+const PAGES={overview:pgOverview,gather:pgGather,recipes:pgRecipes,goods:pgGoods,requests:pgRequests,upgrades:pgUpgrades,rules:pgRules,assets:()=>'<div class="pagehead"><div class="eyebrow">Library</div><h1 class="title">Assets &amp; Images</h1><p class="blurb">Folders for chapters and sections, your PNGs and GLBs, and scenes built from layers. Saved in this browser; Export puts it all in a zip for GitHub.</p></div><div class="asm-host" id="asm-host"></div>'};
 function render(keepScroll){
   buildIdx();
   const y=window.scrollY;
@@ -2662,7 +2714,8 @@ function render(keepScroll){
      <button class="btn" data-act="cats">${ico('gear',18)}<span class="lbl-t">Categories</span></button>
      <button class="btn gold" data-act="publish">${ico('download',18)}<span class="lbl-t">Publish</span><span class="dot" id="pubdot" style="display:none;background:#2a1a08;box-shadow:none"></span></button>
    </header>
-   <div class="page">${sec==='search'?pgSearch():PAGES[UI.sec]()}</div></div></div>`;
+   <div class="page ${UI.sec==='assets'&&sec!=='search'?'asmpage':''}">${sec==='search'?pgSearch():PAGES[UI.sec]()}</div></div></div>`;
+  if(UI.sec==='assets'&&sec!=='search'){const h=$('#asm-host');if(h)AssetsTab.mount(h);}
   document.body.classList.toggle('edit',UI.edit);
   updateFoot();
   const qi=$('#q');
@@ -3040,6 +3093,264 @@ flies();
 render();fbInit();
 window.__book={get data(){return D;},UI,render,save,exportX:buildXlsx,exportC:buildCsv};
 })();
+
+/* ===== ASSETS TAB (folders, images, scene composer) ===== */
+const AssetsTab=(function(){
+/* ===== asset library + scene composer ===== */
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let _tt;const toast=m=>{const t=document.getElementById('toast');if(!t)return;t.textContent=m;t.classList.add('on');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('on'),2200);};
+const ADMIN=true;
+const seeded=s=>{let h=2166136261;for(const c of String(s))h=Math.imul(h^c.charCodeAt(0),16777619);return()=>{h+=0x6D2B79F5;let t=Math.imul(h^h>>>15,1|h);t^=t+Math.imul(t^t>>>7,61|t);return((t^t>>>14)>>>0)/4294967296;};};
+const AS={tree:[],scenes:{},slots:{},urls:{},ready:false,sel:null,scene:null,layer:null,cur:null,open:new Set(),phase:'night',remote:false};
+const uid=()=>Math.random().toString(36).slice(2,9);
+const IMGX=/^(png|jpe?g|webp|gif|svg|avif)$/,MODX=/^(glb|gltf)$/,AUDX=/^(mp3|ogg|wav|m4a)$/;
+let _db=null;
+function idb(){return _db||(_db=new Promise((res,rej)=>{const r=indexedDB.open('nm-assets',1);r.onupgradeneeded=()=>{r.result.createObjectStore('files');r.result.createObjectStore('meta');};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);}));}
+async function dbx(store,mode,fn){const d=await idb();return new Promise((res,rej)=>{const t=d.transaction(store,mode),q=fn(t.objectStore(store));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error);});}
+const dbGet=(s,k)=>dbx(s,'readonly',o=>o.get(k)),dbPut=(s,k,v)=>dbx(s,'readwrite',o=>o.put(v,k)),dbDel=(s,k)=>dbx(s,'readwrite',o=>o.delete(k));
+let _sv=null;function saveMeta(){clearTimeout(_sv);return dbPut('meta','state',{tree:AS.tree,scenes:AS.scenes,slots:AS.slots}).catch(()=>toast('Could not save assets (browser storage blocked?)'));}
+function saveSoon(){clearTimeout(_sv);_sv=setTimeout(saveMeta,400);}
+async function assetsLoad(){
+  try{const st=await dbGet('meta','state');if(st){AS.tree=st.tree||[];AS.scenes=st.scenes||{};AS.slots=st.slots||{};}
+    for(const n of AS.tree)if(n.type==='asset'){const b=await dbGet('files',n.id);if(b)AS.urls[n.id]=URL.createObjectURL(b);}}catch(e){}
+  if(!AS.tree.length){try{const r=await fetch('assets/manifest.json',{cache:'no-cache'});if(r.ok){const m=await r.json();AS.tree=m.tree||[];AS.scenes=m.scenes||{};AS.slots=m.slots||{};AS.remote=true;
+    for(const n of AS.tree)if(n.type==='asset'){AS.urls[n.id]='assets/'+n.path;if(ADMIN){try{const f=await fetch('assets/'+n.path);if(f.ok){const b=await f.blob();await dbPut('files',n.id,b);AS.urls[n.id]=URL.createObjectURL(b);}}catch(e){}}}
+    if(ADMIN)await saveMeta();}}catch(e){}}
+  AS.ready=true;
+}
+/* ----- tree helpers ----- */
+const node=id=>AS.tree.find(n=>n.id===id);
+const kids=p=>AS.tree.filter(n=>(n.parent||null)===(p||null)).sort((a,b)=>a.order-b.order);
+const nextOrder=p=>kids(p).reduce((m,n)=>Math.max(m,n.order),0)+1;
+function isUnder(id,anc){let n=node(id);while(n){if(n.id===anc)return true;n=n.parent?node(n.parent):null;}return false;}
+function renum(p){kids(p).forEach((n,i)=>n.order=i+1);}
+function moveNode(id,newParent,beforeId){
+  const n=node(id);if(!n||id===beforeId)return;if(newParent&&(newParent===id||isUnder(newParent,id)))return;
+  const old=n.parent||null;n.parent=newParent||null;
+  if(beforeId){const b=node(beforeId);n.order=b.order-.5;}else n.order=nextOrder(newParent)+1;
+  renum(newParent||null);if(old!==(newParent||null))renum(old);saveMeta();
+}
+function delNode(id){
+  const n=node(id);if(!n)return;
+  if(n.type==='folder')kids(id).forEach(k=>delNode(k.id));
+  if(n.type==='asset'){dbDel('files',id);delete AS.urls[id];Object.values(AS.scenes).forEach(s=>s.layers=s.layers.filter(l=>l.asset!==id));}
+  if(n.type==='scene'){delete AS.scenes[id];for(const k in AS.slots)if(AS.slots[k]===id)delete AS.slots[k];if(AS.scene===id)AS.scene=null;}
+  AS.tree=AS.tree.filter(x=>x.id!==id);if(AS.sel===id)AS.sel=null;
+}
+async function addFiles(files,parent){
+  let n=0;for(const f of files){const ext=(f.name.split('.').pop()||'').toLowerCase();
+    if(!(IMGX.test(ext)||MODX.test(ext)||AUDX.test(ext))){toast('Skipped '+f.name+' (unsupported type)');continue;}
+    const id=uid();let w=0,h=0;const url=URL.createObjectURL(f);
+    if(IMGX.test(ext)){try{const im=new Image();im.src=url;await im.decode();w=im.naturalWidth;h=im.naturalHeight;}catch(e){}}
+    await dbPut('files',id,f);AS.urls[id]=url;AS.tree.push({id,type:'asset',name:f.name.replace(/\.[^.]+$/,''),ext,parent:parent||null,order:nextOrder(parent),size:f.size,w,h});if(parent)AS.open.add(parent);AS.sel=id;AS.scene=null;n++;}
+  if(n){await saveMeta();toast(n+' added');}amRender();
+}
+const kindOf=ext=>IMGX.test(ext)?'image':MODX.test(ext)?'3D model':'audio';
+const fmtSz=b=>b>1e6?(b/1e6).toFixed(1)+' MB':Math.round(b/1e3)+' KB';
+
+/* ----- scene rendering (used by the game AND the composer) ----- */
+const rgba=(hex,a)=>{const h=(hex||'#ffd98a').replace('#','');const n=parseInt(h.length===3?h.replace(/./g,'$&$&'):h,16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;};
+function layerHtml(L,phase,editing){
+  const vis=L.show==='all'||L.show===phase;if(!editing&&(L.hidden||!vis))return '';
+  const fx=L.fx&&L.fx!=='none'?'fx-'+L.fx:'',dur=(5.2-(L.fxs==null?50:L.fxs)/25).toFixed(2);
+  let inner='';
+  if(L.kind==='glow')inner=`<div class="lyi ${fx}" style="width:${L.size}px;height:${L.size}px;border-radius:50%;background:radial-gradient(circle,${rgba(L.color,.95)} 0%,${rgba(L.color,.4)} 38%,${rgba(L.color,0)} 70%)"></div>`;
+  else if(L.kind==='flies'){const r=seeded(L.id);let d='';for(let i=0;i<(L.count||18);i++)d+=`<i style="left:${r()*100}%;top:${r()*100}%;animation-delay:-${(r()*9).toFixed(1)}s;animation-duration:${(5+r()*6).toFixed(1)}s"></i>`;inner=`<div class="lyi flies" style="width:1920px;height:1080px;--c:${L.color||'#ffe9a6'}">${d}</div>`;}
+  else{const u=AS.urls[L.asset];inner=u?`<img class="lyi ${fx}" src="${u}" draggable="false" alt="">`:`<div class="lyi" style="width:200px;height:120px;border:2px dashed #e58585;color:#e58585;display:grid;place-items:center;font:700 14px sans-serif">missing image</div>`;}
+  const off=(L.hidden||!vis)?'opacity:.22;':'opacity:'+(L.op==null?1:L.op)+';';
+  return `<div class="ly ${editing&&AS.layer===L.id?'sel':''}" data-lid="${L.id}" style="left:${L.x}px;top:${L.y}px;transform:translate(-50%,-50%) rotate(${L.rot||0}deg) scale(${(L.s==null?100:L.s)/100*(L.flip?-1:1)},${(L.s==null?100:L.s)/100});${off}mix-blend-mode:${L.blend||'normal'};--a:${(L.fxa==null?50:L.fxa)/100};--d:${dur}s;${editing?'':'pointer-events:none'}">${inner}</div>`;
+}
+
+
+
+window.addEventListener('resize',()=>fitEdit());
+
+/* ----- composer UI ----- */
+async function mount(host){host.innerHTML='<div id="asm"><p class="am-empty">Loading your library…</p></div>';if(!AS.ready){try{await assetsLoad();}catch(e){}}amRender();}
+function trRows(pid,depth){
+  return kids(pid).map(n=>{
+    const pad=10+depth*16,sel=(AS.sel===n.id||AS.scene===n.id)?'on':'';
+    if(n.type==='folder'){const op=AS.open.has(n.id);return `<div class="tr f ${AS.cur===n.id?'cur':''}" draggable="true" data-id="${n.id}" style="padding-left:${pad}px"><b class="car" data-am="tog" data-id="${n.id}">${op?'▾':'▸'}</b><span class="nm" data-am="fsel" data-id="${n.id}">${esc(n.name)}</span><span class="cnt">${kids(n.id).length}</span><span class="tact"><button data-am="newf" data-id="${n.id}" title="New subfolder">+folder</button><button data-am="newsc" data-id="${n.id}" title="New scene here">+scene</button><button data-am="up" data-id="${n.id}" title="Upload files here">upload</button><button data-am="ren" data-id="${n.id}">rename</button><button data-am="del" data-id="${n.id}">✕</button></span></div>`+(op?trRows(n.id,depth+1):'');}
+    if(n.type==='scene')return `<div class="tr s ${sel}" draggable="true" data-id="${n.id}" data-am="scene" style="padding-left:${pad+16}px"><i class="ico">▣</i><span class="nm">${esc(n.name)}</span><span class="tag">scene</span></div>`;
+    const u=AS.urls[n.id];return `<div class="tr a ${sel}" draggable="true" data-id="${n.id}" data-am="asset" style="padding-left:${pad+16}px">${IMGX.test(n.ext)&&u?`<img src="${u}" class="th">`:`<i class="ico">${MODX.test(n.ext)?'◆':'♪'}</i>`}<span class="nm">${esc(n.name)}</span><span class="tag">${esc(n.ext)}</span></div>`;
+  }).join('');
+}
+function amRender(){
+  const a=document.getElementById('asm');if(!a)return;
+  const sc=AS.scene&&AS.scenes[AS.scene]?AS.scene:null,as=AS.sel&&node(AS.sel)?node(AS.sel):null;
+  a.innerHTML=`<div class="am-top"><b class="am-t">Assets &amp; Scenes</b><span class="am-sp"></span>
+   <button class="btn sm" data-am="newf" data-id="">New folder</button><button class="btn sm" data-am="up" data-id="${AS.cur||''}">Upload${AS.cur&&node(AS.cur)?' into “'+esc(node(AS.cur).name)+'”':''}</button><button class="btn sm" data-am="newsc" data-id="${AS.cur||''}">New scene</button>
+   <span class="am-sp"></span><button class="btn gold sm" data-am="export">Export for GitHub (.zip)</button></div>
+  <div class="am-body"><div class="am-tree" id="am-tree"><div class="tr root" data-id="" data-am="fsel">All files <span class="cnt">${AS.tree.filter(n=>n.type==='asset').length}</span></div>${trRows(null,0)||'<p class="am-empty">Nothing here yet. Make a folder (chapter), then upload PNGs and GLBs into it. Drag anything onto a folder to move it.</p>'}</div>
+  <div class="am-mid" id="am-mid">${sc?amStage(sc):as?amPreview(as):'<div class="am-empty big">Pick an asset to preview it, or open a scene to build a screen from layers.<br><br>Tip: drop image files straight onto a folder.</div>'}</div>
+  <div class="am-right" id="am-right">${sc?amLayers(sc):as?amInfo(as):amHelp()}</div></div>
+  <input type="file" id="am-file" multiple hidden accept=".png,.jpg,.jpeg,.webp,.gif,.svg,.avif,.glb,.gltf,.mp3,.ogg,.wav,.m4a">`;
+  fitEdit();
+}
+function amHelp(){return `<div class="am-p"><h3>How this works</h3><p>Folders are your chapters and sections. Nest them as deep as you like. Drag to reorder or move.</p><p><b>Scenes</b> are screens you build by stacking assets as layers (background, stall, lantern, glow…). Bind a scene to “Title” or “Stall” and the game shows it.</p><p>Everything is saved in this browser. <b>Export for GitHub</b> gives you a zip with an <code>assets</code> folder to put next to your index.html so players see it too.</p></div>`;}
+function amPreview(n){const u=AS.urls[n.id];return `<div class="am-prev">${IMGX.test(n.ext)&&u?`<img src="${u}" style="max-width:100%;max-height:100%;object-fit:contain;background:repeating-conic-gradient(#2a2038 0 25%,#1c1428 0 50%) 0 0/24px 24px">`:`<div class="am-empty big">${MODX.test(n.ext)?'3D model (shown in the 3D version later)':'Audio file'}<br>${esc(n.name)}.${esc(n.ext)}</div>`}</div>`;}
+function amInfo(n){
+  return `<div class="am-p"><h3>${esc(n.name)}</h3><div class="note" style="font-size:12.5px">${kindOf(n.ext)} · .${esc(n.ext)} · ${fmtSz(n.size||0)}${n.w?' · '+n.w+'×'+n.h+' px':''}</div>
+  <div class="fld"><label>Name</label><input data-ai="name" value="${esc(n.name)}"></div>
+  <div class="am-btns"><button class="btn sm" data-am="rename-asset">Rename</button><button class="btn sm" data-am="repl">Replace file</button><button class="btn sm" data-am="dl">Download</button>${IMGX.test(n.ext)?'<button class="btn sm" data-am="cut">Remove background</button>':''}<button class="btn sm danger" data-am="del" data-id="${n.id}">Delete</button></div>
+  ${IMGX.test(n.ext)?'<p class="note" style="font-size:12px;margin-top:12px">Drag it from the left onto a scene to use it.</p>':''}</div>`;
+}
+function amStage(id){
+  const sc=AS.scenes[id],tn=node(id);
+  return `<div class="am-sbar"><b>${esc(tn.name)}</b><span class="am-sp"></span>Preview as <span class="tabs" style="margin:0">${['day','dusk','night'].map(p=>`<button class="tab ${AS.phase===p?'on':''}" data-am="ph" data-v="${p}">${p}</button>`).join('')}</span></div>
+  <div class="am-stagewrap" id="am-sw"><div class="stage edit" id="am-stage">${stageInner(id)}</div></div>
+  <div class="am-sbar" style="font-size:12px;opacity:.8">Drag assets from the left onto the picture. Drag layers to move. The game crops the edges to fit any screen, so keep important things toward the middle.</div>`;
+}
+function stageInner(id){const sc=AS.scenes[id];return `<div class="st" id="am-st" style="background:${sc.bg||'#0e0916'}">${sc.layers.map(l=>layerHtml(l,AS.phase,true)).join('')}</div><div class="guide"></div>`;}
+function fitEdit(){const sw=document.getElementById('am-sw'),st=document.getElementById('am-st');if(!sw||!st)return;const k=Math.min(sw.clientWidth/1920,sw.clientHeight/1080);const s=document.getElementById('am-stage');s.style.width=1920*k+'px';s.style.height=1080*k+'px';st.style.transform=`scale(${k})`;st.style.transformOrigin='0 0';st.style.left='0';st.style.top='0';st.dataset.k=k;}
+function stageRefresh(){const id=AS.scene,s=document.getElementById('am-stage');if(!s||!id)return;s.innerHTML=stageInner(id);fitEdit();}
+function amLayers(id){
+  const sc=AS.scenes[id],L=sc.layers.find(l=>l.id===AS.layer);
+  const rows=sc.layers.slice().reverse().map(l=>`<div class="lrow ${AS.layer===l.id?'on':''}" data-am="lsel" data-id="${l.id}"><span class="nm">${esc(l.name||'layer')}</span>${l.fx&&l.fx!=='none'?'<span class="tag">'+esc(l.fx)+'</span>':''}<button data-am="lvis" data-id="${l.id}" title="Show/hide">${l.hidden?'○':'●'}</button><button data-am="lup" data-id="${l.id}" title="Bring forward">↑</button><button data-am="ldn" data-id="${l.id}" title="Send back">↓</button></div>`).join('')||'<p class="am-empty">No layers yet. Drag an image onto the picture, or add a built-in.</p>';
+  const num=(p,lab,min,max,step)=>`<div class="fld"><label>${lab}</label><div class="rng"><input type="range" data-lp="${p}" min="${min}" max="${max}" step="${step||1}" value="${L[p]==null?(p==='s'?100:p==='op'?1:50):L[p]}"><input type="number" data-lp="${p}" step="${step||1}" value="${L[p]==null?(p==='s'?100:p==='op'?1:50):L[p]}"></div></div>`;
+  const opt=(arr,v)=>arr.map(o=>`<option ${o===v?'selected':''}>${o}</option>`).join('');
+  const props=L?`<h3>${esc(L.name||'Layer')}</h3><div class="fld"><label>Name</label><input data-lp="name" value="${esc(L.name||'')}"></div>
+   <div class="am-grid2"><div class="fld"><label>X</label><input type="number" data-lp="x" value="${Math.round(L.x)}"></div><div class="fld"><label>Y</label><input type="number" data-lp="y" value="${Math.round(L.y)}"></div></div>
+   ${num('s','Size %',5,400)}${num('rot','Rotate °',-180,180)}${num('op','Opacity',0,1,.05)}
+   <div class="am-grid2"><div class="fld"><label>Blend</label><select data-lp="blend">${opt(['normal','screen','plus-lighter','multiply','overlay','soft-light'],L.blend||'normal')}</select></div><div class="fld"><label>Show when</label><select data-lp="show">${opt(['all','day','dusk','night'],L.show||'all')}</select></div></div>
+   <div class="am-grid2"><div class="fld"><label>Animation</label><select data-lp="fx">${opt(['none','pulse','flicker','sway','float','spin','twinkle'],L.fx||'none')}</select></div><div class="fld"><label>Flip</label><select data-lp="flip"><option value="0">no</option><option value="1" ${L.flip?'selected':''}>yes</option></select></div></div>
+   ${L.fx&&L.fx!=='none'?num('fxa','Animation strength',0,100)+num('fxs','Animation speed',0,100):''}
+   ${L.kind==='glow'?`<div class="am-grid2"><div class="fld"><label>Glow colour</label><input type="color" data-lp="color" value="${L.color||'#ffd98a'}"></div><div class="fld"><label>Glow size px</label><input type="number" data-lp="size" value="${L.size||300}"></div></div>`:''}
+   ${L.kind==='flies'?`<div class="fld"><label>Colour</label><input type="color" data-lp="color" value="${L.color||'#ffe9a6'}"></div>`:''}
+   <div class="am-btns"><button class="btn sm" data-am="lfit">Fit width</button><button class="btn sm" data-am="lctr">Centre</button><button class="btn sm" data-am="ldup">Duplicate</button><button class="btn sm danger" data-am="ldel">Delete layer</button></div>`:'<p class="am-empty">Select a layer to edit it.</p>';
+  return `<div class="am-p"><div class="am-btns" style="margin-bottom:10px"><button class="btn sm" data-am="addglow">+ Glow</button><button class="btn sm" data-am="addflies">+ Fireflies</button></div>
+   <div class="fld"><label>Backdrop colour</label><input type="color" data-sp="bg" value="${sc.bg||'#0e0916'}"></div>
+   <div class="fld"><label>Use this scene as</label><div class="am-btns"><label class="chip"><input type="checkbox" data-slot="title" ${AS.slots.title===id?'checked':''}> Title screen</label><label class="chip"><input type="checkbox" data-slot="stall" ${AS.slots.stall===id?'checked':''}> Stall screen</label></div></div>
+   <h3>Layers</h3><div class="lrows">${rows}</div><div class="am-props">${props}</div></div>`;
+}
+function addLayer(id,l,x,y){const sc=AS.scenes[id];const L=Object.assign({id:uid(),x:x==null?960:x,y:y==null?540:y,s:100,rot:0,op:1,flip:0,blend:'normal',show:'all',fx:'none',fxa:50,fxs:50},l);sc.layers.push(L);AS.layer=L.id;saveMeta();return L;}
+function addAssetLayer(id,assetId,x,y){const n=node(assetId);if(!n||!IMGX.test(n.ext))return;const L=addLayer(id,{kind:'img',asset:assetId,name:n.name},x,y);if(n.w>=1500){L.s=Math.round(1920/n.w*100);L.x=960;L.y=540;}amRender();}
+function curLayer(){const sc=AS.scenes[AS.scene];return sc&&sc.layers.find(l=>l.id===AS.layer);}
+
+/* ----- events ----- */
+document.addEventListener('click',async e=>{
+  const t=e.target.closest('[data-am]');if(!t||!document.getElementById('asm'))return;const a=t.dataset.am,id=t.dataset.id;
+  const pick=(parent)=>{const f=document.getElementById('am-file');f.onchange=()=>{addFiles([...f.files],parent||null);f.value='';};f.click();};
+  switch(a){
+   
+   case'tog':e.stopPropagation();AS.open.has(id)?AS.open.delete(id):AS.open.add(id);amRender();break;
+   case'fsel':AS.cur=id||null;if(id)AS.open.add(id);AS.sel=null;AS.scene=null;amRender();break;
+   case'asset':AS.sel=id;AS.scene=null;AS.cur=node(id).parent;amRender();break;
+   case'scene':AS.scene=id;AS.sel=null;AS.layer=null;AS.cur=node(id).parent;amRender();break;
+   case'newf':{const nm=prompt('Folder name (a chapter, section, or anything)','New folder');if(!nm)break;AS.tree.push({id:uid(),type:'folder',name:nm,parent:id||null,order:nextOrder(id||null)});if(id)AS.open.add(id);saveMeta();amRender();break;}
+   case'newsc':{const nm=prompt('Scene name','Stall – night');if(!nm)break;const n={id:uid(),type:'scene',name:nm,parent:id||null,order:nextOrder(id||null)};AS.tree.push(n);AS.scenes[n.id]={bg:'#0e0916',layers:[]};if(id)AS.open.add(id);AS.scene=n.id;AS.sel=null;AS.layer=null;saveMeta();amRender();break;}
+   case'up':pick(id||null);break;
+   case'ren':{const n=node(id),nm=prompt('Rename',n.name);if(nm){n.name=nm;saveMeta();amRender();}break;}
+   case'del':{const n=node(id);if(n&&confirm('Delete “'+n.name+'”'+(n.type==='folder'?' and everything inside it':'')+'?')){delNode(id);saveMeta();amRender();}break;}
+   case'rename-asset':{const n=node(AS.sel),v=document.querySelector('[data-ai=name]').value.trim();if(n&&v){n.name=v;saveMeta();amRender();}break;}
+   case'repl':{const f=document.getElementById('am-file');f.onchange=async()=>{const fl=f.files[0];if(!fl)return;const n=node(AS.sel);await dbPut('files',n.id,fl);AS.urls[n.id]=URL.createObjectURL(fl);n.size=fl.size;n.ext=(fl.name.split('.').pop()||n.ext).toLowerCase();try{const im=new Image();im.src=AS.urls[n.id];await im.decode();n.w=im.naturalWidth;n.h=im.naturalHeight;}catch(x){}saveMeta();amRender();f.value='';};f.click();break;}
+   case'dl':{const n=node(AS.sel),l=document.createElement('a');l.href=AS.urls[n.id];l.download=n.name+'.'+n.ext;l.click();break;}
+   case'cut':openCutout();break;
+   case'ph':AS.phase=t.dataset.v;amRender();break;
+   case'lsel':AS.layer=id;amRender();break;
+   case'lvis':{e.stopPropagation();const l=AS.scenes[AS.scene].layers.find(x=>x.id===id);l.hidden=!l.hidden;saveMeta();amRender();break;}
+   case'lup':case'ldn':{e.stopPropagation();const ls=AS.scenes[AS.scene].layers,i=ls.findIndex(x=>x.id===id),j=a==='lup'?i+1:i-1;if(j>=0&&j<ls.length){[ls[i],ls[j]]=[ls[j],ls[i]];saveMeta();amRender();}break;}
+   case'ldel':{const sc=AS.scenes[AS.scene];sc.layers=sc.layers.filter(l=>l.id!==AS.layer);AS.layer=null;saveMeta();amRender();break;}
+   case'ldup':{const l=curLayer();if(l){const c=Object.assign({},l,{id:uid(),x:l.x+40,y:l.y+40,name:(l.name||'layer')+' copy'});AS.scenes[AS.scene].layers.push(c);AS.layer=c.id;saveMeta();amRender();}break;}
+   case'lctr':{const l=curLayer();if(l){l.x=960;l.y=540;saveMeta();amRender();}break;}
+   case'lfit':{const l=curLayer(),n=l&&l.asset&&node(l.asset);if(n&&n.w){l.s=Math.round(1920/n.w*100);l.x=960;l.y=540;saveMeta();amRender();}break;}
+   case'addglow':addLayer(AS.scene,{kind:'glow',name:'Glow',color:'#ffd98a',size:320,blend:'screen',fx:'pulse',fxa:50,fxs:50});amRender();break;
+   case'addflies':addLayer(AS.scene,{kind:'flies',name:'Fireflies',color:'#ffe9a6',count:18,fx:'none'});amRender();break;
+   case'export':exportAssets();break;
+  }
+});
+document.addEventListener('input',e=>{
+  const t=e.target;if(!document.getElementById('asm'))return;
+  if(t.dataset.lp){const l=curLayer();if(!l)return;const p=t.dataset.lp;let v=t.value;if(['x','y','s','rot','op','fxa','fxs','size'].includes(p))v=parseFloat(v)||0;if(p==='flip')v=v==='1'?1:0;l[p]=v;
+    document.querySelectorAll(`[data-lp="${p}"]`).forEach(o=>{if(o!==t)o.value=v;});stageRefresh();saveSoon();if(p==='fx'||p==='name'){if(t.tagName==='SELECT')amRender();}}
+  else if(t.dataset.sp){AS.scenes[AS.scene][t.dataset.sp]=t.value;stageRefresh();saveSoon();}
+});
+document.addEventListener('change',e=>{const t=e.target;if(!document.getElementById('asm'))return;
+  if(t.dataset.slot){const on=t.checked;if(on)AS.slots[t.dataset.slot]=AS.scene;else if(AS.slots[t.dataset.slot]===AS.scene)delete AS.slots[t.dataset.slot];saveMeta();toast(on?'Bound to the '+t.dataset.slot+' screen':'Unbound');}
+  if(t.dataset.lp&&t.tagName==='INPUT'&&t.type==='text')amRender();});
+/* drag & drop: move in tree, or onto stage, or upload from desktop */
+let dragId=null;
+document.addEventListener('dragstart',e=>{const r=e.target.closest&&e.target.closest('.tr[data-id]');if(r&&document.getElementById('asm')&&r.dataset.id){dragId=r.dataset.id;e.dataTransfer.setData('text/nm',dragId);e.dataTransfer.effectAllowed='move';}});
+document.addEventListener('dragend',()=>{dragId=null;document.querySelectorAll('.dropt,.dropb').forEach(x=>x.classList.remove('dropt','dropb'));});
+document.addEventListener('dragover',e=>{
+  if(!document.getElementById('asm'))return;
+  const r=e.target.closest&&e.target.closest('.tr'),st=e.target.closest&&e.target.closest('#am-stage'),tree=e.target.closest&&e.target.closest('#am-tree');
+  if(r||st||tree){e.preventDefault();document.querySelectorAll('.dropt,.dropb').forEach(x=>x.classList.remove('dropt','dropb'));
+    if(r&&r.dataset.id!==undefined&&r.dataset.id!==''){const nd=node(r.dataset.id),mid=e.offsetY>r.offsetHeight*.3&&e.offsetY<r.offsetHeight*.7;if(nd&&nd.type==='folder'&&mid)r.classList.add('dropt');else r.classList.add('dropb');}
+    else if(r&&r.classList.contains('root'))r.classList.add('dropt');}
+});
+document.addEventListener('drop',async e=>{
+  if(!document.getElementById('asm'))return;
+  const r=e.target.closest&&e.target.closest('.tr'),st=e.target.closest&&e.target.closest('#am-st,#am-stage');
+  const files=e.dataTransfer.files&&e.dataTransfer.files.length?[...e.dataTransfer.files]:null;const id=dragId||e.dataTransfer.getData('text/nm');
+  if(!r&&!st&&!e.target.closest('#am-tree'))return;e.preventDefault();
+  if(files){let parent=null;if(r&&r.dataset.id){const nd=node(r.dataset.id);parent=nd&&nd.type==='folder'?nd.id:nd&&nd.parent;}addFiles(files,parent);return;}
+  if(!id)return;
+  if(st&&AS.scene){const s=document.getElementById('am-st'),k=+s.dataset.k||1,rc=s.getBoundingClientRect();addAssetLayer(AS.scene,id,(e.clientX-rc.left)/k,(e.clientY-rc.top)/k);dragId=null;return;}
+  if(r&&r.classList.contains('root')){moveNode(id,null,null);}
+  else if(r&&r.dataset.id){const nd=node(r.dataset.id);if(nd){const mid=e.offsetY>r.offsetHeight*.3&&e.offsetY<r.offsetHeight*.7;if(nd.type==='folder'&&mid){moveNode(id,nd.id,null);AS.open.add(nd.id);}else moveNode(id,nd.parent||null,nd.id);}}
+  else if(e.target.closest('#am-tree'))moveNode(id,null,null);
+  dragId=null;amRender();
+});
+/* move layers on the stage */
+document.addEventListener('pointerdown',e=>{
+  const ly=e.target.closest&&e.target.closest('#am-st .ly');if(!ly)return;e.preventDefault();
+  const sc=AS.scenes[AS.scene],L=sc.layers.find(l=>l.id===ly.dataset.lid);if(!L)return;
+  if(AS.layer!==L.id){AS.layer=L.id;document.querySelectorAll('#am-st .ly.sel').forEach(x=>x.classList.remove('sel'));ly.classList.add('sel');const rp=document.getElementById('am-right');if(rp)rp.innerHTML=amLayers(AS.scene);}
+  const k=+document.getElementById('am-st').dataset.k||1,sx=e.clientX,sy=e.clientY,ox=L.x,oy=L.y;let moved=false;
+  const mv=ev=>{moved=true;L.x=Math.round(ox+(ev.clientX-sx)/k);L.y=Math.round(oy+(ev.clientY-sy)/k);ly.style.left=L.x+'px';ly.style.top=L.y+'px';};
+  const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);if(moved){saveMeta();document.querySelectorAll('[data-lp=x]').forEach(o=>o.value=L.x);document.querySelectorAll('[data-lp=y]').forEach(o=>o.value=L.y);}};
+  addEventListener('pointermove',mv);addEventListener('pointerup',up);
+});
+document.addEventListener('keydown',e=>{const a=document.getElementById('asm');if(!a||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;const l=curLayer();if(!l)return;const st=e.shiftKey?10:1;
+  if(e.key==='ArrowLeft'){l.x-=st;}else if(e.key==='ArrowRight'){l.x+=st;}else if(e.key==='ArrowUp'){l.y-=st;}else if(e.key==='ArrowDown'){l.y+=st;}else if(e.key==='Delete'||e.key==='Backspace'){const sc=AS.scenes[AS.scene];sc.layers=sc.layers.filter(x=>x.id!==l.id);AS.layer=null;saveMeta();amRender();return;}else return;
+  e.preventDefault();stageRefresh();saveSoon();});
+
+/* ----- background remover ----- */
+function openCutout(){
+  const n=node(AS.sel);if(!n)return;const m=document.createElement('div');m.id='am-cut';m.className='scrim';m.style.zIndex=300;
+  m.innerHTML=`<div class="modal" style="width:min(900px,96vw)"><h2>Remove background</h2><div class="note" style="margin:6px 0">Picks the colour in the corners and makes it transparent. Works best on a plain flat background (white, black, or bright green).</div>
+  <div class="fld"><label>Strength <span id="cutv">40</span></label><input type="range" id="cutt" min="5" max="140" value="40"></div>
+  <label class="chip"><input type="checkbox" id="cutall"> also remove matching colour inside the picture</label>
+  <div style="margin:12px 0;max-height:52vh;overflow:auto;background:repeating-conic-gradient(#2a2038 0 25%,#1c1428 0 50%) 0 0/24px 24px;border-radius:12px;text-align:center"><canvas id="cutc" style="max-width:100%"></canvas></div>
+  <div class="actions"><button class="btn gold" id="cutok">Apply</button><button class="btn" id="cutno">Cancel</button></div></div>`;
+  document.body.appendChild(m);
+  const im=new Image();im.onload=()=>{const c=document.getElementById('cutc'),x=c.getContext('2d',{willReadFrequently:true});c.width=im.naturalWidth;c.height=im.naturalHeight;x.drawImage(im,0,0);const src=x.getImageData(0,0,c.width,c.height);
+    const run=()=>{const tol=+document.getElementById('cutt').value,all=document.getElementById('cutall').checked;document.getElementById('cutv').textContent=tol;const W=c.width,H=c.height,d=new Uint8ClampedArray(src.data),px=(i)=>[d[i*4],d[i*4+1],d[i*4+2]];
+      const cs=[0,W-1,(H-1)*W,H*W-1].map(px),bc=[0,1,2].map(k=>Math.round(cs.reduce((a,v)=>a+v[k],0)/4));
+      const near=i=>Math.hypot(d[i*4]-bc[0],d[i*4+1]-bc[1],d[i*4+2]-bc[2])<=tol;
+      if(all){for(let i=0;i<W*H;i++)if(near(i))d[i*4+3]=0;}
+      else{const seen=new Uint8Array(W*H),q=[];const push=i=>{if(!seen[i]&&near(i)){seen[i]=1;q.push(i);}};for(let x2=0;x2<W;x2++){push(x2);push((H-1)*W+x2);}for(let y=0;y<H;y++){push(y*W);push(y*W+W-1);}
+        while(q.length){const i=q.pop(),x2=i%W,y=(i/W)|0;d[i*4+3]=0;if(x2>0)push(i-1);if(x2<W-1)push(i+1);if(y>0)push(i-W);if(y<H-1)push(i+W);}}
+      x.putImageData(new ImageData(d,W,H),0,0);};
+    document.getElementById('cutt').oninput=run;document.getElementById('cutall').onchange=run;run();
+    document.getElementById('cutno').onclick=()=>m.remove();
+    document.getElementById('cutok').onclick=()=>{c.toBlob(async b=>{await dbPut('files',n.id,b);AS.urls[n.id]=URL.createObjectURL(b);n.ext='png';n.size=b.size;n.w=c.width;n.h=c.height;await saveMeta();m.remove();stageRefresh();amRender();toast('Background removed');},'image/png');};};
+  im.src=AS.urls[n.id];
+}
+
+/* ----- export zip for GitHub ----- */
+const CRCT=(()=>{const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0;}return t;})();
+const crcb=u=>{let c=0xFFFFFFFF;for(let i=0;i<u.length;i++)c=CRCT[(c^u[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0;};
+function zipBin(files){
+  const enc=new TextEncoder(),parts=[],cd=[];let off=0;const u16=n=>[n&255,(n>>8)&255],u32=n=>[n&255,(n>>8)&255,(n>>16)&255,(n>>>24)&255];
+  files.forEach(f=>{const nm=enc.encode(f.name),d=f.data,c=crcb(d);
+    const lh=new Uint8Array([...u32(0x04034b50),...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(33),...u32(c),...u32(d.length),...u32(d.length),...u16(nm.length),...u16(0)]);
+    parts.push(lh,nm,d);cd.push(new Uint8Array([...u32(0x02014b50),...u16(20),...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(33),...u32(c),...u32(d.length),...u32(d.length),...u16(nm.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(off)]),nm);off+=lh.length+nm.length+d.length;});
+  let cs=0;cd.forEach(c=>cs+=c.length);const end=new Uint8Array([...u32(0x06054b50),...u16(0),...u16(0),...u16(files.length),...u16(files.length),...u32(cs),...u32(off),...u16(0)]);
+  return new Blob([...parts,...cd,end],{type:'application/zip'});
+}
+async function exportAssets(){
+  const safe=s=>String(s).replace(/[^\w\- .]+/g,'_').trim()||'x',used=new Set(),files=[],tree=[];
+  const pathOf=n=>{const seg=[];let c=n;while(c){seg.unshift(safe(c.name));c=c.parent?node(c.parent):null;}return seg.join('/');};
+  for(const n of AS.tree){const o=Object.assign({},n);if(n.type==='asset'){let p=pathOf(n)+'.'+n.ext,i=1;while(used.has(p.toLowerCase()))p=pathOf(n)+'-'+(i++)+'.'+n.ext;used.add(p.toLowerCase());o.path=p;const b=await dbGet('files',n.id);if(b)files.push({name:'assets/'+p,data:new Uint8Array(await b.arrayBuffer())});}tree.push(o);}
+  files.unshift({name:'assets/manifest.json',data:new TextEncoder().encode(JSON.stringify({v:1,tree,scenes:AS.scenes,slots:AS.slots},null,1))});
+  const l=document.createElement('a');l.href=URL.createObjectURL(zipBin(files));l.download='night-market-assets.zip';l.click();toast('Unzip next to your index.html (it makes an “assets” folder)');
+}
+
+return {mount,load:assetsLoad,AS,render:amRender};
+})();
+
 </script>
 </body>
 </html>
