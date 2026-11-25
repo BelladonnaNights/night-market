@@ -337,7 +337,7 @@ body.edit .hide-edit{display:none!important}
 .tr{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:9px;cursor:pointer;font-size:13.5px;border:1px solid transparent;position:relative}
 .tr:hover{background:rgba(240,198,116,.07)}.tr.on{background:rgba(240,198,116,.16);border-color:var(--line2)}.tr.cur{background:rgba(201,160,220,.12)}
 .tr .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tr .cnt,.tr .tag{font-size:11px;color:var(--muted)}.tr .th{width:28px;height:28px;object-fit:contain;border-radius:5px;background:#05030a}.tr .ico{width:28px;text-align:center;color:var(--gold);font-style:normal}
-.tr .car{width:14px;cursor:pointer}.tr .tact{display:none;gap:3px}.tr.f:hover .tact{display:flex}.tr .tact button{font:700 10.5px var(--sans);padding:2px 6px;border-radius:6px;background:rgba(255,255,255,.08);color:inherit;border:0;cursor:pointer}.tr .tact button:hover{background:var(--gold);color:#1a1226}
+.tr .car{width:14px;cursor:pointer}.tr .tact{display:none;gap:3px}.tact2{display:flex;flex-wrap:wrap;gap:5px;padding:2px 8px 8px}.tact2 button{font:700 11.5px var(--sans);padding:4px 10px;border-radius:99px;background:rgba(255,255,255,.08);color:inherit;border:1px solid var(--line);cursor:pointer}.tact2 button:hover{background:var(--gold);color:#2a1a08}.tact2 button:last-child{color:var(--bad)}.tr .tact button{font:700 10.5px var(--sans);padding:2px 6px;border-radius:6px;background:rgba(255,255,255,.08);color:inherit;border:0;cursor:pointer}.tr .tact button:hover{background:var(--gold);color:#1a1226}
 .tr.dropt{outline:2px solid var(--gold);background:rgba(240,198,116,.18)}.tr.dropb{box-shadow:0 2px 0 0 var(--gold)}.tr.root{font-weight:700;color:var(--gold)}
 .am-p{padding:6px}.am-p h3{font:700 17px var(--serif);color:var(--gold);margin:12px 0 6px}.am-p p{font-size:13px;color:var(--muted);line-height:1.5}.am-p code{background:rgba(255,255,255,.08);padding:1px 5px;border-radius:5px}
 .am-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.am-grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -3383,7 +3383,7 @@ async function mount(host){host.innerHTML='<div id="asm"><p class="am-empty">Loa
 function trRows(pid,depth){
   return kids(pid).map(n=>{
     const pad=10+depth*16,sel=(AS.sel===n.id||AS.scene===n.id)?'on':'';
-    if(n.type==='folder'){const op=AS.open.has(n.id);return `<div class="tr f ${AS.cur===n.id?'cur':''}" draggable="true" data-id="${n.id}" style="padding-left:${pad}px"><b class="car" data-am="tog" data-id="${n.id}">${op?'▾':'▸'}</b><span class="nm" data-am="fsel" data-id="${n.id}">${esc(n.name)}</span><span class="cnt">${kids(n.id).length}</span><span class="tact"><button data-am="newf" data-id="${n.id}" title="New subfolder">+folder</button><button data-am="newsc" data-id="${n.id}" title="New scene here">+scene</button><button data-am="up" data-id="${n.id}" title="Upload files here">upload</button><button data-am="ren" data-id="${n.id}">rename</button><button data-am="del" data-id="${n.id}">✕</button></span></div>`+(op?trRows(n.id,depth+1):'');}
+    if(n.type==='folder'){const op=AS.open.has(n.id),cur=AS.cur===n.id;return `<div class="tr f ${cur?'cur':''}" draggable="true" data-id="${n.id}" data-am="fsel" style="padding-left:${pad}px"><b class="car" data-am="tog" data-id="${n.id}">${op?'▾':'▸'}</b><span class="nm">${esc(n.name)}</span><span class="cnt">${kids(n.id).length}</span></div>`+(cur?`<div class="tact2" style="padding-left:${pad+20}px"><button data-am="newf" data-id="${n.id}">+ folder</button><button data-am="newsc" data-id="${n.id}">+ scene</button><button data-am="up" data-id="${n.id}">upload</button><button data-am="ren" data-id="${n.id}">rename</button><button data-am="del" data-id="${n.id}">delete</button></div>`:'')+(op?trRows(n.id,depth+1):'');}
     if(n.type==='scene')return `<div class="tr s ${sel}" draggable="true" data-id="${n.id}" data-am="scene" style="padding-left:${pad+16}px"><i class="ico">▣</i><span class="nm">${esc(n.name)}</span><span class="tag">scene</span></div>`;
     const u=AS.urls[n.id];return `<div class="tr a ${sel}" draggable="true" data-id="${n.id}" data-am="asset" style="padding-left:${pad+16}px">${IMGX.test(n.ext)&&u?`<img src="${u}" class="th">`:`<i class="ico">${MODX.test(n.ext)?'◆':'♪'}</i>`}<span class="nm">${esc(n.name)}</span><span class="tag">${esc(n.ext)}</span></div>`;
   }).join('');
@@ -3447,7 +3447,7 @@ document.addEventListener('click',async e=>{
   switch(a){
    
    case'tog':e.stopPropagation();AS.open.has(id)?AS.open.delete(id):AS.open.add(id);amRender();break;
-   case'fsel':AS.cur=id||null;if(id)AS.open.add(id);AS.sel=null;AS.scene=null;amRender();break;
+   case'fsel':{const same=(AS.cur||'')===(id||'');AS.cur=id||null;if(id){if(same&&AS.open.has(id))AS.open.delete(id);else AS.open.add(id);}AS.sel=null;AS.scene=null;amRender();break;}
    case'asset':AS.sel=id;AS.scene=null;AS.cur=node(id).parent;amRender();break;
    case'scene':AS.scene=id;AS.sel=null;AS.layer=null;AS.cur=node(id).parent;amRender();break;
    case'newf':{const nm=prompt('Folder name (a chapter, section, or anything)','New folder');if(!nm)break;AS.tree.push({id:uid(),type:'folder',name:nm,parent:id||null,order:nextOrder(id||null)});if(id)AS.open.add(id);saveMeta();amRender();break;}
