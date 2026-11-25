@@ -3097,7 +3097,7 @@ function zTick(now){
 }
 
 /* ===== asset library + scene composer ===== */
-const DIMS={screen:[1920,1080],map:[2200,1500],portrait:[1200,1800],tile:[1024,1024]};
+const DIMS={screen:[1920,1080],map:[2200,1500],portrait:[1200,1800],tile:[1024,1024],square:[1600,1600]};
 const dimsOf=id=>{const s=AS.scenes[id];return DIMS[(s&&s.size)||'screen']||DIMS.screen;};
 const AS={imgs:{},rev:0,tree:[],scenes:{},slots:{},urls:{},ready:false,sel:null,scene:null,layer:null,cur:null,open:new Set(),phase:'night',remote:false};
 const uid=()=>Math.random().toString(36).slice(2,9);
