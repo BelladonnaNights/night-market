@@ -3125,7 +3125,7 @@ let _db=null;
 function idb(){return _db||(_db=new Promise((res,rej)=>{const r=indexedDB.open('nm-assets',1);r.onupgradeneeded=()=>{r.result.createObjectStore('files');r.result.createObjectStore('meta');};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);}));}
 async function dbx(store,mode,fn){const d=await idb();return new Promise((res,rej)=>{const t=d.transaction(store,mode),q=fn(t.objectStore(store));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error);});}
 const dbGet=(s,k)=>dbx(s,'readonly',o=>o.get(k)),dbPut=(s,k,v)=>dbx(s,'readwrite',o=>o.put(v,k)),dbDel=(s,k)=>dbx(s,'readwrite',o=>o.delete(k));
-const DIMS={screen:[1920,1080,'Screen 16:9'],map:[2200,1500,'Map 3:2'],portrait:[1200,1800,'Portrait 2:3'],tile:[1024,1024,'Seamless tile 1:1']};
+const DIMS={screen:[1920,1080,'Screen 16:9'],map:[2200,1500,'Map 3:2'],portrait:[1200,1800,'Portrait 2:3'],tile:[1024,1024,'Seamless tile 1:1'],square:[1600,1600,'Square 1:1']};
 const dimsOf=id=>{const s=AS.scenes[id];return DIMS[(s&&s.size)||'screen']||DIMS.screen;};
 const SLOTS=[
  {id:'title',label:'Title screen',group:'Main screens',size:'screen'},
@@ -3177,8 +3177,9 @@ async function syncUp(){
   _cs.busy=false;
 }
 async function syncDown(){
-  cstat('Loading from the cloud…');const f=await waitFB(25000);if(!f||f.state!=='live'){cstat('Cloud not reachable right now. Retrying…');clearTimeout(window._sdr);window._sdr=setTimeout(syncDown,10000);return;}
-  try{const v=await window.__book.dbGet('assetmeta');
+  cstat('Loading from the cloud…');
+  const rget=async path=>{const u='https://night-market-7d13a-default-rtdb.firebaseio.com/'+path+'.json';for(let i=0;i<3;i++){try{const r=await fetch(u,{cache:'no-store'});if(r.ok)return await r.json();}catch(e){}await new Promise(r=>setTimeout(r,1500));}throw new Error('cloud unreachable');};
+  try{const v=await rget('assetmeta');
     if(v&&v.json&&(v.rev||0)>(AS.cloudRev||0)&&(v.rev||0)>=(AS.rev||0)){const m=JSON.parse(v.json),oldT=AS.tree,oldS=AS.slots;AS.tree=m.tree||[];AS.scenes=m.scenes||{};AS.slots=m.slots||{};
       /* never lose a saved URL: keep any local URL or link the cloud copy lacks */
       AS.tree.forEach(n=>{if(n.type==='asset'&&!n.url){const o=oldT.find(x=>x.id===n.id&&x.url);if(o)n.url=o.url;}});
@@ -3186,11 +3187,11 @@ async function syncDown(){
       AS.rev=v.rev;AS.cloudRev=v.rev;try{await dbPut('meta','state',stateObj());}catch(e){}amRender();}
     if(!v&&!AS.tree.length&&!AS.rev){seedStarter(true);}
     const miss=[];for(const n of AS.tree)if(n.type==='asset'){if(n.url){AS.urls[n.id]=n.url;continue;}let have=null;try{have=await dbGet('files',n.id);}catch(e){}if(!have)miss.push(n);}
-    let k=0;for(const n of miss){cstat('Downloading from the cloud… '+(++k)+'/'+miss.length);const o=await window.__book.dbGet('assetfiles/'+n.id);if(o&&o.d){const b=unb64(o.d,o.e||n.ext);try{await dbPut('files',n.id,b);}catch(e){}AS.urls[n.id]=URL.createObjectURL(b);}}
+    let k=0;for(const n of miss){cstat('Downloading from the cloud… '+(++k)+'/'+miss.length);const o=await rget('assetfiles/'+n.id);if(o&&o.d){const b=unb64(o.d,o.e||n.ext);try{await dbPut('files',n.id,b);}catch(e){}AS.urls[n.id]=URL.createObjectURL(b);}}
     if(cloudOn()&&(AS.rev>(AS.cloudRev||0)||AS.pending.length||AS.removed.length))await syncUp();
-    else cstat(cloudOn()?'Saved to the cloud ✓':'Showing the cloud copy. Turn on Edit mode and sign in to save changes.');
+    else cstat(cloudOn()?'Saved to the cloud ✓':'Loaded from the cloud ✓');
     amRender();
-  }catch(e){cstat('Cloud read failed: '+(e.code||e.message));}
+  }catch(e){cstat('Cloud not reachable right now. Retrying…');clearTimeout(window._sdr);window._sdr=setTimeout(syncDown,10000);}
 }
 async function assetsLoad(){
   try{const st=await dbGet('meta','state');if(st){AS.tree=st.tree||[];AS.scenes=st.scenes||{};AS.slots=st.slots||{};AS.rev=st.rev||0;AS.cloudRev=st.cloudRev||0;AS.pending=st.pending||[];AS.removed=st.removed||[];}
@@ -3471,6 +3472,11 @@ function amInfo(n){
   <div class="am-btns"><button class="btn sm" data-am="rename-asset">Rename</button><button class="btn sm" data-am="repl">Replace file</button><button class="btn sm" data-am="dl">Download</button>${n.url?'<button class="btn sm" data-am="chgurl">Change link</button>':(IMGX.test(n.ext)?'<button class="btn sm" data-am="cut">Remove background</button>':'')}<button class="btn sm danger" data-am="del" data-id="${n.id}">Delete</button></div>
   ${IMGX.test(n.ext)?'<p class="note" style="font-size:12px;margin-top:12px">Drag it from the left onto a scene to use it.</p>':''}</div>`;
 }
+function refit(sc,ns){const od=DIMS[sc._ps||'screen']||DIMS.screen,nd=DIMS[ns]||DIMS.screen;sc._ps=ns;if(od[0]===nd[0]&&od[1]===nd[1])return;
+  const imgs=sc.layers.filter(l=>l.kind==='img');
+  sc.layers.forEach(l=>{l.x=Math.round(l.x*nd[0]/od[0]);l.y=Math.round(l.y*nd[1]/od[1]);if(l.kind==='glow'&&l.size)l.size=Math.round(l.size*nd[0]/od[0]);});
+  if(imgs.length===1){const n=node(imgs[0].asset);if(n&&n.w&&n.h){imgs[0].s=Math.round(Math.max(nd[0]/n.w,nd[1]/n.h)*100);imgs[0].x=nd[0]/2;imgs[0].y=nd[1]/2;}}
+  if(sc.walls)sc.walls=[];if(sc.nospawn)sc.nospawn=[];if(sc.spawn)delete sc.spawn;toast('Resized: the picture was re-centred and fitted. Walkable shapes were cleared, so redraw them.');}
 function amStage(id){
   const sc=AS.scenes[id],tn=node(id);
   return `<div class="am-sbar"><b>${esc(tn.name)}</b><button class="btn sm ${AS.walk?'gold':''}" data-am="walk">Walkable area${sc.walls&&sc.walls.length?' ✓':''}</button><button class="btn sm" data-am="pop">⤢ Pop out / close</button><span class="am-sp"></span>Preview as <span class="tabs" style="margin:0">${['day','dusk','night'].map(p=>`<button class="tab ${AS.phase===p?'on':''}" data-am="ph" data-v="${p}">${p}</button>`).join('')}</span></div>
@@ -3840,7 +3846,7 @@ document.addEventListener('input',e=>{
   if(t.dataset.lp){const l=curLayer();if(!l)return;const p=t.dataset.lp;let v=t.value;if(['x','y','s','rot','op','fxa','fxs','size'].includes(p))v=parseFloat(v)||0;if(p==='flip')v=v==='1'?1:0;l[p]=v;
     document.querySelectorAll(`[data-lp="${p}"]`).forEach(o=>{if(o!==t)o.value=v;});stageRefresh();saveSoon();if(p==='fx'||p==='name'){if(t.tagName==='SELECT')amRender();}}
   else if(t.dataset.wp){AS[t.dataset.wp]=parseFloat(t.value)||1;document.querySelectorAll(`[data-wp="${t.dataset.wp}"]`).forEach(o=>{if(o!==t)o.value=t.value;});}
-  else if(t.dataset.sp){AS.scenes[AS.scene][t.dataset.sp]=t.value;if(t.dataset.sp==='size'){amRender();}else stageRefresh();saveSoon();}
+  else if(t.dataset.sp){const _sc=AS.scenes[AS.scene],_o=_sc.size||'screen';_sc[t.dataset.sp]=t.value;if(t.dataset.sp==='size'){_sc._ps=_o;refit(_sc,t.value);amRender();}else stageRefresh();saveSoon();}
 });
 document.addEventListener('change',e=>{const t=e.target;if(!document.getElementById('asm'))return;if(t.dataset&&t.dataset.assetsz){const v=Math.max(10,Math.min(500,parseFloat(t.value)||100));if(v===100)delete AS.slots['assetsz_'+t.dataset.assetsz];else AS.slots['assetsz_'+t.dataset.assetsz]=String(v);saveMeta();return;}if(t.dataset&&t.dataset.itsz){const v=Math.max(10,Math.min(500,parseFloat(t.value)||100));if(v===100)delete AS.slots['itemsz_'+t.dataset.itsz];else AS.slots['itemsz_'+t.dataset.itsz]=String(v);saveMeta();return;}if(t.dataset&&t.dataset.nd){if(t.checked)AS.slots[t.dataset.nd]='1';else delete AS.slots[t.dataset.nd];saveMeta();return;}if(t.dataset&&'showused' in t.dataset){AS.showUsed=t.checked;amRender();return;}
     if(t.dataset.lp&&t.tagName==='INPUT'&&t.type==='text')amRender();});
