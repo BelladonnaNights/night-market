@@ -160,6 +160,8 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}input,
 @media(max-width:900px){.am-body{grid-template-columns:1fr}.am-tree{max-height:30vh}.am-right{max-height:34vh}}
 
 .pstage{position:relative;aspect-ratio:2/3}.cust .pstage{width:100%}.vn-char .pstage{height:100%}
+
+.iart{object-fit:contain;display:inline-block;pointer-events:none}.iart.lg{float:right;width:56px;height:56px;margin:0 0 6px 10px}.item .iart.tray{display:block;width:46px;height:46px;margin:0 auto 4px}
 </style></head><body>
 <div id="game"></div><div id="overlay"></div><div id="story"></div><div id="toast"></div>
 <script type="application/json" id="gamedata">{
@@ -2315,6 +2317,7 @@ const rnd2=(r,a)=>a[Math.floor(r()*a.length)];
 function portrait(c,opts){
   opts=opts||{};
   const psid=c.id&&slotScene('char_'+c.id);if(psid)return `<div class="pstage">${stageHtml(psid,'night')}</div>`;
+  {const rq=c.id&&D.requests.find(r=>r.name.toLowerCase()===String(c.id).toLowerCase()),pu=rq&&itemUrl(rq.id);if(pu)return `<img src="${esc(pu)}" style="height:100%;width:auto" alt="">`;}
   if(c.id&&ART.portrait[c.id])return `<img src="${ART.portrait[c.id]}" style="height:100%;width:auto" alt="">`;
   const {hair,skin,cloth,style}=c;const o=c.ghost?'opacity=".72"':'';
   let back='',front='';
@@ -2573,7 +2576,7 @@ function render(){
   const ph=S.phase;const moon=moonOf(S.day);
   $('#game').innerHTML=`<div class="hud"><span class="brand">The Night Market</span>
     <span class="pill">Day <b>${S.day}</b></span><span class="pill">${PHASES[ph].icon} ${PHASES[ph].label}</span><span class="pill">${esc(moon)} moon</span>
-    <span class="pill">Coins <b>${S.coins}</b></span><span class="pill">Stall <b>${S.level}</b> · ${esc(lvName(S.level))}</span><span class="sp"></span>
+    <span class="pill">${itemUrl('x_coin')?`<img class="iart" style="width:18px;height:18px;margin:0 4px 0 0" src="${esc(itemUrl('x_coin'))}" alt="">`:''}Coins <b>${S.coins}</b></span><span class="pill">Stall <b>${S.level}</b> · ${esc(lvName(S.level))}</span><span class="sp"></span>
     <button class="ibtn" data-g="fs" title="Fullscreen (F)">⛶</button>${ADMIN?'<button class="ibtn" data-g="admin" title="Admin">⚙</button>':''}<button class="ibtn" data-g="settings" title="Settings">☰</button></div>
    <div id="main">${mainView()}</div>
    <div class="dock"><button class="btn" data-g="bench">Bench</button><button class="btn" data-g="pack">Pack</button><button class="btn" data-g="almanac">Almanac</button><button class="btn" data-g="wren">Visit Wren</button></div>`;
@@ -2607,7 +2610,7 @@ function customerView(c){
   const sk=sel();
   const selCount={};sk.forEach(k=>selCount[k]=(selCount[k]||0)+1);
   const shelf=inv.map(x=>{const used=selCount[x.k]||0,left=x.qty-used;
-    return `<button class="item ${used?'sel':''} ${left<=0&&!used?'dis':''}" data-g="pick" data-k="${esc(x.k)}"><span class="c">×${left}</span><div class="n">${esc(x.name)}</div><div class="t"><span class="tier ${x.tier}">${x.tier}</span> · ${x.type==='craft'?esc(x.e.kind):'gathered'}</div></button>`;}).join('')||'<div class="lbl" style="padding:14px">Your pack is empty. Forage, then make something at the Bench.</div>';
+    return `<button class="item ${used?'sel':''} ${left<=0&&!used?'dis':''}" data-g="pick" data-k="${esc(x.k)}"><span class="c">×${left}</span>${itemImg(x.e,'tray')}<div class="n">${esc(x.name)}</div><div class="t"><span class="tier ${x.tier}">${x.tier}</span> · ${x.type==='craft'?esc(x.e.kind):'gathered'}</div></button>`;}).join('')||'<div class="lbl" style="padding:14px">Your pack is empty. Forage, then make something at the Bench.</div>';
   const counter=sk.length?sk.map(k=>`<span class="chip" style="font:700 13px var(--sans);padding:3px 10px;border-radius:9px;border:1px solid var(--line2);background:rgba(240,198,116,.1)">${esc(k.split('|')[0])} <span class="tier ${k.split('|')[1]}">${k.split('|')[1]}</span></span>`).join(' '):'<span class="lbl">Click items below to set them on the counter</span>';
   return `<div class="cust ${S.tmp.fresh?'in':''}">${portrait(cast)}</div>
    <div class="speech"><div class="who"><span class="nm">${esc(c.name)}</span><span class="badge" style="--c:${col}">${esc(c.kind)}</span><span class="sp"></span><span class="lbl">${S.queue.length} waiting</span></div>
@@ -2634,23 +2637,23 @@ function renderBench(){
   openModal(`${X}<div class="eyebrow">Stall 13</div><h2>The Bench</h2><div class="note" style="margin:8px 0">Moon tonight: <b>${moonOf(S.day)}</b>. Making a recipe on its wrong moon gives an Improper result. “Any” recipes are never penalised.</div>
    <div class="tabs"><button class="tab ${!benchKind?'on':''}" data-g="bkind" data-v="">All</button>${kinds.map(k=>`<button class="tab ${benchKind===k?'on':''}" data-g="bkind" data-v="${esc(k)}">${esc(k)}</button>`).join('')}</div>
    <div class="grid">${list.map(c=>{const lock=c.level>S.level,can=!lock&&canMake(c),ings=parseIng(c.ingredients);
-    return `<div class="rcard ${lock?'lock':''}" style="--c:${listColor('kinds',c.kind)}"><h4>${esc(c.name)}</h4><div class="row"><span class="badge" style="--c:${listColor('kinds',c.kind)}">${esc(c.kind)}</span><span class="badge" style="--c:#c8b6e8">L${c.level}</span><span class="chip">${c.moon==='Any'?'Any moon':esc(c.moon)+' moon'}</span></div>
+    return `<div class="rcard ${lock?'lock':''}" style="--c:${listColor('kinds',c.kind)}">${itemImg(c,'lg')}<h4>${esc(c.name)}</h4><div class="row"><span class="badge" style="--c:${listColor('kinds',c.kind)}">${esc(c.kind)}</span><span class="badge" style="--c:#c8b6e8">L${c.level}</span><span class="chip">${c.moon==='Any'?'Any moon':esc(c.moon)+' moon'}</span></div>
      <div class="chips">${ings.map(p=>`<span class="chip ${haveCount(p.name)>=p.qty?'have':'miss'}">${p.qty>1?p.qty+'× ':''}${esc(p.name)} ${haveCount(p.name)}/${p.qty}</span>`).join('')}</div>
      <p>${esc(c.purpose||'')}</p><div class="actions"><button class="btn gold sm ${can?'':'off'}" data-g="craft" data-id="${c.id}">${lock?'Level '+c.level:'Make'}</button></div></div>`;}).join('')}</div>`);
 }
 function renderPack(){
   const inv=invList();
   openModal(`${X}<div class="eyebrow">Your things</div><h2>Pack</h2><div class="note" style="margin:8px 0">Coins <b>${S.coins}</b> · Earned <b>${S.earned}</b> · Sold <b>${S.sold}</b></div>
-   <div class="grid">${inv.map(x=>`<div class="rcard" style="--c:${x.type==='craft'?listColor('kinds',x.e.kind):listColor('zones',x.e?x.e.zone:'')}"><h4>${esc(x.name)} <span style="color:var(--gold)">×${x.qty}</span></h4><div class="tier ${x.tier}">${x.tier}</div><p>${x.e?esc(x.type==='craft'?(x.e.purpose||''):(x.e.lore||'')):''}</p></div>`).join('')||'<p style="color:var(--muted)">Empty.</p>'}</div>`);
+   <div class="grid">${inv.map(x=>`<div class="rcard" style="--c:${x.type==='craft'?listColor('kinds',x.e.kind):listColor('zones',x.e?x.e.zone:'')}">${itemImg(x.e,'lg')}<h4>${esc(x.name)} <span style="color:var(--gold)">×${x.qty}</span></h4><div class="tier ${x.tier}">${x.tier}</div><p>${x.e?esc(x.type==='craft'?(x.e.purpose||''):(x.e.lore||'')):''}</p></div>`).join('')||'<p style="color:var(--muted)">Empty.</p>'}</div>`);
 }
 function renderAlmanac(){
   S.flags.opened_almanac=true;save();
   const q=almQ.toLowerCase();
   const rec=D.crafts.filter(c=>!q||(c.name+' '+c.kind+' '+c.purpose+' '+c.ingredients).toLowerCase().includes(q));
   const gat=D.gathers.filter(g=>!q||(g.name+' '+g.latin+' '+g.lore+' '+g.zone).toLowerCase().includes(q));
-  const body=almTab==='Recipes'?rec.map(c=>`<div class="rcard ${c.level>S.level?'lock':''}" style="--c:${listColor('kinds',c.kind)}"><h4>${esc(c.name)}</h4><div class="row"><span class="badge" style="--c:${listColor('kinds',c.kind)}">${esc(c.kind)}</span><span class="badge" style="--c:#c8b6e8">L${c.level}</span><span class="chip">${c.moon==='Any'?'Any moon':esc(c.moon)+' moon'}</span></div>
+  const body=almTab==='Recipes'?rec.map(c=>`<div class="rcard ${c.level>S.level?'lock':''}" style="--c:${listColor('kinds',c.kind)}">${itemImg(c,'lg')}<h4>${esc(c.name)}</h4><div class="row"><span class="badge" style="--c:${listColor('kinds',c.kind)}">${esc(c.kind)}</span><span class="badge" style="--c:#c8b6e8">L${c.level}</span><span class="chip">${c.moon==='Any'?'Any moon':esc(c.moon)+' moon'}</span></div>
      <p><b>Needs:</b> ${esc(c.ingredients)}</p><p>${esc(c.purpose||'')}</p>${c.method?`<p><i>${esc(c.method)}</i></p>`:''}${c.lore?`<p style="color:#d9cde8">${esc(c.lore)}</p>`:''}${c.safety?`<div class="safety">${esc(c.safety)}</div>`:''}</div>`).join('')
-   :gat.map(g=>`<div class="rcard" style="--c:${listColor('zones',g.zone)}"><h4>${esc(g.name)}</h4>${g.latin?`<p style="font-style:italic;margin:0">${esc(g.latin)}</p>`:''}<div class="row"><span class="badge" style="--c:${listColor('zones',g.zone)}">${esc(g.zone)}</span><span class="chip">${esc(g.rarity)}</span><span class="chip">${esc(g.when)}</span></div>${g.corr?`<p><b>${esc(g.corr)}</b></p>`:''}<p>${esc(g.lore||'')}</p>${g.safety?`<div class="safety">${esc(g.safety)}</div>`:''}</div>`).join('');
+   :gat.map(g=>`<div class="rcard" style="--c:${listColor('zones',g.zone)}">${itemImg(g,'lg')}<h4>${esc(g.name)}</h4>${g.latin?`<p style="font-style:italic;margin:0">${esc(g.latin)}</p>`:''}<div class="row"><span class="badge" style="--c:${listColor('zones',g.zone)}">${esc(g.zone)}</span><span class="chip">${esc(g.rarity)}</span><span class="chip">${esc(g.when)}</span></div>${g.corr?`<p><b>${esc(g.corr)}</b></p>`:''}<p>${esc(g.lore||'')}</p>${g.safety?`<div class="safety">${esc(g.safety)}</div>`:''}</div>`).join('');
   openModal(`${X}<div class="eyebrow">Your family's book</div><h2>The Almanac</h2><div class="tabs"><button class="tab ${almTab==='Recipes'?'on':''}" data-g="atab" data-v="Recipes">Recipes</button><button class="tab ${almTab==='Gathering'?'on':''}" data-g="atab" data-v="Gathering">Gathering</button><input id="almq" placeholder="Search…" value="${esc(almQ)}" style="padding:6px 12px;border-radius:99px;background:rgba(14,9,22,.6);border:1px solid var(--line);outline:0;min-width:160px"></div><div class="grid">${body}</div>`);
   const i=$('#almq');if(i){i.addEventListener('input',e=>{almQ=e.target.value;const p=e.target.selectionStart;renderAlmanac();const n=$('#almq');n.focus();n.setSelectionRange(p,p);});}
 }
@@ -2906,7 +2909,7 @@ function genWorld(z){
   const nodes=[];let guard=0;
   while(nodes.length<want.length&&guard++<900){const x=120+Math.random()*(W-240),y=(z==='Canal and shore'?640:200)+Math.random()*(H-(z==='Canal and shore'?740:300));
     if(blockedAt2(blk,x,y)||(MASK&&(maskHit(MASK,x,y)||maskHit(MASK,x+30,y)||maskHit(MASK,x-30,y)||maskHit(MASK,x,y+30)||maskHit(MASK,x,y-30)))||!far(x,y,260)||nodes.some(n=>Math.hypot(n.x-x,n.y-y)<190))continue;
-    const name=want[nodes.length];nodes.push({x,y,name,kind:plantKind(name,z),h:hue(name),done:false});}
+    const name=want[nodes.length];const _e=IDX.get(name.toLowerCase());nodes.push({x,y,name,gid:_e&&_e.e.id,kind:plantKind(name,z),h:hue(name),done:false});}
   const flies=[];for(let k=0;k<45;k++)flies.push({x:r()*W,y:r()*H,p:r()*9,s:.4+r()});
   return {z,W,H,mask:MASK,bg:CUST||bg,objs:CUST?[]:objs,blk:CUST?[]:blk,nodes,spawn,flies,look};
 }
@@ -2947,6 +2950,8 @@ function drawNode(c,n,t,near){
   const x=n.x,y=n.y,col=listColor('zones',ZN.z);
   const pulse=.5+.5*Math.sin(t*3+n.h);
   const gl=c.createRadialGradient(x,y,2,x,y,near?60:42);gl.addColorStop(0,near?'rgba(255,244,200,.8)':'rgba(255,230,160,'+(.35+.25*pulse)+')');gl.addColorStop(1,'rgba(255,230,160,0)');c.fillStyle=gl;c.fillRect(x-70,y-70,140,140);
+  const bm=n.gid&&itemBmp(n.gid);
+  if(bm){const bob=Math.sin(t*2+n.h)*3,sz=68,rr=Math.min(1.6,bm.naturalHeight/bm.naturalWidth);c.drawImage(bm,x-sz/2,y-sz*rr-4+bob,sz,sz*rr);if(near){c.strokeStyle='rgba(255,236,170,.85)';c.lineWidth=2;c.beginPath();c.ellipse(x,y+2,26+pulse*3,10+pulse,0,0,7);c.stroke();}return;}
   c.save();
   if(n.kind==='reed'){for(let i=0;i<5;i++){const hh=64+i*6,sw=Math.sin(t*1.4+i)*4;c.strokeStyle=i%2?'#7fb86a':'#5f9a56';c.lineWidth=3;c.beginPath();c.moveTo(x+(i-2)*5,y);c.quadraticCurveTo(x+(i-2)*5+sw*.4,y-hh*.6,x+(i-2)*5+sw,y-hh);c.stroke();if(i===1||i===3){c.fillStyle='#7a4a2c';c.beginPath();c.ellipse(x+(i-2)*5+sw,y-hh+9,3.8,12,0,0,7);c.fill();}}}
   else if(n.kind==='flower'){c.strokeStyle='#4f8a46';c.lineWidth=3;for(let i=-1;i<=1;i++){c.beginPath();c.moveTo(x+i*6,y);c.quadraticCurveTo(x+i*10,y-18,x+i*8+Math.sin(t*1.6+i)*3,y-34-Math.abs(i)*-6);c.stroke();c.fillStyle='hsl('+n.h+',65%,68%)';for(let p=0;p<5;p++){c.beginPath();c.arc(x+i*8+Math.cos(p*1.26)*6,y-36+(i===0?0:6)+Math.sin(p*1.26)*6,4.6,0,7);c.fill();}c.fillStyle='#ffe28a';c.beginPath();c.arc(x+i*8,y-36+(i===0?0:6),3,0,7);c.fill();}}
@@ -2977,6 +2982,7 @@ function drawHero(c,x,y,P,t){
 const KEYS={};
 async function enterZone(z){
   const sid0=slotScene(zoneKey(z));if(sid0)await loadSceneImgs(sid0);
+  await preloadItems(D.gathers.filter(g=>g.zone===z).map(g=>g.id));
   const W0=genWorld(z);const cv=document.createElement('canvas');
   ZN=Object.assign(W0,{cv,c:cv.getContext('2d'),P:{x:W0.spawn.x,y:W0.spawn.y,face:1,moving:false,run:false,tx:null,ty:null,auto:null},t:0,got:[],last:performance.now(),float:[]});
   $('#overlay').innerHTML=`<div id="zonewrap" style="position:fixed;inset:0;z-index:40;background:#000"></div>`;
@@ -3133,6 +3139,12 @@ function layerHtml(L,phase,editing){
   return `<div class="ly ${editing&&AS.layer===L.id?'sel':''}" data-lid="${L.id}" style="left:${L.x}px;top:${L.y}px;transform:translate(-50%,-50%) rotate(${L.rot||0}deg) scale(${(L.s==null?100:L.s)/100*(L.flip?-1:1)},${(L.s==null?100:L.s)/100});${off}mix-blend-mode:${L.blend||'normal'};--a:${(L.fxa==null?50:L.fxa)/100};--d:${dur}s;${editing?'':'pointer-events:none'}">${inner}</div>`;
 }
 function stageHtml(id,phase,editing){const S0=AS.scenes[id];if(!S0)return '';const [W,H]=dimsOf(id);return `<div class="stage" data-w="${W}" data-h="${H}"><div class="st" style="width:${W}px;height:${H}px;background:${S0.bg||'#0e0916'}">${S0.layers.map(l=>layerHtml(l,phase,editing)).join('')}</div></div>`;}
+/* ----- item art: images the Game Book's Item art window attached to game items ----- */
+function itemUrl(id){const a=id&&AS.slots['item_'+id];return (a&&AS.urls[a])||null;}
+function itemImg(e,cls){const u=e&&itemUrl(e.id);return u?`<img class="iart ${cls||''}" src="${esc(u)}" alt="" draggable="false">`:'';}
+const _ib={};
+function itemBmp(id){const u=itemUrl(id);if(!u)return null;let o=_ib[u];if(!o){o=_ib[u]=new Image();o.src=u;}return o.complete&&o.naturalWidth?o:null;}
+function preloadItems(ids){return Promise.all(ids.map(id=>{const u=itemUrl(id);if(!u)return null;let o=_ib[u];if(!o){o=_ib[u]=new Image();o.src=u;}return o.complete?null:new Promise(r=>{o.onload=o.onerror=r;});}));}
 function slotScene(name){const id=AS.slots[name];return id&&AS.scenes[id]&&AS.scenes[id].layers.length?id:null;}
 function fitStages(){document.querySelectorAll('.stage:not(.edit)').forEach(s=>{const W=+s.dataset.w||1920,H=+s.dataset.h||1080,k=Math.max(s.clientWidth/W,s.clientHeight/H);s.firstChild.style.transform=`translate(-50%,-50%) scale(${k})`;});}
 window.addEventListener('resize',()=>{fitStages();fitEdit();});
