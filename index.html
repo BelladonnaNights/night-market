@@ -330,13 +330,18 @@ body.edit .hide-edit{display:none!important}
 #am-cur{position:absolute;pointer-events:none;z-index:20;border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 1.5px #000,inset 0 0 0 1.5px #000;transform:translate(-50%,-50%);display:none}#am-cur::before,#am-cur::after{content:'';position:absolute;background:#fff;box-shadow:0 0 0 1px #000}#am-cur::before{left:50%;top:50%;width:10px;height:2px;transform:translate(-50%,-50%)}#am-cur::after{left:50%;top:50%;width:2px;height:10px;transform:translate(-50%,-50%)}#am-cur.er{border-style:dashed;border-color:#ffb3b3}#am-cur.st{border-color:#5ad18a}#am-walk{position:absolute;left:0;top:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
 .am-cloud{font-size:12.5px;color:var(--muted);max-width:360px}
 .am-top{display:flex;gap:8px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}.am-t{font:700 20px var(--serif);color:var(--gold)}.am-sp{flex:1}
-.am-body{flex:1;display:grid;grid-template-columns:minmax(250px,310px) 1fr minmax(250px,310px);min-height:0}
+.am-body{flex:1;display:grid;grid-template-columns:var(--amw,310px) minmax(0,1fr) minmax(250px,310px);min-height:0;position:relative}
+.pcin{flex:1;min-width:150px;max-width:260px;padding:6px 12px;border-radius:99px;background:rgba(14,9,22,.7);border:1px solid var(--line);color:inherit;outline:0;font:13px var(--sans)}
+.am-rs{position:absolute;top:0;bottom:0;left:calc(var(--amw,310px) - 5px);width:10px;cursor:col-resize;z-index:30;touch-action:none}.am-rs::after{content:'';position:absolute;left:4px;top:0;bottom:0;width:2px;background:transparent;transition:background .15s}.am-rs:hover::after,.am-rs.on::after{background:var(--gold)}
+.tr.lkr .nm::after{content:' ↗';color:var(--gold);opacity:.7;font-size:11px}
+*{scrollbar-width:thin;scrollbar-color:#c9a24b transparent}
+::-webkit-scrollbar{width:7px;height:7px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#f0c674,#b8893a);border-radius:99px;border:1px solid rgba(14,9,22,.6)}::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#ffd98a,#d4a24a)}::-webkit-scrollbar-corner{background:transparent}
 .am-tree,.am-right{overflow:auto;padding:8px;background:rgba(20,13,32,.6)}.am-tree{border-right:1px solid var(--line)}.am-right{border-left:1px solid var(--line)}
 .am-mid{display:flex;flex-direction:column;min-width:0;min-height:0;padding:10px;gap:8px}
 body.am-pop #am-mid{position:fixed;left:0;top:0;bottom:0;right:340px;z-index:9000;background:#0b0710;padding:10px;display:flex;flex-direction:column}body.am-pop #am-right{position:fixed;right:0;top:0;bottom:0;width:340px;z-index:9001;background:#140d1c;overflow:auto;max-height:none}
 .am-stagewrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;background:#05030a;border-radius:12px;overflow:hidden}
 .am-prev{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;background:#05030a;border-radius:12px;padding:12px}
-.am-sbar{display:flex;gap:10px;align-items:center;font-size:13px}.am-empty{color:var(--muted);font-size:13px;padding:10px}.am-empty.big{font-size:16px;text-align:center;margin:auto;max-width:420px}
+.am-sbar{display:flex;gap:8px 10px;align-items:center;font-size:13px;flex-wrap:wrap}.am-empty{color:var(--muted);font-size:13px;padding:10px}.am-empty.big{font-size:16px;text-align:center;margin:auto;max-width:420px}
 .tr{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:9px;cursor:pointer;font-size:13.5px;border:1px solid transparent;position:relative}
 .tr:hover{background:rgba(240,198,116,.07)}.tr.on{background:rgba(240,198,116,.16);border-color:var(--line2)}.tr.cur{background:rgba(201,160,220,.12)}
 .tr .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tr .cnt,.tr .tag{font-size:11px;color:var(--muted)}.tr .th{width:28px;height:28px;object-fit:contain;border-radius:5px;background:#05030a}.tr .ico{width:28px;text-align:center;color:var(--gold);font-style:normal}
@@ -348,7 +353,7 @@ body.am-pop #am-mid{position:fixed;left:0;top:0;bottom:0;right:340px;z-index:900
 .am-p input[type=text],.am-p input[type=number],.am-p input:not([type]),.am-p select{width:100%;padding:6px 9px;border-radius:9px;background:rgba(14,9,22,.7);border:1px solid var(--line);color:inherit;font:inherit;outline:0}
 .rng{display:flex;gap:8px;align-items:center}.rng input[type=range]{flex:1}.rng input[type=number]{width:74px!important}
 .lrows{max-height:200px;overflow:auto}.lrow{display:flex;align-items:center;gap:5px;padding:5px 8px;border-radius:8px;cursor:pointer;font-size:13px}.lrow.on{background:rgba(240,198,116,.16)}.lrow .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lrow button{background:none;border:0;color:inherit;cursor:pointer;opacity:.7;font-size:14px}
-@media(max-width:900px){.am-body{grid-template-columns:1fr}.am-tree{max-height:30vh}.am-right{max-height:34vh}}
+@media(max-width:900px){.am-rs{display:none}.am-body{grid-template-columns:1fr}.am-tree{max-height:30vh}.am-right{max-height:34vh}}
 
 #asm .tab{padding:6px 14px;border-radius:99px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);font-weight:800;font-size:13px;cursor:pointer}#asm .tab.on{background:var(--gold);color:#2a1a08;border-color:transparent}#asm .tabs{display:inline-flex;gap:6px}
 #asm .chip{display:inline-flex;gap:6px;align-items:center;padding:5px 11px;border-radius:99px;border:1px solid var(--line);font-size:12.5px;cursor:pointer}
@@ -3188,7 +3193,8 @@ async function syncDown(){
     if(!v&&!AS.tree.length&&!AS.rev){seedStarter(true);}
     const miss=[];for(const n of AS.tree)if(n.type==='asset'&&!n.ph){if(n.url){AS.urls[n.id]=n.url;continue;}let have=null;try{have=await dbGet('files',n.id);}catch(e){}if(!have)miss.push(n);}
     let k=0;for(const n of miss){cstat('Downloading from the cloud… '+(++k)+'/'+miss.length);const o=await rget('assetfiles/'+n.id);if(o&&o.d){const b=unb64(o.d,o.e||n.ext);try{await dbPut('files',n.id,b);}catch(e){}AS.urls[n.id]=URL.createObjectURL(b);}}
-    if(AS.slots.__ph!=='1'&&(AS.tree.length||v)){AS.slots.__ph='1';phSeed();saveMeta();}
+    if(AS.slots.__ph!=='1'&&(AS.tree.length||v)){AS.slots.__ph='1';AS.slots.__gl='2';phSeed();phMigrate();saveMeta();}
+    else if(AS.slots.__gl!=='2'&&AS.tree.length){AS.slots.__gl='2';phMigrate();saveMeta();amRender();}
     if(cloudOn()&&(AS.rev>(AS.cloudRev||0)||AS.pending.length||AS.removed.length))await syncUp();
     else cstat(cloudOn()?'Saved to the cloud ✓':'Loaded from the cloud ✓');
     amRender();
@@ -3392,7 +3398,7 @@ function delNode(id){
   if(n.type==='folder')kids(id).forEach(k=>delNode(k.id));
   if(n.type==='asset'){dbDel('files',id);delete AS.urls[id];AS.pending=AS.pending.filter(x=>x!==id);AS.removed.push(id);for(const k in AS.slots)if(AS.slots[k]===id)delete AS.slots[k];Object.values(AS.scenes).forEach(s=>s.layers=s.layers.filter(l=>l.asset!==id));}
   if(n.type==='scene'){delete AS.scenes[id];for(const k in AS.slots)if(AS.slots[k]===id)delete AS.slots[k];if(AS.scene===id)AS.scene=null;}
-  AS.tree=AS.tree.filter(x=>x.id!==id);if(AS.sel===id)AS.sel=null;
+  AS.tree=AS.tree.filter(x=>x.id!==id&&x.to!==id);if(AS.sel===id)AS.sel=null;
 }
 async function addFiles(files,parent,sceneId){
   let n=0;for(const f of files){const ext=(f.name.split('.').pop()||'').toLowerCase();
@@ -3436,12 +3442,16 @@ window.addEventListener('resize',()=>fitEdit());
 /* ----- composer UI ----- */
 async function mount(host){host.innerHTML='<div id="asm"><p class="am-empty">Loading your library…</p></div>';if(!AS.ready){try{await assetsLoad();}catch(e){}}try{autoLinkItems();}catch(e){}amRender();syncDown();}
 const usedInScene=aid=>Object.values(AS.scenes).some(sc=>sc.layers.some(l=>l.asset===aid));
-const vis=n=>n.type!=='asset'||AS.showUsed||!usedInScene(n.id);
+const pathName=n=>{const seg=[];let c=n.parent?node(n.parent):null;while(c){seg.unshift(c.name);c=c.parent?node(c.parent):null;}return seg.join(' › ');};
+const vis=n=>{if(n.type==='link'){const t=node(n.to);return !!t&&vis(t);}return n.type!=='asset'||AS.showUsed||!usedInScene(n.id);};
 const visKids=p=>kids(p).filter(vis);
 function trRows(pid,depth){
   return visKids(pid).map(n=>{
-    const pad=10+depth*16,sel=(AS.sel===n.id||AS.scene===n.id)?'on':'';
-    if(n.type==='folder'){const op=AS.open.has(n.id),cur=AS.cur===n.id;return `<div class="tr f ${cur?'cur':''}" draggable="true" data-id="${n.id}" data-am="fsel" style="padding-left:${pad}px"><b class="car" data-am="tog" data-id="${n.id}">${op?'▾':'▸'}</b><span class="nm">${esc(n.name)}</span><span class="cnt">${visKids(n.id).length}</span></div>`+(op?trRows(n.id,depth+1):'');}
+    const pad=10+depth*16;let sel=(AS.sel===n.id||AS.scene===n.id)?'on':'',lk='',tid=n.id;
+    if(n.type==='link'){const t=node(n.to);if(!t)return '';lk=`data-lkid="${n.id}" `;tid=t.id;sel=(AS.sel===t.id||AS.scene===t.id)?'on':'';
+      if(t.type==='scene')return `<div class="tr s lkr ${sel}" ${lk}data-id="${tid}" data-am="scene" title="${esc(t.name)} (same item as in ${esc(pathName(t))})" style="padding-left:${pad+16}px"><i class="ico">▣</i><span class="nm">${esc(t.name)}</span><span class="tag">scene</span></div>`;
+      const u=AS.urls[t.id];return `<div class="tr a lkr ${sel}" ${lk}data-id="${tid}" data-am="asset" title="${esc(t.name)} (same item as in ${esc(pathName(t))})" style="padding-left:${pad+16}px">${IMGX.test(t.ext)&&u?`<img src="${u}" class="th">`:`<i class="ico">${t.ph?'◌':'♪'}</i>`}<span class="nm">${esc(t.name)}</span><span class="tag">${t.ph?'placeholder':esc(t.ext)}</span></div>`;}
+    if(n.type==='folder'){const op=AS.open.has(n.id),cur=AS.cur===n.id;return `<div class="tr f ${cur?'cur':''}" draggable="true" data-id="${n.id}" data-am="fsel" style="padding-left:${pad}px"><b class="car" data-am="tog" data-id="${n.id}">${op?'▾':'▸'}</b><span class="nm" title="${esc(n.name)}">${esc(n.name)}</span><span class="cnt">${visKids(n.id).length}</span></div>`+(op?trRows(n.id,depth+1):'');}
     if(n.type==='scene')return `<div class="tr s ${sel}" draggable="true" data-id="${n.id}" data-am="scene" style="padding-left:${pad+16}px"><i class="ico">▣</i><span class="nm">${esc(n.name)}</span><span class="tag">scene</span></div>`;
     const u=AS.urls[n.id];return `<div class="tr a ${sel}" draggable="true" data-id="${n.id}" data-am="asset" style="padding-left:${pad+16}px">${IMGX.test(n.ext)&&u?`<img src="${u}" class="th">`:`<i class="ico">${n.ph?'◌':MODX.test(n.ext)?'◆':'♪'}</i>`}<span class="nm">${esc(n.name)}</span><span class="tag">${n.ph?'placeholder':esc(n.ext)}</span></div>`;
   }).join('');
@@ -3457,7 +3467,7 @@ function amRender(){
    <span class="am-sp"></span>${cloudOn()?'':'<button class="btn gold sm" data-am="ccheck">Cloud not connected: check why</button>'}<span id="am-cloud" class="am-cloud">${esc(_cs.msg)}</span><button class="btn sm" data-am="sync">Sync</button><button class="btn sm" data-am="ccheck">Cloud check</button><button class="btn sm" data-am="export">Backup .zip</button></div>
   <div class="am-body"><div class="am-tree" id="am-tree"><div class="am-tools"><div class="am-in">In: <b>${esc(inName)}</b> <label style="margin-left:8px;cursor:pointer"><input type="checkbox" data-showused ${AS.showUsed?'checked':''}> show images used in scenes</label></div><div class="am-tb"><button data-am="newf" data-id="${AS.cur||''}">+ folder</button><button data-am="newsc" data-id="${AS.cur||''}">+ scene</button><button data-am="up" data-id="${AS.cur||''}">upload</button><button data-am="urlf" data-id="${AS.cur||''}">from URL</button><button data-am="ren" data-id="${AS.cur||''}" ${cn?'':'disabled'}>rename</button><button data-am="del" data-id="${AS.cur||''}" class="dn" ${cn?'':'disabled'}>delete</button></div></div>
    <div class="am-list" id="am-list"><div class="tr root ${AS.cur?'':'cur'}" data-id="" data-am="fsel">All files <span class="cnt">${AS.tree.filter(n=>n.type==='asset'&&vis(n)).length}</span></div>${trRows(null,0)||'<p class="am-empty">Nothing here yet. Press Starter folders, or make a folder and upload into it. Drag anything onto a folder to move it.</p>'}</div></div>
-  <div class="am-mid" id="am-mid">${sc?amStage(sc):as?amPreview(as):'<div class="am-empty big">Pick an asset to preview it, or open a scene to build a screen from layers.<br><br>Tip: drop image files straight onto a folder.</div>'}</div>
+  <div class="am-rs" id="am-rs" title="Drag to widen or narrow the folder list (double-click to reset)"></div><div class="am-mid" id="am-mid">${sc?amStage(sc):as?amPreview(as):'<div class="am-empty big">Pick an asset to preview it, or open a scene to build a screen from layers.<br><br>Tip: drop image files straight onto a folder.</div>'}</div>
   <div class="am-right" id="am-right">${sc?amLayers(sc):as?amInfo(as):amHelp()}</div></div>
   <input type="file" id="am-file" multiple hidden accept=".png,.jpg,.jpeg,.webp,.gif,.svg,.avif,.glb,.gltf,.mp3,.ogg,.wav,.m4a">`;
   ['am-list','am-right'].forEach(i=>{const e=document.getElementById(i);if(e&&keep[i])e.scrollTop=keep[i];});const lr2=document.querySelector('.lrows');if(lr2&&keep.lr)lr2.scrollTop=keep.lr;
@@ -3483,11 +3493,16 @@ function refit(sc,ns){const od=DIMS[sc._ps||'screen']||DIMS.screen,nd=DIMS[ns]||
   if(sc.walls)sc.walls=[];if(sc.nospawn)sc.nospawn=[];if(sc.counter)sc.counter=[];if(sc.spawn)delete sc.spawn;toast('Resized: the picture was re-centred and fitted. Walkable shapes were cleared, so redraw them.');}
 function amStage(id){
   const sc=AS.scenes[id],tn=node(id);
-  return `<div class="am-sbar"><b>${esc(tn.name)}</b><button class="btn sm ${AS.walk?'gold':''}" data-am="walk">Walkable area${sc.walls&&sc.walls.length?' ✓':''}</button><button class="btn sm" data-am="pop">⤢ Pop out / close</button><span class="am-sp"></span>Preview as <span class="tabs" style="margin:0">${['day','dusk','night'].map(p=>`<button class="tab ${AS.phase===p?'on':''}" data-am="ph" data-v="${p}">${p}</button>`).join('')}</span></div>
+  return `<div class="am-sbar"><b>${esc(tn.name)}</b><button class="btn sm ${AS.walk?'gold':''}" data-am="walk">Walkable area${sc.walls&&sc.walls.length?' ✓':''}</button><button class="btn sm" data-am="pop">⤢ Pop out / close</button><input list="am-cl" class="pcin" data-pc placeholder="Preview a customer… (type to search)" value="${esc(AS.prevCust?((window.__book.data.requests.find(r=>r.id===AS.prevCust)||{}).name||''):'')}" title="Pick a customer to stand on the counter while you design. Not saved to the scene."><datalist id="am-cl">${window.__book.data.requests.map(r=>`<option value="${esc(r.name)}">`).join('')}</datalist><span class="am-sp"></span>Preview as <span class="tabs" style="margin:0">${['day','dusk','night'].map(p=>`<button class="tab ${AS.phase===p?'on':''}" data-am="ph" data-v="${p}">${p}</button>`).join('')}</span></div>
   <div class="am-stagewrap" id="am-sw"><div class="stage edit" id="am-stage">${stageInner(id)}</div></div>
   <div class="am-sbar" style="font-size:12px;opacity:.8">Drag assets from the left onto the picture. Drag layers to move. The game crops the edges to fit any screen, so keep important things toward the middle.</div>`;
 }
-function stageInner(id){const sc=AS.scenes[id],[W,H]=dimsOf(id);return `<div class="st" id="am-st" style="width:${W}px;height:${H}px;background:${sc.bg||'#0e0916'}">${sc.layers.map(l=>layerHtml(l,AS.phase,true)).join('')}</div><div class="guide"></div>${AS.walk?'<canvas id="am-walk"></canvas>':''}`;}
+function cYat(sc,x){const pts=[].concat(...(sc.counter||[]).filter(s=>s.t==='wall'&&s.pts).map(s=>s.pts)).sort((a,b)=>a[0]-b[0]);if(!pts.length)return null;if(x<=pts[0][0])return pts[0][1];for(let i=1;i<pts.length;i++)if(x<=pts[i][0]){const a=pts[i-1],b=pts[i],t=(x-a[0])/((b[0]-a[0])||1);return a[1]+(b[1]-a[1])*t;}return pts[pts.length-1][1];}
+function pcustHtml(sc,W,H){if(!AS.prevCust)return '';const r=window.__book.data.requests.find(x=>x.id===AS.prevCust);if(!r)return '';
+  const x=AS.pcx==null?W/2:AS.pcx,u=itUrl(r.id),h=Math.round(H*.6),w=Math.round(h*2/3),cy=cYat(sc,x),bottom=(cy==null?H*.9:cy)+h*.1,top=bottom-h;
+  const clip=cy==null?'':`clip-path:inset(0 0 ${Math.max(0,Math.round(h*.1))}px 0);`;
+  return `<div class="pcust" style="position:absolute;left:${x-w/2}px;top:${top}px;width:${w}px;height:${h}px;cursor:ew-resize;${clip}z-index:5">${u?`<img src="${esc(u)}" draggable="false" style="width:100%;height:100%;object-fit:contain;object-position:bottom;pointer-events:none">`:`<div style="width:100%;height:100%;border:3px dashed #f0c674;border-radius:14px;background:rgba(240,198,116,.12);color:#f0c674;display:grid;place-items:center;font:700 34px sans-serif;text-align:center;padding:10px">${esc(r.name)}<br><small style="font-size:24px">placeholder</small></div>`}<div style="position:absolute;left:0;right:0;bottom:${Math.round(h*.1)}px;border-bottom:3px solid rgba(240,198,116,.9)"></div></div>`;}
+function stageInner(id){const sc=AS.scenes[id],[W,H]=dimsOf(id);return `<div class="st" id="am-st" style="width:${W}px;height:${H}px;background:${sc.bg||'#0e0916'}">${sc.layers.map(l=>layerHtml(l,AS.phase,true)).join('')}${pcustHtml(sc,W,H)}</div><div class="guide"></div>${AS.walk?'<canvas id="am-walk"></canvas>':''}`;}
 function fitEdit(){const sw=document.getElementById('am-sw'),st=document.getElementById('am-st');if(!sw||!st||!AS.scene)return;const [W,H]=dimsOf(AS.scene);const k=Math.min(sw.clientWidth/W,sw.clientHeight/H);const s=document.getElementById('am-stage');s.style.width=W*k+'px';s.style.height=H*k+'px';st.style.transform=`scale(${k})`;st.style.transformOrigin='0 0';st.style.left='0';st.style.top='0';st.dataset.k=k;drawWalk();}
 function stageRefresh(){const id=AS.scene,s=document.getElementById('am-stage');if(!s||!id)return;s.innerHTML=stageInner(id);fitEdit();}
 function amLayers(id){
@@ -3577,7 +3592,7 @@ function openNeeds(){
 }
 const PH_CUST=['Characters','Customers','Regulars'];
 function phDefs(){const o=[];
-  itDefs().forEach(d=>{let folder=d.folder||['Items'].concat(d.grp);if(d.grp[0]==='Customers (portraits)')folder=PH_CUST;o.push({t:'item',key:d.key,name:d.fname||d.label,folder});});
+  itDefs().forEach(d=>{let folder=d.folder||['Items'].concat(d.grp);if(d.grp[0]==='Customers (portraits)')folder=PH_CUST;o.push({t:'item',key:d.key,name:d.fname||d.label,folder,link:d.link});});
   SLOTS.filter(s=>NEEDS[s.id]).forEach(s=>o.push({t:'scene',slot:s.id,name:s.label.replace(/ \(.*\)$/,'').replace(/^Story background: /,'Background: '),folder:NEEDS[s.id].f}));
   return o;}
 function phSeed(){let n=0;const have=new Set(AS.tree.filter(x=>x.ph).map(x=>x.phScene||x.phKey));
@@ -3585,7 +3600,7 @@ function phSeed(){let n=0;const have=new Set(AS.tree.filter(x=>x.ph).map(x=>x.ph
     if(d.t==='item'){if(AS.slots['item_'+d.key]||have.has(d.key))return;}else{if(AS.slots[d.slot]||have.has(d.slot))return;}
     const par=ensureFolder(d.folder),nd={id:uid(),type:'asset',ph:1,name:d.name,ext:'png',parent:par,order:nextOrder(par),size:0};
     if(d.t==='item'){nd.phKey=d.key;AS.slots['item_'+d.key]=nd.id;}else nd.phScene=d.slot;
-    AS.tree.push(nd);n++;});
+    AS.tree.push(nd);if(d.link)linkTo(nd.id,d.link);n++;});
   return n;}
 function phMakeScene(n){const sl=SLOTS.find(x=>x.id===n.phScene);if(!sl)return;const dm=DIMS[sl.size||'screen']||DIMS.screen,W=dm[0],H=dm[1];
   const cover=!/^char_/.test(n.phScene),k=n.w&&n.h?(cover?Math.max(W/n.w,H/n.h):Math.min(W/n.w,H/n.h)):1;
@@ -3620,11 +3635,26 @@ const IT_PRESET=[['Decor & collectibles','Lantern'],['Decor & collectibles','Bun
 const AZ_F=['Characters','Azlynn (Hero)','Sprites & Animations'];
 [['idle','Idle (standing), facing right'],['walk right 1','Walk right, frame 1'],['walk right 2','Walk right, frame 2'],['walk right 3','Walk right, frame 3'],['walk right 4','Walk right, frame 4'],['walk right 5','Walk right, frame 5 (optional)'],['walk right 6','Walk right, frame 6 (optional)'],['walk left 1','Walk left, frame 1 (optional) (optional: mirrored from right if empty)'],['walk left 2','Walk left, frame 2 (optional)'],['walk left 3','Walk left, frame 3 (optional)'],['walk left 4','Walk left, frame 4 (optional)'],['walk left 5','Walk left, frame 5 (optional)'],['walk left 6','Walk left, frame 6 (optional)'],['walk up 1','Walk up (away from you), frame 1 (optional)'],['walk up 2','Walk up (away from you), frame 2 (optional)'],['walk up 3','Walk up (away from you), frame 3 (optional)'],['walk up 4','Walk up (away from you), frame 4 (optional)'],['walk up 5','Walk up (away from you), frame 5 (optional)'],['walk up 6','Walk up (away from you), frame 6 (optional)'],['walk down 1','Walk down (toward you), frame 1 (optional)'],['walk down 2','Walk down (toward you), frame 2 (optional)'],['walk down 3','Walk down (toward you), frame 3 (optional)'],['walk down 4','Walk down (toward you), frame 4 (optional)'],['walk down 5','Walk down (toward you), frame 5 (optional)'],['walk down 6','Walk down (toward you), frame 6 (optional)']].forEach(([k,l])=>IT_PRESET.push(['Azlynn walking sprite','Azlynn '+k,l]));
 const IT_GNOTE={'Azlynn walking sprite':'Upload each frame as its own PNG (a walking GIF can be split into frames at ezgif.com/split). Only “idle” and “walk right” 1–4 are needed: left is mirrored, and up/down reuse them until you add real ones. Bulk upload takes many files at once if each is named like azlynn_walk_right_1.png. Use the size box to scale her in the game.'};
+const G_ZF={'Marsh':['Marsh','Plants & Finds'],'Garden and hedgerow':['Garden & Hedgerow','Plants & Finds'],'Woods':['Woods','Plants & Finds'],'Canal and shore':['Canal & Shore','Plants & Finds'],'Town':['Town Lanes','Finds & Trades']};
+const G_CATS={'Reeds & Grasses':['Reed'],'Mushrooms & Mosses':['Bog Moss','Glowcap'],'Flowers':['Meadowsweet','Sweet Violet','Lavender','Chamomile','Calendula','Elderflower','Yarrow','Thistle',"St John's Wort"],'Roots & Bark':['Marshmallow Root','Valerian','Pine Resin','Hazel Twig','Birch Bark','Rowan Twig','Oak Gall','Willow Bark'],'Herbs':['Rosemary','Mint','Sage','Thyme','Comfrey','Plantain','Mugwort','Rosehip','Hawthorn Berry','Fern','Juniper'],'Shore Finds':['Hag Stone','Sea Glass','Driftwood','Clay','Freshwater Pearl','Sea Salt'],'Rewards & Gifts':['Raven Feather','Glow Moth Scale']};
+function gCat(g){for(const c in G_CATS)if(G_CATS[c].includes(g.name))return c;return g.zone==='Town'?'Town Finds':g.zone==='Canal and shore'?'Shore Finds':g.zone==='Reward'?'Rewards & Gifts':'Herbs';}
+function linkTo(tid,path){const par=ensureFolder(path);if(AS.tree.some(n=>n.type==='link'&&n.to===tid&&(n.parent||null)===par))return 0;AS.tree.push({id:uid(),type:'link',to:tid,parent:par,order:nextOrder(par)});return 1;}
+function itLinks(d,id){if(d.link)linkTo(id,d.link);}
+/* one-time: gatherables used to sit in Items > Gatherables > <area>; move them into the zone folder and link them into their category */
+function phMigrate(){let moved=0;const gp=AS.tree.find(n=>n.type==='folder'&&n.name==='Gatherables'&&node(n.parent)&&node(n.parent).name==='Items');
+  const areaIds=new Set(gp?kids(gp.id).filter(f=>f.type==='folder'&&['Marsh','Garden and hedgerow','Woods','Canal and shore','Town','Reward','Other'].includes(f.name)).map(f=>f.id):[]);
+  itDefs().filter(d=>d.link).forEach(d=>{let aid=AS.slots['item_'+d.key],n=aid&&node(aid);
+    const real=AS.tree.find(x=>x.type==='asset'&&!x.ph&&areaIds.has(x.parent)&&x.name.toLowerCase()===d.label.toLowerCase());
+    if(real&&(!n||n.ph)){if(n&&n.ph)AS.tree=AS.tree.filter(x=>x.id!==n.id&&x.to!==n.id);AS.slots['item_'+d.key]=real.id;n=real;}
+    if(!n)return;
+    if(areaIds.has(n.parent)){const par=ensureFolder(d.folder);n.parent=par;n.order=nextOrder(par);moved++;}
+    const want=ensureFolder(d.folder);if(n.parent===want)moved+=linkTo(n.id,d.link);});
+  areaIds.forEach(id=>{if(!kids(id).length)AS.tree=AS.tree.filter(x=>x.id!==id);});return moved;}
 const slug=s=>String(s).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
 const IT={q:'',target:null};
 function itDefs(){
   const D=window.__book.data,o=[];
-  D.gathers.forEach(g=>o.push({key:g.id,label:g.name,sub:[g.latin,g.rarity].filter(Boolean).join(' · '),grp:['Gatherables',g.zone||'Other']}));
+  D.gathers.forEach(g=>{const zf=G_ZF[g.zone],cat=gCat(g);o.push({key:g.id,label:g.name,sub:[g.latin,g.rarity].filter(Boolean).join(' · '),grp:['Gatherables',g.zone||'Other'],folder:zf?['Gathering Zones',zf[0],zf[1]]:['Items','Gatherables',cat],link:zf?['Items','Gatherables',cat]:null});});
   D.crafts.forEach(c=>o.push({key:c.id,label:c.name,sub:'Level '+c.level+(c.sells===false?' · not sold':''),grp:['Crafted goods',c.kind||'Other']}));
   D.upgrades.forEach(u=>o.push({key:u.id,label:u.name,sub:u.stall||'',grp:['Stall upgrades']}));
   D.requests.forEach(r=>o.push({key:r.id,label:r.name,sub:r.kind||'',grp:['Customers (portraits)']}));
@@ -3639,7 +3669,7 @@ async function itFile(d,f){
   const ext=(f.name.split('.').pop()||'').toLowerCase();if(!IMGX.test(ext)){toast('Images only (PNG, JPG, WEBP, GIF, SVG).');return;}
   const id=uid();let w=0,h=0;const url=URL.createObjectURL(f);try{const im=new Image();im.src=url;await im.decode();w=im.naturalWidth;h=im.naturalHeight;}catch(e){}
   const par=ensureFolder(d.folder||['Items'].concat(d.grp));
-  await dbPut('files',id,f);mark(id);AS.urls[id]=url;AS.tree.push({id,type:'asset',name:d.fname||d.label,ext,parent:par,order:nextOrder(par),size:f.size,w,h});
+  await dbPut('files',id,f);mark(id);AS.urls[id]=url;AS.tree.push({id,type:'asset',name:d.fname||d.label,ext,parent:par,order:nextOrder(par),size:f.size,w,h});itLinks(d,id);
   itSet(d.key,id);toast('Added art for '+d.label);
 }
 async function itLink(d,url,quiet){
@@ -3647,7 +3677,7 @@ async function itLink(d,url,quiet){
   let w=0,h=0;if(!quiet)toast('Checking the link…');
   try{const im=new Image();im.src=url;await im.decode();w=im.naturalWidth;h=im.naturalHeight;}catch(e){if(!quiet)toast('Could not load that image. It must be a direct, public image link.');return false;}
   const ext=((url.split('?')[0].match(/\.(png|jpe?g|webp|gif|svg|avif)$/i)||[])[1]||'png').toLowerCase(),id=uid(),par=ensureFolder(d.folder||['Items'].concat(d.grp));
-  AS.urls[id]=url;AS.tree.push({id,type:'asset',name:d.fname||d.label,ext,parent:par,order:nextOrder(par),size:0,w,h,url});
+  AS.urls[id]=url;AS.tree.push({id,type:'asset',name:d.fname||d.label,ext,parent:par,order:nextOrder(par),size:0,w,h,url});itLinks(d,id);
   itSet(d.key,id);if(!quiet)toast('Linked art for '+d.label);return true;
 }
 function autoLinkItems(){
@@ -3808,7 +3838,7 @@ document.addEventListener('click',async e=>{
    case'rename-asset':{const n=node(AS.sel),v=document.querySelector('[data-ai=name]').value.trim();if(n&&v){n.name=v;saveMeta();amRender();}break;}
    case'repl':{const f=document.getElementById('am-file');f.onchange=async()=>{const fl=f.files[0];if(!fl)return;const n=node(AS.sel);await dbPut('files',n.id,fl);mark(n.id);delete n.url;AS.urls[n.id]=URL.createObjectURL(fl);n.size=fl.size;n.ext=(fl.name.split('.').pop()||n.ext).toLowerCase();try{const im=new Image();im.src=AS.urls[n.id];await im.decode();n.w=im.naturalWidth;n.h=im.naturalHeight;}catch(x){}if(n.ph){await phDone(n);}else{saveMeta();amRender();}f.value='';};f.click();break;}
    case'phurl':{const n=node(AS.sel),u=prompt('Paste the image link (https://…)');if(!u||!/^https?:\/\//i.test(u))break;try{const im=new Image();im.src=u.trim();await im.decode();n.w=im.naturalWidth;n.h=im.naturalHeight;}catch(x){toast('Could not load that image. It must be a direct, public image link.');break;}n.url=u.trim();AS.urls[n.id]=n.url;n.ext=((n.url.split('?')[0].match(/\.(png|jpe?g|webp|gif|svg|avif)$/i)||[])[1]||'png').toLowerCase();await phDone(n);break;}
-   case'phseed':{const k=phSeed();saveMeta();amRender();toast(k?'Added '+k+' placeholders in their folders':'Every placeholder is already in place');break;}
+   case'phseed':{const k=phSeed()+phMigrate();saveMeta();amRender();toast(k?'Added '+k+' placeholders in their folders':'Every placeholder is already in place');break;}
    case'dl':{const n=node(AS.sel),l=document.createElement('a');l.href=AS.urls[n.id];l.download=n.name+'.'+n.ext;l.click();break;}
    case'cut':openCutout();break;
    case'ph':AS.phase=t.dataset.v;amRender();break;
@@ -3872,7 +3902,7 @@ document.addEventListener('input',e=>{
   else if(t.dataset.wp){AS[t.dataset.wp]=parseFloat(t.value)||1;document.querySelectorAll(`[data-wp="${t.dataset.wp}"]`).forEach(o=>{if(o!==t)o.value=t.value;});}
   else if(t.dataset.sp){const _sc=AS.scenes[AS.scene],_o=_sc.size||'screen';_sc[t.dataset.sp]=t.value;if(t.dataset.sp==='size'){_sc._ps=_o;refit(_sc,t.value);amRender();}else stageRefresh();saveSoon();}
 });
-document.addEventListener('change',e=>{const t=e.target;if(!document.getElementById('asm'))return;if(t.dataset&&t.dataset.assetspd){const v=Math.max(20,Math.min(400,parseFloat(t.value)||100));if(v===100)delete AS.slots['assetspd_'+t.dataset.assetspd];else AS.slots['assetspd_'+t.dataset.assetspd]=String(v);saveMeta();return;}if(t.dataset&&t.dataset.assetsz){const v=Math.max(10,Math.min(500,parseFloat(t.value)||100));if(v===100)delete AS.slots['assetsz_'+t.dataset.assetsz];else AS.slots['assetsz_'+t.dataset.assetsz]=String(v);saveMeta();return;}if(t.dataset&&t.dataset.itsz){const v=Math.max(10,Math.min(500,parseFloat(t.value)||100));if(v===100)delete AS.slots['itemsz_'+t.dataset.itsz];else AS.slots['itemsz_'+t.dataset.itsz]=String(v);saveMeta();return;}if(t.dataset&&t.dataset.nd){if(t.checked)AS.slots[t.dataset.nd]='1';else delete AS.slots[t.dataset.nd];saveMeta();return;}if(t.dataset&&'showused' in t.dataset){AS.showUsed=t.checked;amRender();return;}
+document.addEventListener('change',e=>{const t=e.target;if(!document.getElementById('asm'))return;if(t.dataset&&t.dataset.pc!==undefined){const q=t.value.trim().toLowerCase(),r=window.__book.data.requests.find(x=>x.name.toLowerCase()===q)||(q?window.__book.data.requests.find(x=>x.name.toLowerCase().includes(q)):null);AS.prevCust=r?r.id:null;AS.pcx=null;stageRefresh();if(!r&&q)toast('No customer matches that');return;}if(t.dataset&&t.dataset.assetspd){const v=Math.max(20,Math.min(400,parseFloat(t.value)||100));if(v===100)delete AS.slots['assetspd_'+t.dataset.assetspd];else AS.slots['assetspd_'+t.dataset.assetspd]=String(v);saveMeta();return;}if(t.dataset&&t.dataset.assetsz){const v=Math.max(10,Math.min(500,parseFloat(t.value)||100));if(v===100)delete AS.slots['assetsz_'+t.dataset.assetsz];else AS.slots['assetsz_'+t.dataset.assetsz]=String(v);saveMeta();return;}if(t.dataset&&t.dataset.itsz){const v=Math.max(10,Math.min(500,parseFloat(t.value)||100));if(v===100)delete AS.slots['itemsz_'+t.dataset.itsz];else AS.slots['itemsz_'+t.dataset.itsz]=String(v);saveMeta();return;}if(t.dataset&&t.dataset.nd){if(t.checked)AS.slots[t.dataset.nd]='1';else delete AS.slots[t.dataset.nd];saveMeta();return;}if(t.dataset&&'showused' in t.dataset){AS.showUsed=t.checked;amRender();return;}
     if(t.dataset.lp&&t.tagName==='INPUT'&&t.type==='text')amRender();});
 /* drag & drop: move in tree, or onto stage, or upload from desktop */
 let dragId=null;
@@ -3882,7 +3912,7 @@ document.addEventListener('dragover',e=>{
   if(!document.getElementById('asm'))return;
   const r=e.target.closest&&e.target.closest('.tr'),st=e.target.closest&&e.target.closest('#am-stage'),tree=e.target.closest&&e.target.closest('#am-tree');
   if(r||st||tree){e.preventDefault();document.querySelectorAll('.dropt,.dropb').forEach(x=>x.classList.remove('dropt','dropb'));
-    if(r&&r.dataset.id!==undefined&&r.dataset.id!==''){const nd=node(r.dataset.id),mid=e.offsetY>r.offsetHeight*.3&&e.offsetY<r.offsetHeight*.7;if(nd&&nd.type==='folder'&&mid)r.classList.add('dropt');else r.classList.add('dropb');}
+    if(r&&r.dataset.id!==undefined&&r.dataset.id!==''){const nd=node(r.dataset.lkid||r.dataset.id),mid=e.offsetY>r.offsetHeight*.3&&e.offsetY<r.offsetHeight*.7;if(nd&&nd.type==='folder'&&mid)r.classList.add('dropt');else r.classList.add('dropb');}
     else if(r&&r.classList.contains('root'))r.classList.add('dropt');}
 });
 document.addEventListener('drop',async e=>{
@@ -3891,14 +3921,20 @@ document.addEventListener('drop',async e=>{
   const files=e.dataTransfer.files&&e.dataTransfer.files.length?[...e.dataTransfer.files]:null;const id=dragId||e.dataTransfer.getData('text/nm');
   if(!r&&!st&&!e.target.closest('#am-tree'))return;e.preventDefault();
   if(files&&st&&AS.scene){const sc=node(AS.scene);addFiles(files,sc&&sc.parent||null,AS.scene);return;}
-  if(files){let parent=null;if(r&&r.dataset.id){const nd=node(r.dataset.id);parent=nd&&nd.type==='folder'?nd.id:nd&&nd.parent;}addFiles(files,parent);return;}
+  if(files){let parent=null;if(r&&r.dataset.id){const nd=node(r.dataset.lkid||r.dataset.id);parent=nd&&nd.type==='folder'?nd.id:nd&&nd.parent;}addFiles(files,parent);return;}
   if(!id)return;
   if(st&&AS.scene){const s=document.getElementById('am-st'),k=+s.dataset.k||1,rc=s.getBoundingClientRect();addAssetLayer(AS.scene,id,(e.clientX-rc.left)/k,(e.clientY-rc.top)/k);dragId=null;return;}
   if(r&&r.classList.contains('root')){moveNode(id,null,null);}
-  else if(r&&r.dataset.id){const nd=node(r.dataset.id);if(nd){const mid=e.offsetY>r.offsetHeight*.3&&e.offsetY<r.offsetHeight*.7;if(nd.type==='folder'&&mid){moveNode(id,nd.id,null);AS.open.add(nd.id);}else moveNode(id,nd.parent||null,nd.id);}}
+  else if(r&&r.dataset.id){const nd=node(r.dataset.lkid||r.dataset.id);if(nd){const mid=e.offsetY>r.offsetHeight*.3&&e.offsetY<r.offsetHeight*.7;if(nd.type==='folder'&&mid){moveNode(id,nd.id,null);AS.open.add(nd.id);}else moveNode(id,nd.parent||null,nd.id);}}
   else if(e.target.closest('#am-tree'))moveNode(id,null,null);
   dragId=null;amRender();
 });
+document.addEventListener('pointerdown',e=>{const pc=e.target.closest&&e.target.closest('#am-st .pcust');if(!pc)return;e.preventDefault();e.stopPropagation();const st=document.getElementById('am-st'),k=+st.dataset.k||1,[W]=dimsOf(AS.scene);const mv=ev=>{const rc=st.getBoundingClientRect();AS.pcx=Math.max(0,Math.min(W,(ev.clientX-rc.left)/k));stageRefresh();};const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);};addEventListener('pointermove',mv);addEventListener('pointerup',up);},true);
+(function(){let w=0;try{w=+localStorage.getItem('nmamw')||0;}catch(e){}if(w)document.documentElement.style.setProperty('--amw',w+'px');
+document.addEventListener('pointerdown',e=>{const h=e.target.closest&&e.target.closest('#am-rs');if(!h)return;e.preventDefault();h.classList.add('on');const body=h.parentElement,x0=e.clientX,w0=document.getElementById('am-tree').getBoundingClientRect().width;
+const mv=ev=>{const nw=Math.max(200,Math.min(Math.round(body.clientWidth*.7),Math.round(w0+ev.clientX-x0)));document.documentElement.style.setProperty('--amw',nw+'px');try{localStorage.setItem('nmamw',nw);}catch(_){}fitEdit();};
+const up=()=>{h.classList.remove('on');removeEventListener('pointermove',mv);removeEventListener('pointerup',up);};addEventListener('pointermove',mv);addEventListener('pointerup',up);});
+document.addEventListener('dblclick',e=>{if(e.target.closest&&e.target.closest('#am-rs')){document.documentElement.style.removeProperty('--amw');try{localStorage.removeItem('nmamw');}catch(_){}fitEdit();}});})();
 /* move layers on the stage */
 document.addEventListener('pointerdown',e=>{
   const ly=e.target.closest&&e.target.closest('#am-st .ly');if(!ly)return;e.preventDefault();
