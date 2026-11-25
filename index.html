@@ -326,7 +326,7 @@ body.edit .hide-edit{display:none!important}
 #asm{position:relative;height:100%;background:#0b0712;display:flex;flex-direction:column;color:var(--text);font-family:var(--sans);border:1px solid var(--line);border-radius:20px;overflow:hidden}
 .asm-host{height:calc(100vh - 190px);min-height:560px}
 .page.asmpage{max-width:none}
-.am-tree{display:flex;flex-direction:column;padding:0!important}.am-list{flex:1;overflow:auto;padding:6px 8px}.am-tools{flex:none;padding:10px;border-bottom:1px solid var(--line);background:rgba(14,9,22,.95)}.am-in{font-size:12.5px;color:var(--muted);margin-bottom:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.am-in b{color:var(--gold)}.am-tb{display:flex;flex-wrap:wrap;gap:6px}.am-tb button{font:700 12px var(--sans);padding:6px 12px;border-radius:99px;background:rgba(255,255,255,.08);color:inherit;border:1px solid var(--line);cursor:pointer}.am-tb button:hover:not(:disabled){background:var(--gold);color:#2a1a08}.am-tb button:disabled{opacity:.35;cursor:default}.am-tb .dn{color:var(--bad)}.am-links{display:flex;flex-wrap:wrap;gap:6px}.lk{display:inline-flex;gap:6px;align-items:center;padding:4px 6px 4px 11px;border-radius:99px;background:rgba(240,198,116,.16);border:1px solid var(--line2);font-size:12.5px}.lk button{border:0;background:rgba(255,255,255,.12);color:inherit;border-radius:50%;width:20px;height:20px;cursor:pointer}.lkrow{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:13.5px}.lkrow select{max-width:300px;padding:6px 9px;border-radius:9px;background:rgba(14,9,22,.7);border:1px solid var(--line);color:inherit}
+.am-tree{display:flex;flex-direction:column;padding:0!important}.am-list{flex:1;overflow:auto;padding:6px 8px}.am-tools{flex:none;padding:10px;border-bottom:1px solid var(--line);background:rgba(14,9,22,.95)}.am-in{font-size:12.5px;color:var(--muted);margin-bottom:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.am-in b{color:var(--gold)}.am-tb{display:flex;flex-wrap:wrap;gap:6px}.am-tb button{font:700 12px var(--sans);padding:6px 12px;border-radius:99px;background:rgba(255,255,255,.08);color:inherit;border:1px solid var(--line);cursor:pointer}.am-tb button:hover:not(:disabled){background:var(--gold);color:#2a1a08}.am-tb button:disabled{opacity:.35;cursor:default}.am-tb .dn{color:var(--bad)}.am-links{display:flex;flex-wrap:wrap;gap:6px}.lk{display:inline-flex;gap:6px;align-items:center;padding:4px 6px 4px 11px;border-radius:99px;background:rgba(240,198,116,.16);border:1px solid var(--line2);font-size:12.5px}.lk button{border:0;background:rgba(255,255,255,.12);color:inherit;border-radius:50%;width:20px;height:20px;cursor:pointer}.lkrow{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:13.5px}.itbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}.itbar input{flex:1;min-width:160px;padding:8px 12px;border-radius:99px;background:rgba(14,9,22,.7);border:1px solid var(--line);color:inherit;outline:0}.itgrp{font:700 15px var(--serif);color:var(--gold);margin:16px 0 4px;border-bottom:1px solid var(--line);padding-bottom:3px}.itrow{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05)}.itth{flex:none;width:52px;height:52px;border-radius:10px;background:repeating-conic-gradient(#2a2038 0 25%,#1c1428 0 50%) 0 0/12px 12px;border:1px solid var(--line);display:grid;place-items:center;color:var(--muted);font-size:11px;overflow:hidden}.itth img{max-width:100%;max-height:100%;object-fit:contain}.itnm{flex:1;min-width:0}.itnm b{display:block;font-size:14px}.itnm i{font-size:11.5px;color:var(--muted);font-style:normal}.itbt{display:flex;gap:6px}.itbt button{font:700 12px var(--sans);padding:6px 11px;border-radius:99px;background:rgba(255,255,255,.08);color:inherit;border:1px solid var(--line);cursor:pointer}.itbt button:hover:not(:disabled){background:var(--gold);color:#2a1a08}.itbt button:disabled{opacity:.3;cursor:default}.itrow.has .itnm b::after{content:' ✓';color:#8bd3b0}.lkrow select{max-width:300px;padding:6px 9px;border-radius:9px;background:rgba(14,9,22,.7);border:1px solid var(--line);color:inherit}
 #am-walk{position:absolute;left:0;top:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
 .am-cloud{font-size:12.5px;color:var(--muted);max-width:360px}
 .am-top{display:flex;gap:8px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}.am-t{font:700 20px var(--serif);color:var(--gold)}.am-sp{flex:1}
@@ -3370,7 +3370,7 @@ function moveNode(id,newParent,beforeId){
 function delNode(id){
   const n=node(id);if(!n)return;
   if(n.type==='folder')kids(id).forEach(k=>delNode(k.id));
-  if(n.type==='asset'){dbDel('files',id);delete AS.urls[id];AS.pending=AS.pending.filter(x=>x!==id);AS.removed.push(id);Object.values(AS.scenes).forEach(s=>s.layers=s.layers.filter(l=>l.asset!==id));}
+  if(n.type==='asset'){dbDel('files',id);delete AS.urls[id];AS.pending=AS.pending.filter(x=>x!==id);AS.removed.push(id);for(const k in AS.slots)if(AS.slots[k]===id)delete AS.slots[k];Object.values(AS.scenes).forEach(s=>s.layers=s.layers.filter(l=>l.asset!==id));}
   if(n.type==='scene'){delete AS.scenes[id];for(const k in AS.slots)if(AS.slots[k]===id)delete AS.slots[k];if(AS.scene===id)AS.scene=null;}
   AS.tree=AS.tree.filter(x=>x.id!==id);if(AS.sel===id)AS.sel=null;
 }
@@ -3430,7 +3430,7 @@ function amRender(){
   const sc=AS.scene&&AS.scenes[AS.scene]?AS.scene:null,as=AS.sel&&node(AS.sel)?node(AS.sel):null;
   const cn=AS.cur&&node(AS.cur),inName=cn?cn.name:'All files';
   a.innerHTML=`<div class="am-top"><b class="am-t">Assets &amp; Scenes</b><span class="am-sp"></span>
-   <button class="btn sm" data-am="starter">Starter folders</button><button class="btn gold sm" data-am="links">Game links</button>
+   <button class="btn sm" data-am="starter">Starter folders</button><button class="btn gold sm" data-am="links">Game links</button><button class="btn gold sm" data-am="items">Item art</button>
    <span class="am-sp"></span><span id="am-cloud" class="am-cloud">${esc(_cs.msg)}</span><button class="btn sm" data-am="sync">Sync</button><button class="btn sm" data-am="export">Backup .zip</button></div>
   <div class="am-body"><div class="am-tree" id="am-tree"><div class="am-tools"><div class="am-in">In: <b>${esc(inName)}</b></div><div class="am-tb"><button data-am="newf" data-id="${AS.cur||''}">+ folder</button><button data-am="newsc" data-id="${AS.cur||''}">+ scene</button><button data-am="up" data-id="${AS.cur||''}">upload</button><button data-am="urlf" data-id="${AS.cur||''}">from URL</button><button data-am="ren" data-id="${AS.cur||''}" ${cn?'':'disabled'}>rename</button><button data-am="del" data-id="${AS.cur||''}" class="dn" ${cn?'':'disabled'}>delete</button></div></div>
    <div class="am-list" id="am-list"><div class="tr root ${AS.cur?'':'cur'}" data-id="" data-am="fsel">All files <span class="cnt">${AS.tree.filter(n=>n.type==='asset').length}</span></div>${trRows(null,0)||'<p class="am-empty">Nothing here yet. Press Starter folders, or make a folder and upload into it. Drag anything onto a folder to move it.</p>'}</div></div>
@@ -3484,6 +3484,57 @@ function addLayer(id,l,x,y){const sc=AS.scenes[id],[W,H]=dimsOf(id);const L=Obje
 function addAssetLayer(id,assetId,x,y){const n=node(assetId);if(!n||!IMGX.test(n.ext))return;const [W,H]=dimsOf(id);const L=addLayer(id,{kind:'img',asset:assetId,name:n.name},x,y);if(n.w>=W*.78){L.s=Math.round(W/n.w*100);L.x=W/2;L.y=H/2;}amRender();}
 function curLayer(){const sc=AS.scenes[AS.scene];return sc&&sc.layers.find(l=>l.id===AS.layer);}
 
+
+/* ----- item art: one image slot per game item (slots key 'item_<id>'; custom items kept as 'itemdef_<slug>' = label) ----- */
+const IT_PRESET=[['Decor & collectibles','Lantern'],['Decor & collectibles','Bunting'],['Decor & collectibles','Wind chime'],['Decor & collectibles','Awning'],['Decor & collectibles','Shelf'],['Decor & collectibles','Rug'],['Decor & collectibles','Stall sign'],['Decor & collectibles','Cauldron'],['Decor & collectibles','Hag stone'],['Familiars','Cat'],['Familiars','Crow'],['Familiars','Fox'],['Money & UI icons','Coin'],['Money & UI icons','Pack (bag)'],['Money & UI icons','Almanac (book)'],['Money & UI icons','Bench'],['Money & UI icons','New moon'],['Money & UI icons','Waxing moon'],['Money & UI icons','Full moon'],['Money & UI icons','Waning moon']];
+const slug=s=>String(s).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+const IT={q:'',target:null};
+function itDefs(){
+  const D=window.__book.data,o=[];
+  D.gathers.forEach(g=>o.push({key:g.id,label:g.name,sub:[g.latin,g.rarity].filter(Boolean).join(' · '),grp:['Gatherables',g.zone||'Other']}));
+  D.crafts.forEach(c=>o.push({key:c.id,label:c.name,sub:'Level '+c.level+(c.sells===false?' · not sold':''),grp:['Crafted goods',c.kind||'Other']}));
+  D.upgrades.forEach(u=>o.push({key:u.id,label:u.name,sub:u.stall||'',grp:['Stall upgrades']}));
+  D.requests.forEach(r=>o.push({key:r.id,label:r.name,sub:r.kind||'',grp:['Customers (portraits)']}));
+  IT_PRESET.forEach(([g,l])=>o.push({key:'x_'+slug(l),label:l,sub:'',grp:[g]}));
+  Object.keys(AS.slots).filter(k=>k.startsWith('itemdef_')).forEach(k=>o.push({key:'x_'+k.slice(8),label:AS.slots[k],sub:'your own',grp:['Your own items'],custom:k}));
+  return o;
+}
+function ensureFolder(path){let par=null;path.forEach(nm=>{let f=AS.tree.find(n=>n.type==='folder'&&n.name===nm&&(n.parent||null)===par);if(!f){f={id:uid(),type:'folder',name:nm,parent:par,order:nextOrder(par)};AS.tree.push(f);}par=f.id;});return par;}
+const itUrl=key=>{const a=AS.slots['item_'+key];return a&&AS.urls[a]||null;};
+function itSet(key,aid){AS.slots['item_'+key]=aid;saveMeta();itRender();}
+async function itFile(d,f){
+  const ext=(f.name.split('.').pop()||'').toLowerCase();if(!IMGX.test(ext)){toast('Images only (PNG, JPG, WEBP, GIF, SVG).');return;}
+  const id=uid();let w=0,h=0;const url=URL.createObjectURL(f);try{const im=new Image();im.src=url;await im.decode();w=im.naturalWidth;h=im.naturalHeight;}catch(e){}
+  const par=ensureFolder(['Items'].concat(d.grp));
+  await dbPut('files',id,f);mark(id);AS.urls[id]=url;AS.tree.push({id,type:'asset',name:d.label,ext,parent:par,order:nextOrder(par),size:f.size,w,h});
+  itSet(d.key,id);toast('Added art for '+d.label);
+}
+async function itLink(d,url){
+  url=(url||'').trim();if(!url)return;if(!/^https?:\/\//i.test(url)){toast('That needs to start with https://');return;}
+  let w=0,h=0;toast('Checking the link…');
+  try{const im=new Image();im.src=url;await im.decode();w=im.naturalWidth;h=im.naturalHeight;}catch(e){toast('Could not load that image. It must be a direct, public image link.');return;}
+  const ext=((url.split('?')[0].match(/\.(png|jpe?g|webp|gif|svg|avif)$/i)||[])[1]||'png').toLowerCase(),id=uid(),par=ensureFolder(['Items'].concat(d.grp));
+  AS.urls[id]=url;AS.tree.push({id,type:'asset',name:d.label,ext,parent:par,order:nextOrder(par),size:0,w,h,url});
+  itSet(d.key,id);toast('Linked art for '+d.label);
+}
+function itRows(){
+  const q=IT.q.toLowerCase(),defs=itDefs().filter(d=>!q||(d.label+' '+d.grp.join(' ')+' '+d.sub).toLowerCase().includes(q));
+  const groups=[];defs.forEach(d=>{const g=d.grp.join(' · ');let o=groups.find(x=>x.g===g);if(!o)groups.push(o={g,a:[]});o.a.push(d);});
+  return groups.map(o=>`<div class="itgrp">${esc(o.g)} <span style="color:var(--muted);font:12px var(--sans)">${o.a.filter(d=>itUrl(d.key)).length}/${o.a.length}</span></div>`+o.a.map(d=>{const u=itUrl(d.key);
+    return `<div class="itrow ${u?'has':''}"><div class="itth">${u?`<img src="${esc(u)}" alt="">`:'none'}</div><div class="itnm"><b>${esc(d.label)}</b><i>${esc(d.sub)}</i></div><div class="itbt"><button data-am="itup" data-id="${esc(d.key)}">Upload PNG</button><button data-am="iturl" data-id="${esc(d.key)}">From URL</button><button data-am="itclr" data-id="${esc(d.key)}" ${u?'':'disabled'} title="Remove this image from the item">✕</button>${d.custom?`<button data-am="itdel" data-id="${esc(d.key)}" title="Delete this custom item">delete</button>`:''}</div></div>`;}).join('')).join('')||'<p class="am-empty">No items match.</p>';
+}
+function itRender(){const b=document.getElementById('it-body');if(!b)return;const keep=b.scrollTop;b.innerHTML=itRows();b.scrollTop=keep;const all=itDefs(),n=all.filter(d=>itUrl(d.key)).length,c=document.getElementById('it-count');if(c)c.textContent=n+' of '+all.length+' have art';}
+function openItems(){
+  if(document.getElementById('am-items'))return;
+  const m=document.createElement('div');m.id='am-items';m.className='scrim';m.style.zIndex=300;
+  m.innerHTML=`<div class="modal" style="width:min(820px,96vw);height:90vh;display:flex;flex-direction:column"><div class="am-t" style="font-size:26px">Item art</div><p style="color:var(--muted);font-size:13px;margin:4px 0 0">Every gatherable, crafted good, upgrade, customer and extra gets its own picture. Upload a PNG or paste a link (Cloudflare etc.). Square PNGs with a clear background look best (about 256×256). The game shows these in the pack, bench, almanac, counter tray and on the glowing gather spots.</p>
+  <div class="itbar"><input id="it-q" placeholder="Search items…"><span id="it-count" style="font-size:12.5px;color:var(--muted)"></span><button class="btn sm" data-am="itadd">+ Add your own item</button></div>
+  <div id="it-body" style="flex:1;overflow:auto;padding-right:6px"></div><input type="file" id="it-file" accept=".png,.jpg,.jpeg,.webp,.gif,.svg,.avif" hidden>
+  <div class="actions" style="margin-top:10px"><button class="btn gold" data-am="closeitems">Done</button></div></div>`;
+  document.body.appendChild(m);itRender();
+  document.getElementById('it-q').addEventListener('input',e=>{IT.q=e.target.value;itRender();});
+  document.getElementById('it-file').addEventListener('change',e=>{const f=e.target.files[0],d=IT.target&&itDefs().find(x=>x.key===IT.target);e.target.value='';if(f&&d)itFile(d,f);});
+}
 function openLinks(){
   const m=document.createElement('div');m.id='am-links';m.className='scrim';m.style.zIndex=300;
   const scenes=AS.tree.filter(n=>n.type==='scene');
@@ -3595,6 +3646,13 @@ document.addEventListener('click',async e=>{
    case'wdone':AS.walk=false;AS.draft=null;amRender();break;
    case'link':{const s=document.getElementById('am-linksel').value;if(!s)break;const sl=SLOTS.find(x=>x.id===s),sc=AS.scenes[AS.scene];if(!sc.layers.length&&sl)sc.size=sl.size;AS.slots[s]=AS.scene;saveMeta();amRender();toast('Linked to: '+slotLabel(s)+((sl&&(sc.size||'screen')!==sl.size)?' (shape differs from what that place expects)':''));break;}
    case'unlink':delete AS.slots[t.dataset.v];saveMeta();amRender();break;
+   case'items':openItems();break;
+   case'closeitems':{const m=document.getElementById('am-items');if(m)m.remove();amRender();break;}
+   case'itup':IT.target=id;document.getElementById('it-file').click();break;
+   case'iturl':{const d=itDefs().find(x=>x.key===id);if(d){const u=prompt('Paste the image link for “'+d.label+'” (https://…)');if(u)itLink(d,u);}break;}
+   case'itclr':delete AS.slots['item_'+id];saveMeta();itRender();break;
+   case'itadd':{const nm=(prompt('Name of the item (decor, collectible, anything)','')||'').trim();if(!nm)break;const sg=slug(nm);if(!sg)break;AS.slots['itemdef_'+sg]=nm;saveMeta();IT.q='';const qi=document.getElementById('it-q');if(qi)qi.value='';itRender();toast('Added “'+nm+'”. Find it under Your own items.');break;}
+   case'itdel':{const d=itDefs().find(x=>x.key===id);if(d&&d.custom&&confirm('Delete the custom item “'+d.label+'”?')){delete AS.slots[d.custom];delete AS.slots['item_'+id];saveMeta();itRender();}break;}
    case'links':openLinks();break;
    case'closelinks':{const m=document.getElementById('am-links');if(m)m.remove();amRender();break;}
    case'urlf':{const u=prompt('Paste the image link (https://…)');if(u)addUrl(u,id||AS.cur||null,null);break;}
