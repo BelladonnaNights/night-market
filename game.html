@@ -2615,7 +2615,7 @@ function renderTitle(){
   const has=!!localStorage.getItem(SAVE_KEY),TS=slotScene('title');
   $('#game').innerHTML=`<div></div><div id="main"><div id="artback">${TS?stageHtml(TS,'night'):stallBack('night','Waxing')}</div>${TS?'':`<div style="position:absolute;inset:0;z-index:2;pointer-events:none">${fireflies(22)}</div><div id="artfront">${stallFront('night')}</div>`}
    <div class="center" style="top:42%"><div class="eyebrow">A cozy gather-and-craft romantasy</div><h2 style="font-size:clamp(46px,8vw,92px)">The Night Market</h2><p>Follow the token. Keep the stall. Be remembered.</p>
-   <div class="actions" style="justify-content:center"><button class="btn gold" data-g="begin">${has?'New game':'Begin'}</button>${has?'<button class="btn" data-g="continue">Continue</button>':''}${ADMIN?'<button class="btn" data-a="assets">Assets</button>':''}</div></div></div><div></div>`;fitStages();
+   <div class="actions" style="justify-content:center"><button class="btn gold" data-g="begin">${has?'New game':'Begin'}</button>${has?'<button class="btn" data-g="continue">Continue</button>':''}</div></div></div><div></div>`;fitStages();
 }
 
 /* ---------- panels ---------- */
@@ -3022,7 +3022,7 @@ function zTick(now){
 }
 
 /* ===== asset library + scene composer ===== */
-const AS={tree:[],scenes:{},slots:{},urls:{},ready:false,sel:null,scene:null,layer:null,cur:null,open:new Set(),phase:'night',remote:false};
+const AS={rev:0,tree:[],scenes:{},slots:{},urls:{},ready:false,sel:null,scene:null,layer:null,cur:null,open:new Set(),phase:'night',remote:false};
 const uid=()=>Math.random().toString(36).slice(2,9);
 const IMGX=/^(png|jpe?g|webp|gif|svg|avif)$/,MODX=/^(glb|gltf)$/,AUDX=/^(mp3|ogg|wav|m4a)$/;
 let _db=null;
@@ -3031,12 +3031,25 @@ async function dbx(store,mode,fn){const d=await idb();return new Promise((res,re
 const dbGet=(s,k)=>dbx(s,'readonly',o=>o.get(k)),dbPut=(s,k,v)=>dbx(s,'readwrite',o=>o.put(v,k)),dbDel=(s,k)=>dbx(s,'readwrite',o=>o.delete(k));
 let _sv=null;function saveMeta(){clearTimeout(_sv);return dbPut('meta','state',{tree:AS.tree,scenes:AS.scenes,slots:AS.slots}).catch(()=>toast('Could not save assets (browser storage blocked?)'));}
 function saveSoon(){clearTimeout(_sv);_sv=setTimeout(saveMeta,400);}
+const DBU='https://night-market-7d13a-default-rtdb.firebaseio.com';
+async function jget(path,ms){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms||8000);try{const r=await fetch(DBU+'/'+path+'.json',{signal:c.signal});if(!r.ok)return null;return await r.json();}catch(e){return null;}finally{clearTimeout(t);}}
+function unb64(s,ext){const bin=atob(s),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);const M={png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',webp:'image/webp',gif:'image/gif',svg:'image/svg+xml',avif:'image/avif',glb:'model/gltf-binary',mp3:'audio/mpeg',ogg:'audio/ogg',wav:'audio/wav',m4a:'audio/mp4'};return new Blob([u],{type:M[ext]||'application/octet-stream'});}
+async function fetchAssetFile(n){try{const o=await jget('assetfiles/'+n.id,20000);if(o&&o.d){const b=unb64(o.d,o.e||n.ext);await dbPut('files',n.id,b);AS.urls[n.id]=URL.createObjectURL(b);return true;}}catch(e){}return false;}
 async function assetsLoad(){
-  try{const st=await dbGet('meta','state');if(st){AS.tree=st.tree||[];AS.scenes=st.scenes||{};AS.slots=st.slots||{};}
+  let st=null;
+  try{st=await dbGet('meta','state');if(st){AS.tree=st.tree||[];AS.scenes=st.scenes||{};AS.slots=st.slots||{};AS.rev=st.rev||0;}
     for(const n of AS.tree)if(n.type==='asset'){const b=await dbGet('files',n.id);if(b)AS.urls[n.id]=URL.createObjectURL(b);}}catch(e){}
-  if(!AS.tree.length){try{const r=await fetch('assets/manifest.json',{cache:'no-cache'});if(r.ok){const m=await r.json();AS.tree=m.tree||[];AS.scenes=m.scenes||{};AS.slots=m.slots||{};AS.remote=true;
-    for(const n of AS.tree)if(n.type==='asset'){AS.urls[n.id]='assets/'+n.path;if(ADMIN){try{const f=await fetch('assets/'+n.path);if(f.ok){const b=await f.blob();await dbPut('files',n.id,b);AS.urls[n.id]=URL.createObjectURL(b);}}catch(e){}}}
-    if(ADMIN)await saveMeta();}}catch(e){}}
+  // newest copy lives in the cloud (saved from the Game Book's Assets tab)
+  const cl=await jget('assetmeta',6000);
+  if(cl&&cl.json&&(cl.rev||0)>(AS.rev||0)){try{const m=JSON.parse(cl.json);AS.tree=m.tree||[];AS.scenes=m.scenes||{};AS.slots=m.slots||{};AS.rev=cl.rev;
+    await dbPut('meta','state',Object.assign({},st||{},{tree:AS.tree,scenes:AS.scenes,slots:AS.slots,rev:cl.rev,cloudRev:cl.rev}));}catch(e){}}
+  // fetch what the title and stall screens need first, the rest quietly in the background
+  const need=new Set();['title','stall'].forEach(k=>{const sc=AS.scenes[AS.slots[k]];if(sc)sc.layers.forEach(l=>{if(l.asset)need.add(l.asset);});});
+  const missing=AS.tree.filter(n=>n.type==='asset'&&!AS.urls[n.id]);
+  const first=missing.filter(n=>need.has(n.id)),rest=missing.filter(n=>!need.has(n.id));
+  await Promise.all(first.map(fetchAssetFile));
+  (async()=>{for(const n of rest)await fetchAssetFile(n);})();
+  if(!AS.tree.length){try{const r=await fetch('assets/manifest.json',{cache:'no-cache'});if(r.ok){const m=await r.json();AS.tree=m.tree||[];AS.scenes=m.scenes||{};AS.slots=m.slots||{};for(const n of AS.tree)if(n.type==='asset')AS.urls[n.id]='assets/'+n.path;}}catch(e){}}
   AS.ready=true;
 }
 /* ----- tree helpers ----- */
@@ -3296,7 +3309,6 @@ function renderAdmin(){
   <section><h3>Game Book data</h3><div class="note" style="font-size:12.5px">Source: <b>${DATAINFO.source}</b> · rev ${DATAINFO.rev}<br>Cloud rev: ${DATAINFO.cloudRev||'unknown'}${DATAINFO.error?'<br><span style="color:var(--bad)">'+esc(DATAINFO.error)+'</span>':''}<br>${D.gathers.length} gatherables · ${D.crafts.length} recipes · ${D.requests.length} customers</div>
    <div class="row" style="margin-top:8px"><button class="btn sm" data-a="refresh">Refresh from cloud</button></div>
    <div class="note" style="margin-top:8px;font-size:12.5px;${broken.length?'border-color:rgba(229,133,133,.4)':''}">${broken.length?broken.slice(0,8).map(esc).join('<br>')+(broken.length>8?'<br>…':''):'Every ingredient resolves.'}</div></section>
-  <section><h3>Images &amp; scenes</h3><div class="note" style="font-size:12.5px">Your asset library: folders, PNGs, GLBs, and scenes built from layers.</div><div class="row" style="margin-top:8px"><button class="btn gold sm" data-a="assets">Open assets</button></div></section>
   <section><h3>Save</h3><div class="row"><button class="btn sm" data-a="exp">Export save</button><label class="btn sm" style="cursor:pointer">Import<input type="file" id="a-imp" accept=".json" hidden></label><button class="btn sm danger" data-a="wipe">Wipe save</button></div></section>
   </div>`);
 }
@@ -3305,7 +3317,6 @@ document.addEventListener('click',async e=>{
   const a=t.dataset.a,v=t.dataset.v,val=id=>$('#'+id).value;
   const again=()=>{save();render();renderAdmin();};
   switch(a){
-    case'assets':openAssets();break;
     case'day':S.day=Math.max(1,parseInt(val('a-day'))||1);again();break;
     case'phase':if(v==='night'){closeModal();openStall();}else{setPhase(v);renderAdmin();}break;
     case'moon':S.day+=2;again();break;
