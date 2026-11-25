@@ -3468,7 +3468,7 @@ function amPreview(n){const u=AS.urls[n.id];return `<div class="am-prev">${IMGX.
 function amInfo(n){
   return `<div class="am-p"><h3>${esc(n.name)}</h3><div class="note" style="font-size:12.5px">${kindOf(n.ext)} · .${esc(n.ext)} · ${n.url?'linked from a URL':fmtSz(n.size||0)}${n.w?' · '+n.w+'×'+n.h+' px':''}</div>
   <div class="fld"><label>Name</label><input data-ai="name" value="${esc(n.name)}"></div>
-  ${IMGX.test(n.ext)?`<div class="fld"><label>Size in the game (%)</label><input type="number" data-assetsz="${n.id}" value="${AS.slots['assetsz_'+n.id]||100}" min="10" max="500" step="5"><div class="note" style="font-size:12px;margin-top:4px">100 = normal. On a character’s <b>…_portrait_full</b> file (for example azlynn_portrait_full), this sizes <b>all of that character’s sprites</b> in the game.</div></div>`:''}${n.url?`<div class="fld"><label>Link</label><input readonly value="${esc(n.url)}" onclick="this.select()"></div>`:''}
+  ${IMGX.test(n.ext)?`<div class="fld"><label>Size in the game (%)</label><input type="number" data-assetsz="${n.id}" value="${AS.slots['assetsz_'+n.id]||100}" min="10" max="500" step="5"><div class="note" style="font-size:12px;margin-top:4px">100 = normal. On a character’s <b>…_portrait_full</b> file (for example azlynn_portrait_full), this sizes <b>all of that character’s sprites</b> in the game.</div></div><div class="fld"><label>Walking speed in the game (%)</label><input type="number" data-assetspd="${n.id}" value="${AS.slots['assetspd_'+n.id]||100}" min="20" max="400" step="5"><div class="note" style="font-size:12px;margin-top:4px">100 = normal. Also goes on the character’s <b>…_portrait_full</b> file.</div></div>`:''}${n.url?`<div class="fld"><label>Link</label><input readonly value="${esc(n.url)}" onclick="this.select()"></div>`:''}
   <div class="am-btns"><button class="btn sm" data-am="rename-asset">Rename</button><button class="btn sm" data-am="repl">Replace file</button><button class="btn sm" data-am="dl">Download</button>${n.url?'<button class="btn sm" data-am="chgurl">Change link</button>':(IMGX.test(n.ext)?'<button class="btn sm" data-am="cut">Remove background</button>':'')}<button class="btn sm danger" data-am="del" data-id="${n.id}">Delete</button></div>
   ${IMGX.test(n.ext)?'<p class="note" style="font-size:12px;margin-top:12px">Drag it from the left onto a scene to use it.</p>':''}</div>`;
 }
@@ -3476,7 +3476,7 @@ function refit(sc,ns){const od=DIMS[sc._ps||'screen']||DIMS.screen,nd=DIMS[ns]||
   const imgs=sc.layers.filter(l=>l.kind==='img');
   sc.layers.forEach(l=>{l.x=Math.round(l.x*nd[0]/od[0]);l.y=Math.round(l.y*nd[1]/od[1]);if(l.kind==='glow'&&l.size)l.size=Math.round(l.size*nd[0]/od[0]);});
   if(imgs.length===1){const n=node(imgs[0].asset);if(n&&n.w&&n.h){imgs[0].s=Math.round(Math.max(nd[0]/n.w,nd[1]/n.h)*100);imgs[0].x=nd[0]/2;imgs[0].y=nd[1]/2;}}
-  if(sc.walls)sc.walls=[];if(sc.nospawn)sc.nospawn=[];if(sc.spawn)delete sc.spawn;toast('Resized: the picture was re-centred and fitted. Walkable shapes were cleared, so redraw them.');}
+  if(sc.walls)sc.walls=[];if(sc.nospawn)sc.nospawn=[];if(sc.counter)sc.counter=[];if(sc.spawn)delete sc.spawn;toast('Resized: the picture was re-centred and fitted. Walkable shapes were cleared, so redraw them.');}
 function amStage(id){
   const sc=AS.scenes[id],tn=node(id);
   return `<div class="am-sbar"><b>${esc(tn.name)}</b><button class="btn sm ${AS.walk?'gold':''}" data-am="walk">Walkable area${sc.walls&&sc.walls.length?' ✓':''}</button><button class="btn sm" data-am="pop">⤢ Pop out / close</button><span class="am-sp"></span>Preview as <span class="tabs" style="margin:0">${['day','dusk','night'].map(p=>`<button class="tab ${AS.phase===p?'on':''}" data-am="ph" data-v="${p}">${p}</button>`).join('')}</span></div>
@@ -3691,7 +3691,7 @@ function openLinks(){
 document.addEventListener('change',e=>{const t=e.target;if(t.dataset&&t.dataset.lk){if(t.value){AS.slots[t.dataset.lk]=t.value;const sc=AS.scenes[t.value],sl=SLOTS.find(x=>x.id===t.dataset.lk);if(sc&&!sc.layers.length&&sl)sc.size=sl.size;}else delete AS.slots[t.dataset.lk];saveMeta();}});
 /* ----- walkable-area editor ----- */
 AS.wmode='block';AS.wtool='pencil';AS.walkSize=40;AS.walkW=14;AS.walk=false;AS.draft=null;
-function wl(sc){return AS.wmode==='ns'?(sc.nospawn=sc.nospawn||[]):(sc.walls=sc.walls||[]);}
+function wl(sc){return AS.wmode==='ctr'?(sc.counter=sc.counter||[]):AS.wmode==='ns'?(sc.nospawn=sc.nospawn||[]):(sc.walls=sc.walls||[]);}
 function paintShape(c,s){c.save();c.globalCompositeOperation=s.t==='erase'?'destination-out':'source-over';c.fillStyle=c.strokeStyle='#fff';c.lineCap=c.lineJoin='round';const P=s.pts||[];
   if((s.t==='brush'||s.t==='erase'||s.t==='wall')&&P.length){c.lineWidth=s.t==='wall'?s.w:s.r*2;c.beginPath();if(P.length===1){c.arc(P[0][0],P[0][1],c.lineWidth/2,0,7);c.fill();}else{c.moveTo(P[0][0],P[0][1]);for(let i=1;i<P.length;i++)c.lineTo(P[i][0],P[i][1]);c.stroke();}}
   else if(s.t==='poly'&&P.length>2){c.beginPath();c.moveTo(P[0][0],P[0][1]);for(let i=1;i<P.length;i++)c.lineTo(P[i][0],P[i][1]);c.closePath();c.fill();}
@@ -3702,7 +3702,7 @@ function drawWalk(){
   const cv=document.getElementById('am-walk');if(!cv||!AS.scene)return;const sc=AS.scenes[AS.scene],[W,H]=dimsOf(AS.scene);
   if(cv.width!==W){cv.width=W;cv.height=H;}const c=cv.getContext('2d');c.clearRect(0,0,W,H);
   const lay=(arr,col,dr)=>{const tmp=document.createElement('canvas');tmp.width=W;tmp.height=H;const q=tmp.getContext('2d');(arr||[]).forEach(s=>paintShape(q,s));const ds=dr&&draftShape(AS.draft);if(ds)paintShape(q,ds);q.globalCompositeOperation='source-in';q.fillStyle=col;q.fillRect(0,0,W,H);c.drawImage(tmp,0,0);};
-  lay(sc.walls,'rgba(235,70,70,.5)',AS.wmode!=='ns');lay(sc.nospawn,'rgba(70,200,120,.45)',AS.wmode==='ns');
+  lay(sc.walls,'rgba(235,70,70,.5)',!AS.wmode||AS.wmode==='block');lay(sc.nospawn,'rgba(70,200,120,.45)',AS.wmode==='ns');lay(sc.counter,'rgba(240,198,116,.95)',AS.wmode==='ctr');
   c.strokeStyle='#ffb347';c.lineWidth=3;(sc.walls||[]).forEach(s=>{if(s.t==='wall'){c.beginPath();s.pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.stroke();}});
   const d=AS.draft;if(d&&d.pts&&d.pts.length&&(d.tool==='wall'||d.tool==='poly')){c.strokeStyle='#fff';c.setLineDash([12,9]);c.lineWidth=3;c.beginPath();d.pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));if(d.cursor)c.lineTo(d.cursor[0],d.cursor[1]);c.stroke();c.setLineDash([]);d.pts.forEach((p,i)=>{c.fillStyle=i===0&&d.tool==='poly'?'#ffd98a':'#fff';c.beginPath();c.arc(p[0],p[1],i===0?11:7,0,7);c.fill();});}
   if(d&&d.pts&&d.pts.length&&(d.tool==='wall'||d.tool==='poly')){c.font='bold 34px sans-serif';c.textAlign='left';const msg='Right-click, press Enter, or press Finish to end';const w=c.measureText(msg).width;c.fillStyle='rgba(0,0,0,.7)';c.fillRect(16,16,w+28,56);c.fillStyle='#ffd98a';c.fillText(msg,30,54);}
@@ -3712,7 +3712,7 @@ function amWalk(id){
   const sc=AS.scenes[id],n=(sc.walls||[]).length;
   const tb=(v,l)=>`<button class="btn sm ${AS.wtool===v?'gold':''}" data-am="wtool" data-v="${v}">${l}</button>`;
   const help={pencil:'Drag to paint places she can’t walk.',eraser:'Drag over red to un-block it.',wall:'Click points to lay a wall. Double-click (or Enter) to finish. She can’t cross it and has to walk around.',poly:'Click the corners of an area. Click the first (gold) dot, double-click or press Enter to close and fill it.',rect:'Drag a box to block a rectangle.',start:'Click where Azlynn starts when she walks in.'};
-  return `<div class="am-p"><h3>Walkable area</h3><div class="am-btns"><button class="btn sm ${AS.wmode!=='ns'?'gold':''}" data-am="wmode" data-v="block">Blocked (red)</button><button class="btn sm ${AS.wmode==='ns'?'gold':''}" data-am="wmode" data-v="ns">No-spawn (green)</button></div><p>Red = Azlynn can’t go there. Green = she can walk there, but nothing grows or spawns there. Everything else is walkable. ${n} red and ${(sc.nospawn||[]).length} green shape${n===1?'':'s'} so far. Drawing now: <b>${AS.wmode==='ns'?'green':'red'}</b>.</p>
+  return `<div class="am-p"><h3>Walkable area</h3><div class="am-btns"><button class="btn sm ${AS.wmode!=='ns'?'gold':''}" data-am="wmode" data-v="block">Blocked (red)</button><button class="btn sm ${AS.wmode==='ns'?'gold':''}" data-am="wmode" data-v="ns">No-spawn (green)</button><button class="btn sm ${AS.wmode==='ctr'?'gold':''}" data-am="wmode" data-v="ctr">Counter line (gold)</button></div>${AS.wmode==='ctr'?'<p><b>Counter line:</b> use the Wall line tool and click along the top edge of the counter, then press Finish. Customers in the game stand with their bottom on this line and are hidden below it. Drawing a new line replaces the old one.</p>':''}<p>Red = Azlynn can’t go there. Green = she can walk there, but nothing grows or spawns there. Everything else is walkable. ${n} red and ${(sc.nospawn||[]).length} green shape${n===1?'':'s'} so far. Drawing now: <b>${AS.wmode==='ns'?'green':'red'}</b>.</p>
   <div class="am-btns">${tb('pencil','Pencil')}${tb('eraser','Eraser')}${tb('wall','Wall line')}${tb('poly','Fill area')}${tb('rect','Box')}${tb('start','Start point')}</div>
   <div class="am-btns" style="margin-top:8px"><button class="btn sm gold" data-am="wfinish">✓ Finish this line / shape</button><button class="btn sm" data-am="wcancel">Cancel it</button></div><p class="note" style="font-size:12px">You can also finish with a right-click or the Enter key.</p>
   <p style="margin-top:10px"><b>${{pencil:'Pencil',eraser:'Eraser',wall:'Wall line',poly:'Fill area',rect:'Box',start:'Start point'}[AS.wtool]}:</b> ${help[AS.wtool]}</p>
@@ -3722,7 +3722,7 @@ function amWalk(id){
   <p class="note" style="font-size:12px;margin-top:12px">This only works for scenes linked to a Foraging map. Saved with the scene.</p></div>`;
 }
 function wpt(e){const cv=document.getElementById('am-walk'),r=cv.getBoundingClientRect();return [Math.round((e.clientX-r.left)/r.width*cv.width),Math.round((e.clientY-r.top)/r.height*cv.height)];}
-function finishDraft(){const d=AS.draft;if(!d)return;const sc=AS.scenes[AS.scene],W_=wl(sc);
+function finishDraft(){const d=AS.draft;if(!d)return;const sc=AS.scenes[AS.scene],W_=wl(sc);if(AS.wmode==='ctr')W_.length=0;
   if(d.tool==='wall'&&d.pts.length>=2)W_.push({t:'wall',pts:d.pts,w:AS.walkW});else if(d.tool==='poly'&&d.pts.length>=3)W_.push({t:'poly',pts:d.pts});
   AS.draft=null;saveMeta();drawWalk();const rp=document.getElementById('am-right');if(rp)rp.innerHTML=amLayers(AS.scene);}
 document.addEventListener('pointerdown',e=>{
@@ -3800,7 +3800,7 @@ document.addEventListener('click',async e=>{
    case'export':exportAssets();break;
    case'starter':seedStarter();break;
    case'walk':AS.walk=!AS.walk;AS.draft=null;AS.layer=null;amRender();break;
-   case'wmode':finishDraft();AS.wmode=t.dataset.v;AS.draft=null;amRender();break;
+   case'wmode':finishDraft();AS.wmode=t.dataset.v;AS.draft=null;if(AS.wmode==='ctr')AS.wtool='wall';amRender();break;
    case'pop':document.body.classList.toggle('am-pop');setTimeout(()=>{fitEdit();},60);break;
    case'wtool':finishDraft();AS.wtool=t.dataset.v;AS.draft=null;amRender();break;
    case'wfinish':finishDraft();drawWalk();amRender();break;
@@ -3848,7 +3848,7 @@ document.addEventListener('input',e=>{
   else if(t.dataset.wp){AS[t.dataset.wp]=parseFloat(t.value)||1;document.querySelectorAll(`[data-wp="${t.dataset.wp}"]`).forEach(o=>{if(o!==t)o.value=t.value;});}
   else if(t.dataset.sp){const _sc=AS.scenes[AS.scene],_o=_sc.size||'screen';_sc[t.dataset.sp]=t.value;if(t.dataset.sp==='size'){_sc._ps=_o;refit(_sc,t.value);amRender();}else stageRefresh();saveSoon();}
 });
-document.addEventListener('change',e=>{const t=e.target;if(!document.getElementById('asm'))return;if(t.dataset&&t.dataset.assetsz){const v=Math.max(10,Math.min(500,parseFloat(t.value)||100));if(v===100)delete AS.slots['assetsz_'+t.dataset.assetsz];else AS.slots['assetsz_'+t.dataset.assetsz]=String(v);saveMeta();return;}if(t.dataset&&t.dataset.itsz){const v=Math.max(10,Math.min(500,parseFloat(t.value)||100));if(v===100)delete AS.slots['itemsz_'+t.dataset.itsz];else AS.slots['itemsz_'+t.dataset.itsz]=String(v);saveMeta();return;}if(t.dataset&&t.dataset.nd){if(t.checked)AS.slots[t.dataset.nd]='1';else delete AS.slots[t.dataset.nd];saveMeta();return;}if(t.dataset&&'showused' in t.dataset){AS.showUsed=t.checked;amRender();return;}
+document.addEventListener('change',e=>{const t=e.target;if(!document.getElementById('asm'))return;if(t.dataset&&t.dataset.assetspd){const v=Math.max(20,Math.min(400,parseFloat(t.value)||100));if(v===100)delete AS.slots['assetspd_'+t.dataset.assetspd];else AS.slots['assetspd_'+t.dataset.assetspd]=String(v);saveMeta();return;}if(t.dataset&&t.dataset.assetsz){const v=Math.max(10,Math.min(500,parseFloat(t.value)||100));if(v===100)delete AS.slots['assetsz_'+t.dataset.assetsz];else AS.slots['assetsz_'+t.dataset.assetsz]=String(v);saveMeta();return;}if(t.dataset&&t.dataset.itsz){const v=Math.max(10,Math.min(500,parseFloat(t.value)||100));if(v===100)delete AS.slots['itemsz_'+t.dataset.itsz];else AS.slots['itemsz_'+t.dataset.itsz]=String(v);saveMeta();return;}if(t.dataset&&t.dataset.nd){if(t.checked)AS.slots[t.dataset.nd]='1';else delete AS.slots[t.dataset.nd];saveMeta();return;}if(t.dataset&&'showused' in t.dataset){AS.showUsed=t.checked;amRender();return;}
     if(t.dataset.lp&&t.tagName==='INPUT'&&t.type==='text')amRender();});
 /* drag & drop: move in tree, or onto stage, or upload from desktop */
 let dragId=null;
