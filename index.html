@@ -3142,6 +3142,7 @@ async function syncDown(){
   const f=await waitFB(7000);if(!f||f.state!=='live'){cstat('Cloud not reachable right now. Working from this browser’s copy.');return;}
   try{const v=(await f.DB.get(f.DB.ref(f.db,'assetmeta'))).val();
     if(v&&v.json&&(v.rev||0)>(AS.cloudRev||0)&&(v.rev||0)>=(AS.rev||0)){const m=JSON.parse(v.json);AS.tree=m.tree||[];AS.scenes=m.scenes||{};AS.slots=m.slots||{};AS.rev=v.rev;AS.cloudRev=v.rev;await dbPut('meta','state',stateObj());}
+    if(!v&&!AS.tree.length&&!AS.rev){seedStarter(true);}
     const miss=[];for(const n of AS.tree)if(n.type==='asset'&&!(await dbGet('files',n.id)))miss.push(n);
     let k=0;for(const n of miss){cstat('Downloading from the cloud… '+(++k)+'/'+miss.length);const o=(await f.DB.get(f.DB.ref(f.db,'assetfiles/'+n.id))).val();if(o&&o.d){const b=unb64(o.d,o.e||n.ext);await dbPut('files',n.id,b);AS.urls[n.id]=URL.createObjectURL(b);}}
     if(cloudOn()&&(AS.rev>(AS.cloudRev||0)||AS.pending.length||AS.removed.length))await syncUp();
@@ -3156,6 +3157,179 @@ async function assetsLoad(){
     for(const n of AS.tree)if(n.type==='asset'){AS.urls[n.id]='assets/'+n.path;if(ADMIN){try{const f=await fetch('assets/'+n.path);if(f.ok){const b=await f.blob();await dbPut('files',n.id,b);AS.urls[n.id]=URL.createObjectURL(b);}}catch(e){}}}
     if(ADMIN)await saveMeta();}}catch(e){}}
   AS.ready=true;
+}
+const STARTER=`Screens & Scenes
+  Title & Menus
+    ▣ Title Screen @title
+  The Stall
+    ▣ Stall Screen @stall
+  Night Market Streets
+  Witch's Cottage & Garden
+  Wren's Corner
+  Transitions & Loading
+Characters
+  Azlynn (Hero)
+    Portraits
+    Expressions
+    Outfits
+    Full Body & Poses
+    Sprites & Animations
+  Wren
+    Portraits
+    Expressions
+    Full Body & Poses
+  Fenn
+    Portraits
+    Expressions
+    Full Body & Poses
+  Romance Cast
+    Love Interest 1
+    Love Interest 2
+    Love Interest 3
+    Gift Reactions
+  Customers
+    Regulars
+    Walk-ins
+    Moth-winged Visitor
+    Shades & Hauntings
+  Familiars
+    Cat
+    Crow
+    Fox
+    Other Companions
+Story & Visual Novel
+  Prologue – Arrival
+  Night One
+  Chapters (one folder per chapter)
+  Key Art & CGs
+  Story Backgrounds
+  Endings
+  Dialogue Boxes & Name Plates
+Gathering Zones
+  Marsh
+    Backgrounds & Maps
+    Plants & Finds
+    Props & Decor
+    Look-alikes
+  Garden & Hedgerow
+    Backgrounds & Maps
+    Plants & Finds
+    Props & Decor
+    Look-alikes
+  Woods
+    Backgrounds & Maps
+    Plants & Finds
+    Props & Decor
+    Look-alikes
+  Canal & Shore
+    Backgrounds & Maps
+    Plants & Finds
+    Props & Decor
+  Town Lanes
+    Backgrounds & Maps
+    Finds & Trades
+    Props & Decor
+  Hag Stone & Reveals
+  Foraging Tools
+Items
+  Gatherables
+    Herbs
+    Flowers
+    Roots & Bark
+    Mushrooms & Mosses
+    Reeds & Grasses
+    Shore Finds
+    Town Finds
+    Rewards & Gifts
+  Crafted Goods
+    Candles
+    Incense
+    Charms
+    Brews & Teas
+    Salves & Oils
+    Lanterns
+    Crafts & Keepsakes
+    Story Items
+  Materials (wax, wicks, jars, thread)
+  Quality Tier Badges
+  Tools & Upgrades
+Stall & Bench
+  Stall Pieces (awning, counter, shelves, sign)
+  Stall Level Looks (1 to 5)
+  Crafting Bench & Minigames
+  Counter Props & Jars
+  Upgrades
+Garden & Home
+  Witch's Garden
+  Drying Rack
+  Bee Skeps
+  Cottage Interior
+  Seasonal Decor
+Calendar & Festivals
+  Moon Phases
+  Wheel of the Year
+    Samhain
+    Yule
+    Imbolc
+    Ostara
+    Beltane
+    Litha
+    Lughnasadh
+    Mabon
+UI
+  HUD & Frames
+  Buttons & Icons
+  Item & Recipe Cards
+  Almanac Pages
+  Menus & Settings
+  Cursors
+  Minigame Bars
+  Dialogue & Choice Boxes
+  Notifications & Toasts
+Effects & Atmosphere
+  Glows & Lights
+  Fireflies & Particles
+  Mist & Weather
+  Sky, Stars & Moon
+  Overlays & Vignettes
+3D Models (GLB)
+  Characters
+  Environment
+  Props
+  Stall & Buildings
+  Animations
+Audio
+  Music
+  Ambience
+  Sound Effects
+  Voice
+Marketing & Brand
+  Logo & Wordmark
+  Key Art
+  Screenshots & Trailers
+  Social Media
+  Store Pages
+Reference & Style
+  Style Guide & Palettes
+  Mood Boards
+  Book & Lore Reference
+  ChatGPT Prompts & Settings
+Inbox (unsorted)
+Archive (old versions)`;
+function seedStarter(quiet){
+  const stack=[null];let addedF=0,addedS=0;
+  STARTER.split('\n').forEach(line=>{
+    const depth=(line.match(/^ */)[0].length/2)|0;let nm=line.trim();if(!nm)return;
+    let isScene=false,slot=null;if(nm.startsWith('▣ ')){isScene=true;nm=nm.slice(2);}
+    const m=nm.match(/\s@(\w+)$/);if(m){slot=m[1];nm=nm.replace(/\s@\w+$/,'');}
+    const parent=stack[depth]||null,type=isScene?'scene':'folder';
+    let n=AS.tree.find(x=>(x.parent||null)===parent&&x.type===type&&x.name===nm);
+    if(!n){n={id:uid(),type,name:nm,parent,order:nextOrder(parent)};AS.tree.push(n);if(isScene){AS.scenes[n.id]={bg:'#0e0916',layers:[]};addedS++;}else addedF++;}
+    if(slot&&!AS.slots[slot])AS.slots[slot]=n.id;
+    if(!isScene)stack[depth+1]=n.id;
+    if(depth===0&&!isScene)AS.open.add(n.id);
+  });
+  saveMeta();amRender();if(!quiet)toast(addedF||addedS?'Added '+addedF+' folders and '+addedS+' scenes':'Everything is already there');
 }
 /* ----- tree helpers ----- */
 const node=id=>AS.tree.find(n=>n.id===id);
@@ -3218,7 +3392,7 @@ function amRender(){
   const a=document.getElementById('asm');if(!a)return;
   const sc=AS.scene&&AS.scenes[AS.scene]?AS.scene:null,as=AS.sel&&node(AS.sel)?node(AS.sel):null;
   a.innerHTML=`<div class="am-top"><b class="am-t">Assets &amp; Scenes</b><span class="am-sp"></span>
-   <button class="btn sm" data-am="newf" data-id="">New folder</button><button class="btn sm" data-am="up" data-id="${AS.cur||''}">Upload${AS.cur&&node(AS.cur)?' into “'+esc(node(AS.cur).name)+'”':''}</button><button class="btn sm" data-am="newsc" data-id="${AS.cur||''}">New scene</button>
+   <button class="btn sm" data-am="newf" data-id="">New folder</button><button class="btn sm" data-am="up" data-id="${AS.cur||''}">Upload${AS.cur&&node(AS.cur)?' into “'+esc(node(AS.cur).name)+'”':''}</button><button class="btn sm" data-am="newsc" data-id="${AS.cur||''}">New scene</button><button class="btn sm" data-am="starter">Starter folders</button>
    <span class="am-sp"></span><span id="am-cloud" class="am-cloud">${esc(_cs.msg)}</span><button class="btn sm" data-am="sync">Sync</button><button class="btn sm" data-am="export">Backup .zip</button></div>
   <div class="am-body"><div class="am-tree" id="am-tree"><div class="tr root" data-id="" data-am="fsel">All files <span class="cnt">${AS.tree.filter(n=>n.type==='asset').length}</span></div>${trRows(null,0)||'<p class="am-empty">Nothing here yet. Make a folder (chapter), then upload PNGs and GLBs into it. Drag anything onto a folder to move it.</p>'}</div>
   <div class="am-mid" id="am-mid">${sc?amStage(sc):as?amPreview(as):'<div class="am-empty big">Pick an asset to preview it, or open a scene to build a screen from layers.<br><br>Tip: drop image files straight onto a folder.</div>'}</div>
@@ -3226,7 +3400,7 @@ function amRender(){
   <input type="file" id="am-file" multiple hidden accept=".png,.jpg,.jpeg,.webp,.gif,.svg,.avif,.glb,.gltf,.mp3,.ogg,.wav,.m4a">`;
   fitEdit();
 }
-function amHelp(){return `<div class="am-p"><h3>How this works</h3><p>Folders are your chapters and sections. Nest them as deep as you like. Drag to reorder or move.</p><p><b>Scenes</b> are screens you build by stacking assets as layers (background, stall, lantern, glow…). Bind a scene to “Title” or “Stall” and the game shows it.</p><p>Everything is saved in this browser. <b>Export for GitHub</b> gives you a zip with an <code>assets</code> folder to put next to your index.html so players see it too.</p></div>`;}
+function amHelp(){return `<div class="am-p"><h3>How this works</h3><p>Folders are your chapters and sections. Nest them as deep as you like. Drag to reorder or move.</p><p>Press <b>Starter folders</b> any time to add the full set of chapters and sections (it never duplicates or overwrites).</p><p><b>Scenes</b> are screens you build by stacking assets as layers (background, stall, lantern, glow…). Bind a scene to “Title” or “Stall” and the game shows it.</p><p>Everything is saved in this browser. <b>Export for GitHub</b> gives you a zip with an <code>assets</code> folder to put next to your index.html so players see it too.</p></div>`;}
 function amPreview(n){const u=AS.urls[n.id];return `<div class="am-prev">${IMGX.test(n.ext)&&u?`<img src="${u}" style="max-width:100%;max-height:100%;object-fit:contain;background:repeating-conic-gradient(#2a2038 0 25%,#1c1428 0 50%) 0 0/24px 24px">`:`<div class="am-empty big">${MODX.test(n.ext)?'3D model (shown in the 3D version later)':'Audio file'}<br>${esc(n.name)}.${esc(n.ext)}</div>`}</div>`;}
 function amInfo(n){
   return `<div class="am-p"><h3>${esc(n.name)}</h3><div class="note" style="font-size:12.5px">${kindOf(n.ext)} · .${esc(n.ext)} · ${fmtSz(n.size||0)}${n.w?' · '+n.w+'×'+n.h+' px':''}</div>
@@ -3296,6 +3470,7 @@ document.addEventListener('click',async e=>{
    case'addglow':addLayer(AS.scene,{kind:'glow',name:'Glow',color:'#ffd98a',size:320,blend:'screen',fx:'pulse',fxa:50,fxs:50});amRender();break;
    case'addflies':addLayer(AS.scene,{kind:'flies',name:'Fireflies',color:'#ffe9a6',count:18,fx:'none'});amRender();break;
    case'export':exportAssets();break;
+   case'starter':seedStarter();break;
    case'sync':if(cloudOn()){syncUp();}syncDown();break;
   }
 });
