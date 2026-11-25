@@ -2365,11 +2365,11 @@ function save(quiet){
   D.rev=Date.now();
   try{localStorage.setItem(STORE,JSON.stringify(D));}catch(e){}
   updateFoot();push();
-  if(!quiet)toast(FB.user?'Saved to the cloud':'Saved in this browser');
+  if(!quiet)toast(FB.state==='live'?'Saved to the cloud':'Saved in this browser');
 }
 function isDirty(){return (D.rev||0)>EMB_REV;}
 function updateFoot(){
-  const f=$('#footstat'); if(f&&FB.state==='live'){f.innerHTML=`<span class="dot" style="display:inline-block;margin-right:8px;background:${FB.msg.startsWith('Could')?'#e58585':'#7fc8a0'};box-shadow:0 0 8px currentColor"></span><b>${FB.msg||(FB.user?'Live. Edits sync to the cloud.':'Live from the cloud.')}</b>${FB.user?' <a href="#" data-act="signout">Sign out</a>':''}`;} else if(f) f.innerHTML=isDirty()?'<span class="dot" style="display:inline-block;margin-right:8px"></span><b>Unpublished edits.</b> Download to keep them.':'All changes are in this file.';
+  const f=$('#footstat'); if(f&&FB.state==='live'){f.innerHTML=`<span class="dot" style="display:inline-block;margin-right:8px;background:${FB.msg.startsWith('Could')?'#e58585':'#7fc8a0'};box-shadow:0 0 8px currentColor"></span><b>${FB.msg||'Live. Edits sync to the cloud.'}</b>${FB.user?' <a href="#" data-act="signout">Sign out</a>':''}`;} else if(f) f.innerHTML=isDirty()?'<span class="dot" style="display:inline-block;margin-right:8px"></span><b>Unpublished edits.</b> Download to keep them.':'All changes are in this file.';
   else if(f&&FB.state==='offline'&&FB.msg){f.innerHTML='<span class="dot" style="display:inline-block;margin-right:8px;background:#e58585"></span><b>Cloud offline.</b> '+esc(FB.msg);}
   const pd=$('#pubdot'); if(pd) pd.style.display=isDirty()?'inline-block':'none';
 }
@@ -2400,8 +2400,8 @@ function applySnap(v){
     if((v.rev||0)>(D.rev||0)){
       try{D=JSON.parse(v.json);normalize();D.rev=v.rev;try{localStorage.setItem(STORE,JSON.stringify(D));}catch(e){}
         if(!fbBusy())render(true);}catch(e){}
-    }else if((v.rev||0)<(D.rev||0)&&FB.user)push();
-  }else if(FB.user)push();
+    }else if((v.rev||0)<(D.rev||0))push();
+  }else push();
   updateFoot();
 }
 async function fbInit(){
@@ -2411,13 +2411,13 @@ async function fbInit(){
     try{DB.forceLongPolling();}catch(e){}
     const app=A.initializeApp(FBCFG);
     FB.DB=DB;FB.AU=AU;FB.db=DB.getDatabase(app);FB.auth=AU.getAuth(app);FB.ref=DB.ref(FB.db,'gamebook');
-    AU.onAuthStateChanged(FB.auth,u=>{FB.user=u;if(!u&&UI.edit)UI.edit=false;if(u&&FB.state==='live')push();render(true);});
+    AU.onAuthStateChanged(FB.auth,u=>{FB.user=u;if(u&&FB.state==='live')push();render(true);});
     setTimeout(async()=>{if(FB.state==='loading'){FB.rest=true;try{applySnap(await restCall('GET','gamebook'));}catch(e){FB.state='offline';FB.msg='The database did not answer: '+(e.code||e.message);updateFoot();}}},5000);
     DB.onValue(FB.ref,snap=>applySnap(snap.val()),err=>{FB.state='offline';FB.msg=err.message;updateFoot();});
   }catch(e){FB.state='offline';FB.msg=String(e.message||e);updateFoot();}
 }
 function push(){
-  if(!FB.user||FB.state!=='live')return;
+  if(FB.state!=='live')return;
   clearTimeout(FB.timer);FB.msg='Saving…';updateFoot();
   FB.timer=setTimeout(async()=>{
     try{await dbSet('gamebook',{rev:D.rev,json:JSON.stringify(D)});FB.msg='';}
@@ -3040,7 +3040,7 @@ document.addEventListener('click',ev=>{
     case'goto-zone':UI.sec='gather';UI.f.gather.zone=t.dataset.val;UI.q='';render();window.scrollTo(0,0);break;
     case'open':closeModal();detail(t.dataset.type,t.dataset.id);break;
     case'close':closeModal();break;
-    case'toggle-edit':if(!UI.edit&&FB.state==='loading'){toast('Connecting to the cloud… wait about 10 seconds. If it then says the Realtime Database never answered, it needs creating (see the footer).');break;}if(!UI.edit&&FB.state==='live'&&!FB.user){openSignin();break;}UI.edit=!UI.edit;render(true);break;
+    case'toggle-edit':if(!UI.edit&&FB.state==='loading'){toast('Connecting to the cloud… wait about 10 seconds. If it then says the Realtime Database never answered, it needs creating (see the footer).');break;}UI.edit=!UI.edit;render(true);break;
     case'signin':doSignin();break;
     case'signout':FB.AU.signOut(FB.auth);toast('Signed out');break;
     case'edit':closeModal();openForm(t.dataset.type,t.dataset.id);break;
@@ -3153,14 +3153,14 @@ function saveSoon(){clearTimeout(_sv);_sv=setTimeout(saveMeta,400);}
 const mark=id=>{if(!AS.pending.includes(id))AS.pending.push(id);};
 /* ----- cloud (Firebase Realtime Database, same project as the Game Book) ----- */
 const FBX=()=>window.__book&&window.__book.fb&&window.__book.fb();
-const cloudOn=()=>{const f=FBX();return !!(f&&f.state==='live'&&f.user);};
+const cloudOn=()=>{const f=FBX();return !!(f&&f.state==='live');};
 let _cs={busy:false,msg:''};
 function cstat(m){_cs.msg=m;const e=document.getElementById('am-cloud');if(e)e.textContent=m;}
 const b64=blob=>new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(String(fr.result).split(',')[1]||'');fr.readAsDataURL(blob);});
 const MIME={png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',webp:'image/webp',gif:'image/gif',svg:'image/svg+xml',avif:'image/avif',glb:'model/gltf-binary',gltf:'model/gltf+json',mp3:'audio/mpeg',ogg:'audio/ogg',wav:'audio/wav',m4a:'audio/mp4'};
 function unb64(s,ext){const bin=atob(s),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new Blob([u],{type:MIME[ext]||'application/octet-stream'});}
 async function waitFB(ms){const t0=Date.now();while(Date.now()-t0<ms){const f=FBX();if(f&&(f.state==='live'||f.state==='offline'))return f;await new Promise(r=>setTimeout(r,200));}return FBX();}
-function cloudSoon(){clearTimeout(_ct);_ct=setTimeout(()=>{if(cloudOn())syncUp();else cstat('Saved in this browser only. Press “Sign in to save to cloud”.');},1200);}
+function cloudSoon(){clearTimeout(_ct);_ct=setTimeout(()=>{if(cloudOn())syncUp();else cstat('Not connected to the cloud yet. Press Cloud check.');},1200);}
 async function syncUp(){
   const f=FBX();if(!cloudOn()||_cs.busy)return;_cs.busy=true;
   try{const {DB,db}=f;let n=0;const tot=AS.pending.length;
@@ -3447,7 +3447,7 @@ function amRender(){
   const cn=AS.cur&&node(AS.cur),inName=cn?cn.name:'All files';
   a.innerHTML=`<div class="am-top"><b class="am-t">Assets &amp; Scenes</b><span class="am-sp"></span>
    <button class="btn sm" data-am="starter">Starter folders</button><button class="btn gold sm" data-am="links">Game links</button><button class="btn gold sm" data-am="items">Item art</button><button class="btn gold sm" data-am="needs">What to make</button>
-   <span class="am-sp"></span>${cloudOn()?'':'<button class="btn gold sm" data-am="csign">Sign in to save to cloud</button>'}<span id="am-cloud" class="am-cloud">${esc(_cs.msg)}</span><button class="btn sm" data-am="sync">Sync</button><button class="btn sm" data-am="ccheck">Cloud check</button><button class="btn sm" data-am="export">Backup .zip</button></div>
+   <span class="am-sp"></span>${cloudOn()?'':'<button class="btn gold sm" data-am="ccheck">Cloud not connected: check why</button>'}<span id="am-cloud" class="am-cloud">${esc(_cs.msg)}</span><button class="btn sm" data-am="sync">Sync</button><button class="btn sm" data-am="ccheck">Cloud check</button><button class="btn sm" data-am="export">Backup .zip</button></div>
   <div class="am-body"><div class="am-tree" id="am-tree"><div class="am-tools"><div class="am-in">In: <b>${esc(inName)}</b> <label style="margin-left:8px;cursor:pointer"><input type="checkbox" data-showused ${AS.showUsed?'checked':''}> show images used in scenes</label></div><div class="am-tb"><button data-am="newf" data-id="${AS.cur||''}">+ folder</button><button data-am="newsc" data-id="${AS.cur||''}">+ scene</button><button data-am="up" data-id="${AS.cur||''}">upload</button><button data-am="urlf" data-id="${AS.cur||''}">from URL</button><button data-am="ren" data-id="${AS.cur||''}" ${cn?'':'disabled'}>rename</button><button data-am="del" data-id="${AS.cur||''}" class="dn" ${cn?'':'disabled'}>delete</button></div></div>
    <div class="am-list" id="am-list"><div class="tr root ${AS.cur?'':'cur'}" data-id="" data-am="fsel">All files <span class="cnt">${AS.tree.filter(n=>n.type==='asset'&&vis(n)).length}</span></div>${trRows(null,0)||'<p class="am-empty">Nothing here yet. Press Starter folders, or make a folder and upload into it. Drag anything onto a folder to move it.</p>'}</div></div>
   <div class="am-mid" id="am-mid">${sc?amStage(sc):as?amPreview(as):'<div class="am-empty big">Pick an asset to preview it, or open a scene to build a screen from layers.<br><br>Tip: drop image files straight onto a folder.</div>'}</div>
@@ -3461,7 +3461,8 @@ function amHelp(){return `<div class="am-p"><h3>How this works</h3><p>Folders ar
 function amPreview(n){const u=AS.urls[n.id];return `<div class="am-prev">${IMGX.test(n.ext)&&u?`<img src="${u}" style="max-width:100%;max-height:100%;object-fit:contain;background:repeating-conic-gradient(#2a2038 0 25%,#1c1428 0 50%) 0 0/24px 24px">`:`<div class="am-empty big">${MODX.test(n.ext)?'3D model (shown in the 3D version later)':'Audio file'}<br>${esc(n.name)}.${esc(n.ext)}</div>`}</div>`;}
 function amInfo(n){
   return `<div class="am-p"><h3>${esc(n.name)}</h3><div class="note" style="font-size:12.5px">${kindOf(n.ext)} · .${esc(n.ext)} · ${n.url?'linked from a URL':fmtSz(n.size||0)}${n.w?' · '+n.w+'×'+n.h+' px':''}</div>
-  <div class="fld"><label>Name</label><input data-ai="name" value="${esc(n.name)}"></div>${n.url?`<div class="fld"><label>Link</label><input readonly value="${esc(n.url)}" onclick="this.select()"></div>`:''}
+  <div class="fld"><label>Name</label><input data-ai="name" value="${esc(n.name)}"></div>
+  ${IMGX.test(n.ext)?`<div class="fld"><label>Size in the game (%)</label><input type="number" data-assetsz="${n.id}" value="${AS.slots['assetsz_'+n.id]||100}" min="10" max="500" step="5"><div class="note" style="font-size:12px;margin-top:4px">100 = normal. On a character’s <b>…_portrait_full</b> file (for example azlynn_portrait_full), this sizes <b>all of that character’s sprites</b> in the game.</div></div>`:''}${n.url?`<div class="fld"><label>Link</label><input readonly value="${esc(n.url)}" onclick="this.select()"></div>`:''}
   <div class="am-btns"><button class="btn sm" data-am="rename-asset">Rename</button><button class="btn sm" data-am="repl">Replace file</button><button class="btn sm" data-am="dl">Download</button>${n.url?'<button class="btn sm" data-am="chgurl">Change link</button>':(IMGX.test(n.ext)?'<button class="btn sm" data-am="cut">Remove background</button>':'')}<button class="btn sm danger" data-am="del" data-id="${n.id}">Delete</button></div>
   ${IMGX.test(n.ext)?'<p class="note" style="font-size:12px;margin-top:12px">Drag it from the left onto a scene to use it.</p>':''}</div>`;
 }
@@ -3828,7 +3829,7 @@ document.addEventListener('input',e=>{
   else if(t.dataset.wp){AS[t.dataset.wp]=parseFloat(t.value)||1;document.querySelectorAll(`[data-wp="${t.dataset.wp}"]`).forEach(o=>{if(o!==t)o.value=t.value;});}
   else if(t.dataset.sp){AS.scenes[AS.scene][t.dataset.sp]=t.value;if(t.dataset.sp==='size'){amRender();}else stageRefresh();saveSoon();}
 });
-document.addEventListener('change',e=>{const t=e.target;if(!document.getElementById('asm'))return;if(t.dataset&&t.dataset.itsz){const v=Math.max(10,Math.min(500,parseFloat(t.value)||100));if(v===100)delete AS.slots['itemsz_'+t.dataset.itsz];else AS.slots['itemsz_'+t.dataset.itsz]=String(v);saveMeta();return;}if(t.dataset&&t.dataset.nd){if(t.checked)AS.slots[t.dataset.nd]='1';else delete AS.slots[t.dataset.nd];saveMeta();return;}if(t.dataset&&'showused' in t.dataset){AS.showUsed=t.checked;amRender();return;}
+document.addEventListener('change',e=>{const t=e.target;if(!document.getElementById('asm'))return;if(t.dataset&&t.dataset.assetsz){const v=Math.max(10,Math.min(500,parseFloat(t.value)||100));if(v===100)delete AS.slots['assetsz_'+t.dataset.assetsz];else AS.slots['assetsz_'+t.dataset.assetsz]=String(v);saveMeta();return;}if(t.dataset&&t.dataset.itsz){const v=Math.max(10,Math.min(500,parseFloat(t.value)||100));if(v===100)delete AS.slots['itemsz_'+t.dataset.itsz];else AS.slots['itemsz_'+t.dataset.itsz]=String(v);saveMeta();return;}if(t.dataset&&t.dataset.nd){if(t.checked)AS.slots[t.dataset.nd]='1';else delete AS.slots[t.dataset.nd];saveMeta();return;}if(t.dataset&&'showused' in t.dataset){AS.showUsed=t.checked;amRender();return;}
     if(t.dataset.lp&&t.tagName==='INPUT'&&t.type==='text')amRender();});
 /* drag & drop: move in tree, or onto stage, or upload from desktop */
 let dragId=null;
