@@ -3096,7 +3096,7 @@ function flies(){
 loadData();normalize();
 flies();
 render();fbInit();
-window.__book={get data(){return D;},UI,render,save,fb:()=>FB,signin:()=>{if(FB.user){toast('Already signed in');}else if(FB.state==='live')openSignin();else toast('Still connecting to the cloud… try again in a moment');},exportX:buildXlsx,exportC:buildCsv};
+window.__book={cfg:FBCFG,get data(){return D;},UI,render,save,fb:()=>FB,signin:()=>{if(FB.user){toast('Already signed in');}else if(FB.state==='live')openSignin();else toast('Still connecting to the cloud… try again in a moment');},exportX:buildXlsx,exportC:buildCsv};
 })();
 
 /* ===== ASSETS TAB (folders, images, scene composer) ===== */
@@ -3436,7 +3436,7 @@ function amRender(){
   const cn=AS.cur&&node(AS.cur),inName=cn?cn.name:'All files';
   a.innerHTML=`<div class="am-top"><b class="am-t">Assets &amp; Scenes</b><span class="am-sp"></span>
    <button class="btn sm" data-am="starter">Starter folders</button><button class="btn gold sm" data-am="links">Game links</button><button class="btn gold sm" data-am="items">Item art</button><button class="btn gold sm" data-am="needs">What to make</button>
-   <span class="am-sp"></span>${cloudOn()?'':'<button class="btn gold sm" data-am="csign">Sign in to save to cloud</button>'}<span id="am-cloud" class="am-cloud">${esc(_cs.msg)}</span><button class="btn sm" data-am="sync">Sync</button><button class="btn sm" data-am="export">Backup .zip</button></div>
+   <span class="am-sp"></span>${cloudOn()?'':'<button class="btn gold sm" data-am="csign">Sign in to save to cloud</button>'}<span id="am-cloud" class="am-cloud">${esc(_cs.msg)}</span><button class="btn sm" data-am="sync">Sync</button><button class="btn sm" data-am="ccheck">Cloud check</button><button class="btn sm" data-am="export">Backup .zip</button></div>
   <div class="am-body"><div class="am-tree" id="am-tree"><div class="am-tools"><div class="am-in">In: <b>${esc(inName)}</b> <label style="margin-left:8px;cursor:pointer"><input type="checkbox" data-showused ${AS.showUsed?'checked':''}> show images used in scenes</label></div><div class="am-tb"><button data-am="newf" data-id="${AS.cur||''}">+ folder</button><button data-am="newsc" data-id="${AS.cur||''}">+ scene</button><button data-am="up" data-id="${AS.cur||''}">upload</button><button data-am="urlf" data-id="${AS.cur||''}">from URL</button><button data-am="ren" data-id="${AS.cur||''}" ${cn?'':'disabled'}>rename</button><button data-am="del" data-id="${AS.cur||''}" class="dn" ${cn?'':'disabled'}>delete</button></div></div>
    <div class="am-list" id="am-list"><div class="tr root ${AS.cur?'':'cur'}" data-id="" data-am="fsel">All files <span class="cnt">${AS.tree.filter(n=>n.type==='asset'&&vis(n)).length}</span></div>${trRows(null,0)||'<p class="am-empty">Nothing here yet. Press Starter folders, or make a folder and upload into it. Drag anything onto a folder to move it.</p>'}</div></div>
   <div class="am-mid" id="am-mid">${sc?amStage(sc):as?amPreview(as):'<div class="am-empty big">Pick an asset to preview it, or open a scene to build a screen from layers.<br><br>Tip: drop image files straight onto a folder.</div>'}</div>
@@ -3551,6 +3551,23 @@ function ndMake(slot){
   const N=NEEDS[slot],sl=SLOTS.find(x=>x.id===slot);if(!N||!sl||AS.slots[slot])return;
   const par=ensureFolder(N.f),n={id:uid(),type:'scene',name:sl.label.replace(/ \(.*\)$/,'').replace(/^Story background: /,''),parent:par,order:nextOrder(par)};
   AS.tree.push(n);AS.scenes[n.id]={bg:'#0e0916',layers:[],size:sl.size};AS.slots[slot]=n.id;
+}
+
+async function cloudCheck(){
+  const f=FBX()||{},url=(window.__book.cfg&&window.__book.cfg.databaseURL)||'https://night-market-7d13a-default-rtdb.firebaseio.com';
+  const m=document.createElement('div');m.id='am-cc';m.className='scrim';m.style.zIndex=310;
+  m.innerHTML='<div class="modal" style="width:min(640px,96vw)"><div class="am-t" style="font-size:26px">Cloud check</div><div id="cc-body" style="font-size:14px;line-height:1.6;margin:10px 0">Testing…</div><div class="actions"><button class="btn gold" data-am="ccclose">Close</button></div></div>';
+  document.body.appendChild(m);const out=[];const add=(ok,t)=>{out.push(`<div style="color:${ok?'#8bd3b0':'#e58585'}">${ok?'✓':'✗'} ${t}</div>`);document.getElementById('cc-body').innerHTML=out.join('');};
+  add(f.state==='live','Firebase connection in this page: <b>'+(f.state||'not started')+'</b>'+(f.msg?' ('+esc(f.msg)+')':''));
+  add(!!f.user,'Signed in: <b>'+(f.user?esc(f.user.email||'yes'):'no')+'</b>');
+  async function probe(path,label){
+    try{const c=new AbortController(),t=setTimeout(()=>c.abort(),8000);const r=await fetch(url+'/'+path+'.json?shallow=true',{signal:c.signal});clearTimeout(t);const tx=await r.text();
+      if(r.ok)add(true,label+': readable (HTTP '+r.status+')');
+      else add(false,label+': HTTP '+r.status+' '+esc(tx.slice(0,120))+(r.status===401?' → the database rules are refusing reads. Publish the rules in Realtime Database → Rules.':r.status===404?' → this database does not exist at that address.':''));
+    }catch(e){add(false,label+': could not reach '+esc(url)+' ('+esc(e.name==='AbortError'?'timed out':e.message)+'). A blocker, VPN, network or wrong database address stops this.');}
+  }
+  await probe('assetmeta','Asset library in the cloud');await probe('gamebook','Game book data in the cloud');
+  add(true,'Database address used: '+esc(url));
 }
 /* ----- item art: one image slot per game item (slots key 'item_<id>'; custom items kept as 'itemdef_<slug>' = label) ----- */
 const IT_PRESET=[['Decor & collectibles','Lantern'],['Decor & collectibles','Bunting'],['Decor & collectibles','Wind chime'],['Decor & collectibles','Awning'],['Decor & collectibles','Shelf'],['Decor & collectibles','Rug'],['Decor & collectibles','Stall sign'],['Decor & collectibles','Cauldron'],['Decor & collectibles','Hag stone'],['Familiars','Cat'],['Familiars','Crow'],['Familiars','Fox'],['Money & UI icons','Coin'],['Money & UI icons','Pack (bag)'],['Money & UI icons','Almanac (book)'],['Money & UI icons','Bench'],['Money & UI icons','New moon'],['Money & UI icons','Waxing moon'],['Money & UI icons','Full moon'],['Money & UI icons','Waning moon']];
@@ -3752,6 +3769,8 @@ document.addEventListener('click',async e=>{
    case'lurl':{const u=prompt('Paste the image link (https://…)\nExample: your Cloudflare R2 / custom-domain URL ending in .png');if(u){const sc=node(AS.scene);addUrl(u,sc&&sc.parent||null,AS.scene);}break;}
    case'lupload':{const sc=node(AS.scene);pick(sc&&sc.parent||null,AS.scene);break;}
    case'chgurl':{const n=node(AS.sel),u=prompt('New image link',n.url);if(u&&/^https?:\/\//i.test(u)){n.url=u.trim();AS.urls[n.id]=n.url;try{const im=new Image();im.src=n.url;await im.decode();n.w=im.naturalWidth;n.h=im.naturalHeight;}catch(e){}saveMeta();amRender();}break;}
+   case'ccheck':cloudCheck();break;
+   case'ccclose':{const m=document.getElementById('am-cc');if(m)m.remove();break;}
    case'csign':window.__book.signin();break;
    case'sync':if(cloudOn()){syncUp();}syncDown();break;
   }
