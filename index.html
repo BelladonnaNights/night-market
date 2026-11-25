@@ -326,6 +326,7 @@ body.edit .hide-edit{display:none!important}
 #asm{position:relative;height:100%;background:#0b0712;display:flex;flex-direction:column;color:var(--text);font-family:var(--sans);border:1px solid var(--line);border-radius:20px;overflow:hidden}
 .asm-host{height:calc(100vh - 190px);min-height:560px}
 .page.asmpage{max-width:none}
+.am-tree{display:flex;flex-direction:column;padding:0!important}.am-list{flex:1;overflow:auto;padding:6px 8px}.am-tools{flex:none;padding:10px;border-bottom:1px solid var(--line);background:rgba(14,9,22,.95)}.am-in{font-size:12.5px;color:var(--muted);margin-bottom:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.am-in b{color:var(--gold)}.am-tb{display:flex;flex-wrap:wrap;gap:6px}.am-tb button{font:700 12px var(--sans);padding:6px 12px;border-radius:99px;background:rgba(255,255,255,.08);color:inherit;border:1px solid var(--line);cursor:pointer}.am-tb button:hover:not(:disabled){background:var(--gold);color:#2a1a08}.am-tb button:disabled{opacity:.35;cursor:default}.am-tb .dn{color:var(--bad)}.am-links{display:flex;flex-wrap:wrap;gap:6px}.lk{display:inline-flex;gap:6px;align-items:center;padding:4px 6px 4px 11px;border-radius:99px;background:rgba(240,198,116,.16);border:1px solid var(--line2);font-size:12.5px}.lk button{border:0;background:rgba(255,255,255,.12);color:inherit;border-radius:50%;width:20px;height:20px;cursor:pointer}.lkrow{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:13.5px}.lkrow select{max-width:300px;padding:6px 9px;border-radius:9px;background:rgba(14,9,22,.7);border:1px solid var(--line);color:inherit}
 .am-cloud{font-size:12.5px;color:var(--muted);max-width:360px}
 .am-top{display:flex;gap:8px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}.am-t{font:700 20px var(--serif);color:var(--gold)}.am-sp{flex:1}
 .am-body{flex:1;display:grid;grid-template-columns:minmax(250px,310px) 1fr minmax(250px,310px);min-height:0}
@@ -3109,6 +3110,28 @@ let _db=null;
 function idb(){return _db||(_db=new Promise((res,rej)=>{const r=indexedDB.open('nm-assets',1);r.onupgradeneeded=()=>{r.result.createObjectStore('files');r.result.createObjectStore('meta');};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);}));}
 async function dbx(store,mode,fn){const d=await idb();return new Promise((res,rej)=>{const t=d.transaction(store,mode),q=fn(t.objectStore(store));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error);});}
 const dbGet=(s,k)=>dbx(s,'readonly',o=>o.get(k)),dbPut=(s,k,v)=>dbx(s,'readwrite',o=>o.put(v,k)),dbDel=(s,k)=>dbx(s,'readwrite',o=>o.delete(k));
+const DIMS={screen:[1920,1080,'Screen 16:9'],map:[2200,1500,'Map 3:2'],portrait:[1200,1800,'Portrait 2:3']};
+const dimsOf=id=>{const s=AS.scenes[id];return DIMS[(s&&s.size)||'screen']||DIMS.screen;};
+const SLOTS=[
+ {id:'title',label:'Title screen',group:'Main screens',size:'screen'},
+ {id:'stall',label:'The stall (main play screen, all phases)',group:'Main screens',size:'screen'},
+ {id:'zone_marsh',label:'Marsh (walkable map)',group:'Foraging maps',size:'map'},
+ {id:'zone_garden_and_hedgerow',label:'Garden and hedgerow (walkable map)',group:'Foraging maps',size:'map'},
+ {id:'zone_woods',label:'Woods (walkable map)',group:'Foraging maps',size:'map'},
+ {id:'zone_canal_and_shore',label:'Canal and shore (walkable map)',group:'Foraging maps',size:'map'},
+ {id:'zone_town',label:'Town lanes (walkable map)',group:'Foraging maps',size:'map'},
+ {id:'bg_market_dusk',label:'Story background: market at dusk',group:'Story backgrounds',size:'screen'},
+ {id:'bg_market_day',label:'Story background: market by day',group:'Story backgrounds',size:'screen'},
+ {id:'bg_stall',label:'Story background: the stall',group:'Story backgrounds',size:'screen'},
+ {id:'bg_marsh_night',label:'Story background: marsh at night',group:'Story backgrounds',size:'screen'},
+ {id:'char_azlynn',label:'Azlynn (hero)',group:'Characters (portrait)',size:'portrait'},
+ {id:'char_wren',label:'Wren',group:'Characters (portrait)',size:'portrait'},
+ {id:'char_fenn',label:'Fenn',group:'Characters (portrait)',size:'portrait'},
+ {id:'char_moth',label:'The moth-winged visitor',group:'Characters (portrait)',size:'portrait'},
+ {id:'char_shade',label:'The shade',group:'Characters (portrait)',size:'portrait'}
+];
+const slotLabel=id=>(SLOTS.find(s=>s.id===id)||{label:id}).label;
+const slotsOf=sid=>Object.keys(AS.slots).filter(k=>AS.slots[k]===sid);
 const stateObj=()=>({tree:AS.tree,scenes:AS.scenes,slots:AS.slots,rev:AS.rev,cloudRev:AS.cloudRev,pending:AS.pending,removed:AS.removed});
 let _sv=null,_ct=null;
 function saveMeta(){clearTimeout(_sv);AS.rev=Date.now();cloudSoon();return dbPut('meta','state',stateObj()).catch(()=>toast('Could not save assets (browser storage blocked?)'));}
@@ -3394,21 +3417,27 @@ async function mount(host){host.innerHTML='<div id="asm"><p class="am-empty">Loa
 function trRows(pid,depth){
   return kids(pid).map(n=>{
     const pad=10+depth*16,sel=(AS.sel===n.id||AS.scene===n.id)?'on':'';
-    if(n.type==='folder'){const op=AS.open.has(n.id),cur=AS.cur===n.id;return `<div class="tr f ${cur?'cur':''}" draggable="true" data-id="${n.id}" data-am="fsel" style="padding-left:${pad}px"><b class="car" data-am="tog" data-id="${n.id}">${op?'▾':'▸'}</b><span class="nm">${esc(n.name)}</span><span class="cnt">${kids(n.id).length}</span></div>`+(cur?`<div class="tact2" style="padding-left:${pad+20}px"><button data-am="newf" data-id="${n.id}">+ folder</button><button data-am="newsc" data-id="${n.id}">+ scene</button><button data-am="up" data-id="${n.id}">upload</button><button data-am="urlf" data-id="${n.id}">from URL</button><button data-am="ren" data-id="${n.id}">rename</button><button data-am="del" data-id="${n.id}">delete</button></div>`:'')+(op?trRows(n.id,depth+1):'');}
+    if(n.type==='folder'){const op=AS.open.has(n.id),cur=AS.cur===n.id;return `<div class="tr f ${cur?'cur':''}" draggable="true" data-id="${n.id}" data-am="fsel" style="padding-left:${pad}px"><b class="car" data-am="tog" data-id="${n.id}">${op?'▾':'▸'}</b><span class="nm">${esc(n.name)}</span><span class="cnt">${kids(n.id).length}</span></div>`+(op?trRows(n.id,depth+1):'');}
     if(n.type==='scene')return `<div class="tr s ${sel}" draggable="true" data-id="${n.id}" data-am="scene" style="padding-left:${pad+16}px"><i class="ico">▣</i><span class="nm">${esc(n.name)}</span><span class="tag">scene</span></div>`;
     const u=AS.urls[n.id];return `<div class="tr a ${sel}" draggable="true" data-id="${n.id}" data-am="asset" style="padding-left:${pad+16}px">${IMGX.test(n.ext)&&u?`<img src="${u}" class="th">`:`<i class="ico">${MODX.test(n.ext)?'◆':'♪'}</i>`}<span class="nm">${esc(n.name)}</span><span class="tag">${esc(n.ext)}</span></div>`;
   }).join('');
 }
 function amRender(){
   const a=document.getElementById('asm');if(!a)return;
+  const keep={w:window.scrollY};const sp=[];let el=a.parentElement;while(el){if(el.scrollHeight>el.clientHeight+4){sp.push([el,el.scrollTop]);}el=el.parentElement;}
+  ['am-list','am-right'].forEach(i=>{const e=document.getElementById(i);if(e)keep[i]=e.scrollTop;});const lr=document.querySelector('.lrows');if(lr)keep.lr=lr.scrollTop;
   const sc=AS.scene&&AS.scenes[AS.scene]?AS.scene:null,as=AS.sel&&node(AS.sel)?node(AS.sel):null;
+  const cn=AS.cur&&node(AS.cur),inName=cn?cn.name:'All files';
   a.innerHTML=`<div class="am-top"><b class="am-t">Assets &amp; Scenes</b><span class="am-sp"></span>
-   <button class="btn sm" data-am="newf" data-id="">New folder</button><button class="btn sm" data-am="up" data-id="${AS.cur||''}">Upload${AS.cur&&node(AS.cur)?' into “'+esc(node(AS.cur).name)+'”':''}</button><button class="btn sm" data-am="newsc" data-id="${AS.cur||''}">New scene</button><button class="btn sm" data-am="urlf" data-id="${AS.cur||''}">Add from URL</button><button class="btn sm" data-am="starter">Starter folders</button>
+   <button class="btn sm" data-am="starter">Starter folders</button><button class="btn gold sm" data-am="links">Game links</button>
    <span class="am-sp"></span><span id="am-cloud" class="am-cloud">${esc(_cs.msg)}</span><button class="btn sm" data-am="sync">Sync</button><button class="btn sm" data-am="export">Backup .zip</button></div>
-  <div class="am-body"><div class="am-tree" id="am-tree"><div class="tr root" data-id="" data-am="fsel">All files <span class="cnt">${AS.tree.filter(n=>n.type==='asset').length}</span></div>${trRows(null,0)||'<p class="am-empty">Nothing here yet. Make a folder (chapter), then upload PNGs and GLBs into it. Drag anything onto a folder to move it.</p>'}</div>
+  <div class="am-body"><div class="am-tree" id="am-tree"><div class="am-tools"><div class="am-in">In: <b>${esc(inName)}</b></div><div class="am-tb"><button data-am="newf" data-id="${AS.cur||''}">+ folder</button><button data-am="newsc" data-id="${AS.cur||''}">+ scene</button><button data-am="up" data-id="${AS.cur||''}">upload</button><button data-am="urlf" data-id="${AS.cur||''}">from URL</button><button data-am="ren" data-id="${AS.cur||''}" ${cn?'':'disabled'}>rename</button><button data-am="del" data-id="${AS.cur||''}" class="dn" ${cn?'':'disabled'}>delete</button></div></div>
+   <div class="am-list" id="am-list"><div class="tr root ${AS.cur?'':'cur'}" data-id="" data-am="fsel">All files <span class="cnt">${AS.tree.filter(n=>n.type==='asset').length}</span></div>${trRows(null,0)||'<p class="am-empty">Nothing here yet. Press Starter folders, or make a folder and upload into it. Drag anything onto a folder to move it.</p>'}</div></div>
   <div class="am-mid" id="am-mid">${sc?amStage(sc):as?amPreview(as):'<div class="am-empty big">Pick an asset to preview it, or open a scene to build a screen from layers.<br><br>Tip: drop image files straight onto a folder.</div>'}</div>
   <div class="am-right" id="am-right">${sc?amLayers(sc):as?amInfo(as):amHelp()}</div></div>
   <input type="file" id="am-file" multiple hidden accept=".png,.jpg,.jpeg,.webp,.gif,.svg,.avif,.glb,.gltf,.mp3,.ogg,.wav,.m4a">`;
+  ['am-list','am-right'].forEach(i=>{const e=document.getElementById(i);if(e&&keep[i])e.scrollTop=keep[i];});const lr2=document.querySelector('.lrows');if(lr2&&keep.lr)lr2.scrollTop=keep.lr;
+  sp.forEach(([e,v])=>{e.scrollTop=v;});window.scrollTo(0,keep.w);
   fitEdit();
 }
 function amHelp(){return `<div class="am-p"><h3>How this works</h3><p>Folders are your chapters and sections. Nest them as deep as you like. Drag to reorder or move.</p><p>Press <b>Starter folders</b> any time to add the full set of chapters and sections (it never duplicates or overwrites).</p><p><b>Scenes</b> are screens you build by stacking assets as layers (background, stall, lantern, glow…). Bind a scene to “Title” or “Stall” and the game shows it.</p><p>Everything is saved in this browser. <b>Export for GitHub</b> gives you a zip with an <code>assets</code> folder to put next to your index.html so players see it too.</p></div>`;}
@@ -3425,8 +3454,8 @@ function amStage(id){
   <div class="am-stagewrap" id="am-sw"><div class="stage edit" id="am-stage">${stageInner(id)}</div></div>
   <div class="am-sbar" style="font-size:12px;opacity:.8">Drag assets from the left onto the picture. Drag layers to move. The game crops the edges to fit any screen, so keep important things toward the middle.</div>`;
 }
-function stageInner(id){const sc=AS.scenes[id];return `<div class="st" id="am-st" style="background:${sc.bg||'#0e0916'}">${sc.layers.map(l=>layerHtml(l,AS.phase,true)).join('')}</div><div class="guide"></div>`;}
-function fitEdit(){const sw=document.getElementById('am-sw'),st=document.getElementById('am-st');if(!sw||!st)return;const k=Math.min(sw.clientWidth/1920,sw.clientHeight/1080);const s=document.getElementById('am-stage');s.style.width=1920*k+'px';s.style.height=1080*k+'px';st.style.transform=`scale(${k})`;st.style.transformOrigin='0 0';st.style.left='0';st.style.top='0';st.dataset.k=k;}
+function stageInner(id){const sc=AS.scenes[id],[W,H]=dimsOf(id);return `<div class="st" id="am-st" style="width:${W}px;height:${H}px;background:${sc.bg||'#0e0916'}">${sc.layers.map(l=>layerHtml(l,AS.phase,true)).join('')}</div><div class="guide"></div>`;}
+function fitEdit(){const sw=document.getElementById('am-sw'),st=document.getElementById('am-st');if(!sw||!st||!AS.scene)return;const [W,H]=dimsOf(AS.scene);const k=Math.min(sw.clientWidth/W,sw.clientHeight/H);const s=document.getElementById('am-stage');s.style.width=W*k+'px';s.style.height=H*k+'px';st.style.transform=`scale(${k})`;st.style.transformOrigin='0 0';st.style.left='0';st.style.top='0';st.dataset.k=k;}
 function stageRefresh(){const id=AS.scene,s=document.getElementById('am-stage');if(!s||!id)return;s.innerHTML=stageInner(id);fitEdit();}
 function amLayers(id){
   const sc=AS.scenes[id],L=sc.layers.find(l=>l.id===AS.layer);
@@ -3444,13 +3473,25 @@ function amLayers(id){
    <div class="am-btns"><button class="btn sm" data-am="lfit">Fit width</button><button class="btn sm" data-am="lctr">Centre</button><button class="btn sm" data-am="ldup">Duplicate</button><button class="btn sm danger" data-am="ldel">Delete layer</button></div>`:'<p class="am-empty">Select a layer to edit it.</p>';
   return `<div class="am-p"><div class="am-btns" style="margin-bottom:10px"><button class="btn gold sm" data-am="lupload">+ Upload image</button><button class="btn gold sm" data-am="lurl">+ Image from URL</button><button class="btn sm" data-am="addglow">+ Glow</button><button class="btn sm" data-am="addflies">+ Fireflies</button></div>
    <div class="fld"><label>Backdrop colour</label><input type="color" data-sp="bg" value="${sc.bg||'#0e0916'}"></div>
-   <div class="fld"><label>Use this scene as</label><div class="am-btns"><label class="chip"><input type="checkbox" data-slot="title" ${AS.slots.title===id?'checked':''}> Title screen</label><label class="chip"><input type="checkbox" data-slot="stall" ${AS.slots.stall===id?'checked':''}> Stall screen</label></div></div>
+   <div class="fld"><label>Canvas shape</label><select data-sp="size">${Object.keys(DIMS).map(k=>`<option value="${k}" ${(sc.size||'screen')===k?'selected':''}>${DIMS[k][2]} (${DIMS[k][0]}×${DIMS[k][1]})</option>`).join('')}</select></div>
+   <div class="fld"><label>Shows up in the game at</label><div class="am-links">${slotsOf(id).map(k=>`<span class="lk">${esc(slotLabel(k))}<button data-am="unlink" data-v="${k}" title="Unlink">✕</button></span>`).join('')||'<span class="am-empty" style="padding:0">Not linked yet, so the game isn’t using it.</span>'}</div>
+    <div class="rng" style="margin-top:6px"><select id="am-linksel"><option value="">Link to a place…</option>${[...new Set(SLOTS.map(s=>s.group))].map(g=>`<optgroup label="${g}">${SLOTS.filter(s=>s.group===g&&AS.slots[s.id]!==id).map(s=>`<option value="${s.id}">${esc(s.label)}${AS.slots[s.id]&&AS.scenes[AS.slots[s.id]]?' (replaces another scene)':''}</option>`).join('')}</optgroup>`).join('')}</select><button class="btn sm gold" data-am="link">Link</button></div></div>
    <h3>Layers</h3><div class="lrows">${rows}</div><div class="am-props">${props}</div></div>`;
 }
-function addLayer(id,l,x,y){const sc=AS.scenes[id];const L=Object.assign({id:uid(),x:x==null?960:x,y:y==null?540:y,s:100,rot:0,op:1,flip:0,blend:'normal',show:'all',fx:'none',fxa:50,fxs:50},l);sc.layers.push(L);AS.layer=L.id;saveMeta();return L;}
-function addAssetLayer(id,assetId,x,y){const n=node(assetId);if(!n||!IMGX.test(n.ext))return;const L=addLayer(id,{kind:'img',asset:assetId,name:n.name},x,y);if(n.w>=1500){L.s=Math.round(1920/n.w*100);L.x=960;L.y=540;}amRender();}
+function addLayer(id,l,x,y){const sc=AS.scenes[id],[W,H]=dimsOf(id);const L=Object.assign({id:uid(),x:x==null?W/2:x,y:y==null?H/2:y,s:100,rot:0,op:1,flip:0,blend:'normal',show:'all',fx:'none',fxa:50,fxs:50},l);sc.layers.push(L);AS.layer=L.id;saveMeta();return L;}
+function addAssetLayer(id,assetId,x,y){const n=node(assetId);if(!n||!IMGX.test(n.ext))return;const [W,H]=dimsOf(id);const L=addLayer(id,{kind:'img',asset:assetId,name:n.name},x,y);if(n.w>=W*.78){L.s=Math.round(W/n.w*100);L.x=W/2;L.y=H/2;}amRender();}
 function curLayer(){const sc=AS.scenes[AS.scene];return sc&&sc.layers.find(l=>l.id===AS.layer);}
 
+function openLinks(){
+  const m=document.createElement('div');m.id='am-links';m.className='scrim';m.style.zIndex=300;
+  const scenes=AS.tree.filter(n=>n.type==='scene');
+  const pathOfN=n=>{const s=[];let c=n;while(c){s.unshift(c.name);c=c.parent?node(c.parent):null;}return s.join(' / ');};
+  m.innerHTML=`<div class="modal" style="width:min(760px,96vw);max-height:90vh;overflow:auto"><div class="am-t" style="font-size:26px">Game links</div><p style="color:var(--muted);font-size:13px;margin:4px 0 12px">Pick which scene the game shows in each place. Leave it on “Game default” to keep the built-in art.</p>
+  ${[...new Set(SLOTS.map(s=>s.group))].map(g=>`<h3 style="font:700 16px var(--serif);color:var(--gold);margin:14px 0 6px">${g}</h3>`+SLOTS.filter(s=>s.group===g).map(s=>`<div class="lkrow"><span>${esc(s.label)}</span><select data-lk="${s.id}"><option value="">Game default</option>${scenes.map(n=>`<option value="${n.id}" ${AS.slots[s.id]===n.id?'selected':''}>${esc(pathOfN(n))}</option>`).join('')}</select></div>`).join('')).join('')}
+  <div class="actions" style="margin-top:14px"><button class="btn gold" data-am="closelinks">Done</button></div></div>`;
+  document.body.appendChild(m);
+}
+document.addEventListener('change',e=>{const t=e.target;if(t.dataset&&t.dataset.lk){if(t.value){AS.slots[t.dataset.lk]=t.value;const sc=AS.scenes[t.value],sl=SLOTS.find(x=>x.id===t.dataset.lk);if(sc&&!sc.layers.length&&sl)sc.size=sl.size;}else delete AS.slots[t.dataset.lk];saveMeta();}});
 /* ----- events ----- */
 document.addEventListener('click',async e=>{
   const t=e.target.closest('[data-am]');if(!t||!document.getElementById('asm'))return;const a=t.dataset.am,id=t.dataset.id;
@@ -3476,12 +3517,16 @@ document.addEventListener('click',async e=>{
    case'lup':case'ldn':{e.stopPropagation();const ls=AS.scenes[AS.scene].layers,i=ls.findIndex(x=>x.id===id),j=a==='lup'?i+1:i-1;if(j>=0&&j<ls.length){[ls[i],ls[j]]=[ls[j],ls[i]];saveMeta();amRender();}break;}
    case'ldel':{const sc=AS.scenes[AS.scene];sc.layers=sc.layers.filter(l=>l.id!==AS.layer);AS.layer=null;saveMeta();amRender();break;}
    case'ldup':{const l=curLayer();if(l){const c=Object.assign({},l,{id:uid(),x:l.x+40,y:l.y+40,name:(l.name||'layer')+' copy'});AS.scenes[AS.scene].layers.push(c);AS.layer=c.id;saveMeta();amRender();}break;}
-   case'lctr':{const l=curLayer();if(l){l.x=960;l.y=540;saveMeta();amRender();}break;}
-   case'lfit':{const l=curLayer(),n=l&&l.asset&&node(l.asset);if(n&&n.w){l.s=Math.round(1920/n.w*100);l.x=960;l.y=540;saveMeta();amRender();}break;}
+   case'lctr':{const l=curLayer();if(l){const d=dimsOf(AS.scene);l.x=d[0]/2;l.y=d[1]/2;saveMeta();amRender();}break;}
+   case'lfit':{const l=curLayer(),n=l&&l.asset&&node(l.asset);if(n&&n.w){const d=dimsOf(AS.scene);l.s=Math.round(d[0]/n.w*100);l.x=d[0]/2;l.y=d[1]/2;saveMeta();amRender();}break;}
    case'addglow':addLayer(AS.scene,{kind:'glow',name:'Glow',color:'#ffd98a',size:320,blend:'screen',fx:'pulse',fxa:50,fxs:50});amRender();break;
    case'addflies':addLayer(AS.scene,{kind:'flies',name:'Fireflies',color:'#ffe9a6',count:18,fx:'none'});amRender();break;
    case'export':exportAssets();break;
    case'starter':seedStarter();break;
+   case'link':{const s=document.getElementById('am-linksel').value;if(!s)break;const sl=SLOTS.find(x=>x.id===s),sc=AS.scenes[AS.scene];if(!sc.layers.length&&sl)sc.size=sl.size;AS.slots[s]=AS.scene;saveMeta();amRender();toast('Linked to: '+slotLabel(s)+((sl&&(sc.size||'screen')!==sl.size)?' (shape differs from what that place expects)':''));break;}
+   case'unlink':delete AS.slots[t.dataset.v];saveMeta();amRender();break;
+   case'links':openLinks();break;
+   case'closelinks':{const m=document.getElementById('am-links');if(m)m.remove();amRender();break;}
    case'urlf':{const u=prompt('Paste the image link (https://…)');if(u)addUrl(u,id||AS.cur||null,null);break;}
    case'lurl':{const u=prompt('Paste the image link (https://…)\nExample: your Cloudflare R2 / custom-domain URL ending in .png');if(u){const sc=node(AS.scene);addUrl(u,sc&&sc.parent||null,AS.scene);}break;}
    case'lupload':{const sc=node(AS.scene);pick(sc&&sc.parent||null,AS.scene);break;}
@@ -3493,11 +3538,10 @@ document.addEventListener('input',e=>{
   const t=e.target;if(!document.getElementById('asm'))return;
   if(t.dataset.lp){const l=curLayer();if(!l)return;const p=t.dataset.lp;let v=t.value;if(['x','y','s','rot','op','fxa','fxs','size'].includes(p))v=parseFloat(v)||0;if(p==='flip')v=v==='1'?1:0;l[p]=v;
     document.querySelectorAll(`[data-lp="${p}"]`).forEach(o=>{if(o!==t)o.value=v;});stageRefresh();saveSoon();if(p==='fx'||p==='name'){if(t.tagName==='SELECT')amRender();}}
-  else if(t.dataset.sp){AS.scenes[AS.scene][t.dataset.sp]=t.value;stageRefresh();saveSoon();}
+  else if(t.dataset.sp){AS.scenes[AS.scene][t.dataset.sp]=t.value;if(t.dataset.sp==='size'){amRender();}else stageRefresh();saveSoon();}
 });
 document.addEventListener('change',e=>{const t=e.target;if(!document.getElementById('asm'))return;
-  if(t.dataset.slot){const on=t.checked;if(on)AS.slots[t.dataset.slot]=AS.scene;else if(AS.slots[t.dataset.slot]===AS.scene)delete AS.slots[t.dataset.slot];saveMeta();toast(on?'Bound to the '+t.dataset.slot+' screen':'Unbound');}
-  if(t.dataset.lp&&t.tagName==='INPUT'&&t.type==='text')amRender();});
+    if(t.dataset.lp&&t.tagName==='INPUT'&&t.type==='text')amRender();});
 /* drag & drop: move in tree, or onto stage, or upload from desktop */
 let dragId=null;
 document.addEventListener('dragstart',e=>{const r=e.target.closest&&e.target.closest('.tr[data-id]');if(r&&document.getElementById('asm')&&r.dataset.id){dragId=r.dataset.id;e.dataTransfer.setData('text/nm',dragId);e.dataTransfer.effectAllowed='move';}});
