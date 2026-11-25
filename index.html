@@ -2389,6 +2389,7 @@ async function fbInit(){
   try{
     const base='https://www.gstatic.com/firebasejs/10.14.1/';
     const [A,DB,AU]=await Promise.all([import(base+'firebase-app.js'),import(base+'firebase-database.js'),import(base+'firebase-auth.js')]);
+    try{DB.forceLongPolling();}catch(e){}
     const app=A.initializeApp(FBCFG);
     FB.DB=DB;FB.AU=AU;FB.db=DB.getDatabase(app);FB.auth=AU.getAuth(app);FB.ref=DB.ref(FB.db,'gamebook');
     AU.onAuthStateChanged(FB.auth,u=>{FB.user=u;if(!u&&UI.edit)UI.edit=false;if(u&&FB.state==='live')push();render(true);});
@@ -3382,7 +3383,7 @@ async function addFiles(files,parent,sceneId){
     const id=uid();let w=0,h=0;const url=URL.createObjectURL(f);
     if(IMGX.test(ext)){try{const im=new Image();im.src=url;await im.decode();w=im.naturalWidth;h=im.naturalHeight;}catch(e){}}
     await dbPut('files',id,f);mark(id);AS.urls[id]=url;AS.tree.push({id,type:'asset',name:f.name.replace(/\.[^.]+$/,''),ext,parent:parent||null,order:nextOrder(parent),size:f.size,w,h});if(parent)AS.open.add(parent);if(sceneId){AS.sel=null;AS.scene=sceneId;addAssetLayer(sceneId,id);}else{AS.sel=id;AS.scene=null;}n++;}
-  if(n){await saveMeta();toast(n+' added');}amRender();
+  if(n){autoLinkItems();await saveMeta();toast(n+' added');}amRender();
 }
 async function addUrl(url,parent,sceneId){
   url=(url||'').trim();if(!url)return;
@@ -3416,7 +3417,7 @@ function layerHtml(L,phase,editing){
 window.addEventListener('resize',()=>fitEdit());
 
 /* ----- composer UI ----- */
-async function mount(host){host.innerHTML='<div id="asm"><p class="am-empty">Loading your library…</p></div>';if(!AS.ready){try{await assetsLoad();}catch(e){}}amRender();syncDown();}
+async function mount(host){host.innerHTML='<div id="asm"><p class="am-empty">Loading your library…</p></div>';if(!AS.ready){try{await assetsLoad();}catch(e){}}try{autoLinkItems();}catch(e){}amRender();syncDown();}
 const usedInScene=aid=>Object.values(AS.scenes).some(sc=>sc.layers.some(l=>l.asset===aid));
 const vis=n=>n.type!=='asset'||AS.showUsed||!usedInScene(n.id);
 const visKids=p=>kids(p).filter(vis);
@@ -3603,6 +3604,11 @@ async function itLink(d,url){
   const ext=((url.split('?')[0].match(/\.(png|jpe?g|webp|gif|svg|avif)$/i)||[])[1]||'png').toLowerCase(),id=uid(),par=ensureFolder(d.folder||['Items'].concat(d.grp));
   AS.urls[id]=url;AS.tree.push({id,type:'asset',name:d.fname||d.label,ext,parent:par,order:nextOrder(par),size:0,w,h,url});
   itSet(d.key,id);toast('Linked art for '+d.label);
+}
+function autoLinkItems(){
+  let n=0;const keys=new Set(itDefs().map(d=>d.key));
+  AS.tree.forEach(a=>{if(a.type!=='asset'||!IMGX.test(a.ext))return;const k='x_'+slug(a.name);if(keys.has(k)&&!AS.slots['item_'+k]){AS.slots['item_'+k]=a.id;n++;}});
+  if(n){saveMeta();}return n;
 }
 function itRows(){
   const q=IT.q.toLowerCase(),defs=itDefs().filter(d=>!q||(d.label+' '+d.grp.join(' ')+' '+d.sub).toLowerCase().includes(q));
