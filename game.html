@@ -2571,15 +2571,14 @@ function forage(){ // temporary until the real foraging round
   else{const pool=D.gathers.filter(g=>g.source==='Gather'&&g.zone!=='Reward');const got=[];for(let i=0;i<4;i++){const g=rnd(pool);addItem(g.name,1);got.push(g.name);}toast('Foraged: '+got.join(', '));}
   save();render();
 }
-function visitWren(){
-  if(flag('gathered')&&!flag('wren_gave'))playScene('wren_bring',()=>render());else if(flag('wren_gave'))renderWrenShop();else playScene('wren_chat',()=>render());
-}
+function visitWren(){renderWrenShop();}
+function wrenTalk(){closeModal();if(flag('gathered')&&!flag('wren_gave'))playScene('wren_bring',()=>render());else playScene('wren_chat',()=>render());}
 const WREN_PRICE={Common:3,Uncommon:8,Rare:20};
 function wrenStock(){return D.gathers.filter(g=>/Trade with Wren|Buy or trade|Scavenge/.test(g.source)).sort((a,b)=>(WREN_PRICE[a.rarity]||3)-(WREN_PRICE[b.rarity]||3));}
 function renderWrenShop(msg){
   openModal(`${X}<div class="eyebrow">Wren, Stall Thirteen</div><h2>Wren's table</h2><div class="note" style="margin:6px 0 12px">${esc(msg||'Market scraps and small things. Coins on the table, take what you need.')}</div>
    <div class="grid">${wrenStock().map(g=>{const pr=WREN_PRICE[g.rarity]||3;return `<div class="rcard"><h4>${esc(g.name)}</h4><p>${esc(g.rarity)} · you have ${haveCount(g.name)}</p><div class="actions"><button class="btn gold sm" data-g="wrenbuy" data-n="${esc(g.name)}" ${S.coins<pr?'disabled':''}>Buy · ${pr} coins</button></div></div>`;}).join('')}</div>
-   <div class="actions" style="margin-top:14px"><span class="lbl">Coins <b>${S.coins}</b></span><span style="flex:1"></span><button class="btn sm" data-g="wrentalk">Just talk</button></div>`);
+   <div class="actions" style="margin-top:14px"><span class="lbl">Coins <b>${S.coins}</b></span><span style="flex:1"></span><button class="btn sm ${flag('gathered')&&!flag('wren_gave')?'gold':''}" data-g="wrentalk">${flag('gathered')&&!flag('wren_gave')?'Show her what you gathered':'Just talk'}</button></div>`);
 }
 
 /* ---------- render ---------- */
@@ -2711,7 +2710,7 @@ document.addEventListener('click',e=>{
     case'atab':almTab=t.dataset.v;renderAlmanac();break;
     case'wren':visitWren();break;
     case'wrenbuy':{const g=D.gathers.find(x=>x.name===t.dataset.n),pr=g&&(WREN_PRICE[g.rarity]||3);if(g&&S.coins>=pr){S.coins-=pr;addItem(g.name,1,'Proper');save();render();renderWrenShop('Bought '+g.name+'.');}break;}
-    case'wrentalk':closeModal();playScene('wren_chat',()=>render());break;
+    case'wrentalk':wrenTalk();break;
     case'settings':renderSettings();break;
     case'mode':S.mode=t.dataset.v;save();renderSettings();break;
     case'newgame':if(confirm('Delete your save and start over?')){localStorage.removeItem(SAVE_KEY);S=DEFAULT();closeModal();render();}break;
@@ -3494,7 +3493,7 @@ async function assetsLoad(){
   // fetch what the title and stall screens need first, the rest quietly in the background
   const need=new Set();['title','stall'].forEach(k=>{const sc=AS.scenes[AS.slots[k]];if(sc)sc.layers.forEach(l=>{if(l.asset)need.add(l.asset);});});
   AS.tree.forEach(n=>{if(n.type==='asset'&&n.url)AS.urls[n.id]=n.url;});
-  const missing=AS.tree.filter(n=>n.type==='asset'&&!AS.urls[n.id]);
+  const missing=AS.tree.filter(n=>n.type==='asset'&&!n.ph&&!AS.urls[n.id]);
   const first=missing.filter(n=>need.has(n.id)),rest=missing.filter(n=>!need.has(n.id));
   await Promise.all(first.map(fetchAssetFile));
   (async()=>{for(const n of rest)await fetchAssetFile(n);})();
