@@ -3186,8 +3186,9 @@ async function syncDown(){
       Object.keys(oldS||{}).forEach(k=>{if(AS.slots[k]==null||AS.slots[k]==='')AS.slots[k]=oldS[k];});
       AS.rev=v.rev;AS.cloudRev=v.rev;try{await dbPut('meta','state',stateObj());}catch(e){}amRender();}
     if(!v&&!AS.tree.length&&!AS.rev){seedStarter(true);}
-    const miss=[];for(const n of AS.tree)if(n.type==='asset'){if(n.url){AS.urls[n.id]=n.url;continue;}let have=null;try{have=await dbGet('files',n.id);}catch(e){}if(!have)miss.push(n);}
+    const miss=[];for(const n of AS.tree)if(n.type==='asset'&&!n.ph){if(n.url){AS.urls[n.id]=n.url;continue;}let have=null;try{have=await dbGet('files',n.id);}catch(e){}if(!have)miss.push(n);}
     let k=0;for(const n of miss){cstat('Downloading from the cloud… '+(++k)+'/'+miss.length);const o=await rget('assetfiles/'+n.id);if(o&&o.d){const b=unb64(o.d,o.e||n.ext);try{await dbPut('files',n.id,b);}catch(e){}AS.urls[n.id]=URL.createObjectURL(b);}}
+    if(AS.slots.__ph!=='1'&&(AS.tree.length||v)){AS.slots.__ph='1';phSeed();saveMeta();}
     if(cloudOn()&&(AS.rev>(AS.cloudRev||0)||AS.pending.length||AS.removed.length))await syncUp();
     else cstat(cloudOn()?'Saved to the cloud ✓':'Loaded from the cloud ✓');
     amRender();
@@ -3442,7 +3443,7 @@ function trRows(pid,depth){
     const pad=10+depth*16,sel=(AS.sel===n.id||AS.scene===n.id)?'on':'';
     if(n.type==='folder'){const op=AS.open.has(n.id),cur=AS.cur===n.id;return `<div class="tr f ${cur?'cur':''}" draggable="true" data-id="${n.id}" data-am="fsel" style="padding-left:${pad}px"><b class="car" data-am="tog" data-id="${n.id}">${op?'▾':'▸'}</b><span class="nm">${esc(n.name)}</span><span class="cnt">${visKids(n.id).length}</span></div>`+(op?trRows(n.id,depth+1):'');}
     if(n.type==='scene')return `<div class="tr s ${sel}" draggable="true" data-id="${n.id}" data-am="scene" style="padding-left:${pad+16}px"><i class="ico">▣</i><span class="nm">${esc(n.name)}</span><span class="tag">scene</span></div>`;
-    const u=AS.urls[n.id];return `<div class="tr a ${sel}" draggable="true" data-id="${n.id}" data-am="asset" style="padding-left:${pad+16}px">${IMGX.test(n.ext)&&u?`<img src="${u}" class="th">`:`<i class="ico">${MODX.test(n.ext)?'◆':'♪'}</i>`}<span class="nm">${esc(n.name)}</span><span class="tag">${esc(n.ext)}</span></div>`;
+    const u=AS.urls[n.id];return `<div class="tr a ${sel}" draggable="true" data-id="${n.id}" data-am="asset" style="padding-left:${pad+16}px">${IMGX.test(n.ext)&&u?`<img src="${u}" class="th">`:`<i class="ico">${n.ph?'◌':MODX.test(n.ext)?'◆':'♪'}</i>`}<span class="nm">${esc(n.name)}</span><span class="tag">${n.ph?'placeholder':esc(n.ext)}</span></div>`;
   }).join('');
 }
 function amRender(){
@@ -3452,7 +3453,7 @@ function amRender(){
   const sc=AS.scene&&AS.scenes[AS.scene]?AS.scene:null,as=AS.sel&&node(AS.sel)?node(AS.sel):null;
   const cn=AS.cur&&node(AS.cur),inName=cn?cn.name:'All files';
   a.innerHTML=`<div class="am-top"><b class="am-t">Assets &amp; Scenes</b><span class="am-sp"></span>
-   <button class="btn sm" data-am="starter">Starter folders</button><button class="btn gold sm" data-am="links">Game links</button><button class="btn gold sm" data-am="items">Item art</button><button class="btn gold sm" data-am="needs">What to make</button>
+   <button class="btn sm" data-am="starter">Starter folders</button><button class="btn gold sm" data-am="links">Game links</button><button class="btn gold sm" data-am="items">Item art</button><button class="btn gold sm" data-am="needs">What to make</button><button class="btn sm" data-am="phseed">Add placeholders</button>
    <span class="am-sp"></span>${cloudOn()?'':'<button class="btn gold sm" data-am="ccheck">Cloud not connected: check why</button>'}<span id="am-cloud" class="am-cloud">${esc(_cs.msg)}</span><button class="btn sm" data-am="sync">Sync</button><button class="btn sm" data-am="ccheck">Cloud check</button><button class="btn sm" data-am="export">Backup .zip</button></div>
   <div class="am-body"><div class="am-tree" id="am-tree"><div class="am-tools"><div class="am-in">In: <b>${esc(inName)}</b> <label style="margin-left:8px;cursor:pointer"><input type="checkbox" data-showused ${AS.showUsed?'checked':''}> show images used in scenes</label></div><div class="am-tb"><button data-am="newf" data-id="${AS.cur||''}">+ folder</button><button data-am="newsc" data-id="${AS.cur||''}">+ scene</button><button data-am="up" data-id="${AS.cur||''}">upload</button><button data-am="urlf" data-id="${AS.cur||''}">from URL</button><button data-am="ren" data-id="${AS.cur||''}" ${cn?'':'disabled'}>rename</button><button data-am="del" data-id="${AS.cur||''}" class="dn" ${cn?'':'disabled'}>delete</button></div></div>
    <div class="am-list" id="am-list"><div class="tr root ${AS.cur?'':'cur'}" data-id="" data-am="fsel">All files <span class="cnt">${AS.tree.filter(n=>n.type==='asset'&&vis(n)).length}</span></div>${trRows(null,0)||'<p class="am-empty">Nothing here yet. Press Starter folders, or make a folder and upload into it. Drag anything onto a folder to move it.</p>'}</div></div>
@@ -3466,6 +3467,9 @@ function amRender(){
 function amHelp(){return `<div class="am-p"><h3>How this works</h3><p>Folders are your chapters and sections. Nest them as deep as you like. Drag to reorder or move.</p><p>Press <b>Starter folders</b> any time to add the full set of chapters and sections (it never duplicates or overwrites).</p><p><b>Scenes</b> are screens you build by stacking assets as layers (background, stall, lantern, glow…). Bind a scene to “Title” or “Stall” and the game shows it.</p><p>Everything is saved in this browser. <b>Export for GitHub</b> gives you a zip with an <code>assets</code> folder to put next to your index.html so players see it too.</p></div>`;}
 function amPreview(n){const u=AS.urls[n.id];return `<div class="am-prev">${IMGX.test(n.ext)&&u?`<img src="${u}" style="max-width:100%;max-height:100%;object-fit:contain;background:repeating-conic-gradient(#2a2038 0 25%,#1c1428 0 50%) 0 0/24px 24px">`:`<div class="am-empty big">${MODX.test(n.ext)?'3D model (shown in the 3D version later)':'Audio file'}<br>${esc(n.name)}.${esc(n.ext)}</div>`}</div>`;}
 function amInfo(n){
+  if(n.ph)return `<div class="am-p"><h3>${esc(n.name)}</h3><div class="note" style="font-size:12.5px;color:#f0c674">PLACEHOLDER</div>
+   <p class="note" style="font-size:13px;margin:8px 0">${n.phScene?'The game draws its own stand-in for this screen or portrait until you add art. It is already linked. Add an image here and I build the scene for you.':'The game shows its own stand-in (or nothing) for this item until you add art. It is already linked. Add an image here and the game uses it straight away.'}</p>
+   <div class="am-btns"><button class="btn gold sm" data-am="repl">Upload image</button><button class="btn gold sm" data-am="phurl">Image from URL</button><button class="btn sm" data-am="rename-asset">Rename</button><button class="btn sm danger" data-am="del" data-id="${n.id}">Delete</button></div></div>`;
   return `<div class="am-p"><h3>${esc(n.name)}</h3><div class="note" style="font-size:12.5px">${kindOf(n.ext)} · .${esc(n.ext)} · ${n.url?'linked from a URL':fmtSz(n.size||0)}${n.w?' · '+n.w+'×'+n.h+' px':''}</div>
   <div class="fld"><label>Name</label><input data-ai="name" value="${esc(n.name)}"></div>
   ${IMGX.test(n.ext)?`<div class="fld"><label>Size in the game (%)</label><input type="number" data-assetsz="${n.id}" value="${AS.slots['assetsz_'+n.id]||100}" min="10" max="500" step="5"><div class="note" style="font-size:12px;margin-top:4px">100 = normal. On a character’s <b>…_portrait_full</b> file (for example azlynn_portrait_full), this sizes <b>all of that character’s sprites</b> in the game.</div></div><div class="fld"><label>Walking speed in the game (%)</label><input type="number" data-assetspd="${n.id}" value="${AS.slots['assetspd_'+n.id]||100}" min="20" max="400" step="5"><div class="note" style="font-size:12px;margin-top:4px">100 = normal. Also goes on the character’s <b>…_portrait_full</b> file.</div></div>`:''}${n.url?`<div class="fld"><label>Link</label><input readonly value="${esc(n.url)}" onclick="this.select()"></div>`:''}
@@ -3571,6 +3575,24 @@ function openNeeds(){
   document.getElementById('it-file').addEventListener('change',e=>{const f=e.target.files[0],d=IT.target&&itDefs().find(x=>x.key===IT.target);e.target.value='';if(f&&d)itFile(d,f);});
   m.addEventListener('toggle',e=>{if(e.target.dataset&&e.target.dataset.ndid&&e.target.open)AS.ndOpen=e.target.dataset.ndid;},true);
 }
+const PH_CUST=['Characters','Customers','Regulars'];
+function phDefs(){const o=[];
+  itDefs().forEach(d=>{let folder=d.folder||['Items'].concat(d.grp);if(d.grp[0]==='Customers (portraits)')folder=PH_CUST;o.push({t:'item',key:d.key,name:d.fname||d.label,folder});});
+  SLOTS.filter(s=>NEEDS[s.id]).forEach(s=>o.push({t:'scene',slot:s.id,name:s.label.replace(/ \(.*\)$/,'').replace(/^Story background: /,'Background: '),folder:NEEDS[s.id].f}));
+  return o;}
+function phSeed(){let n=0;const have=new Set(AS.tree.filter(x=>x.ph).map(x=>x.phScene||x.phKey));
+  phDefs().forEach(d=>{
+    if(d.t==='item'){if(AS.slots['item_'+d.key]||have.has(d.key))return;}else{if(AS.slots[d.slot]||have.has(d.slot))return;}
+    const par=ensureFolder(d.folder),nd={id:uid(),type:'asset',ph:1,name:d.name,ext:'png',parent:par,order:nextOrder(par),size:0};
+    if(d.t==='item'){nd.phKey=d.key;AS.slots['item_'+d.key]=nd.id;}else nd.phScene=d.slot;
+    AS.tree.push(nd);n++;});
+  return n;}
+function phMakeScene(n){const sl=SLOTS.find(x=>x.id===n.phScene);if(!sl)return;const dm=DIMS[sl.size||'screen']||DIMS.screen,W=dm[0],H=dm[1];
+  const cover=!/^char_/.test(n.phScene),k=n.w&&n.h?(cover?Math.max(W/n.w,H/n.h):Math.min(W/n.w,H/n.h)):1;
+  const sid=uid();AS.tree.push({id:sid,type:'scene',name:n.name,parent:n.parent,order:nextOrder(n.parent)});
+  AS.scenes[sid]={bg:'#0e0916',size:sl.size,layers:[{id:uid(),x:W/2,y:H/2,s:Math.round(k*100),rot:0,op:1,flip:0,blend:'normal',show:'all',fx:'none',fxa:50,fxs:50,kind:'img',asset:n.id,name:n.name}]};
+  AS.slots[n.phScene]=sid;delete n.phScene;}
+async function phDone(n){delete n.ph;if(n.phScene)phMakeScene(n);delete n.phKey;saveMeta();amRender();toast('Placeholder replaced');}
 function ndMake(slot){
   const N=NEEDS[slot],sl=SLOTS.find(x=>x.id===slot);if(!N||!sl||AS.slots[slot])return;
   const par=ensureFolder(N.f),n={id:uid(),type:'scene',name:sl.label.replace(/ \(.*\)$/,'').replace(/^Story background: /,''),parent:par,order:nextOrder(par)};
@@ -3784,7 +3806,9 @@ document.addEventListener('click',async e=>{
    case'ren':{const n=node(id),nm=prompt('Rename',n.name);if(nm){n.name=nm;saveMeta();amRender();}break;}
    case'del':{const n=node(id);if(n&&confirm('Delete “'+n.name+'”'+(n.type==='folder'?' and everything inside it':'')+'?')){delNode(id);saveMeta();amRender();}break;}
    case'rename-asset':{const n=node(AS.sel),v=document.querySelector('[data-ai=name]').value.trim();if(n&&v){n.name=v;saveMeta();amRender();}break;}
-   case'repl':{const f=document.getElementById('am-file');f.onchange=async()=>{const fl=f.files[0];if(!fl)return;const n=node(AS.sel);await dbPut('files',n.id,fl);mark(n.id);delete n.url;AS.urls[n.id]=URL.createObjectURL(fl);n.size=fl.size;n.ext=(fl.name.split('.').pop()||n.ext).toLowerCase();try{const im=new Image();im.src=AS.urls[n.id];await im.decode();n.w=im.naturalWidth;n.h=im.naturalHeight;}catch(x){}saveMeta();amRender();f.value='';};f.click();break;}
+   case'repl':{const f=document.getElementById('am-file');f.onchange=async()=>{const fl=f.files[0];if(!fl)return;const n=node(AS.sel);await dbPut('files',n.id,fl);mark(n.id);delete n.url;AS.urls[n.id]=URL.createObjectURL(fl);n.size=fl.size;n.ext=(fl.name.split('.').pop()||n.ext).toLowerCase();try{const im=new Image();im.src=AS.urls[n.id];await im.decode();n.w=im.naturalWidth;n.h=im.naturalHeight;}catch(x){}if(n.ph){await phDone(n);}else{saveMeta();amRender();}f.value='';};f.click();break;}
+   case'phurl':{const n=node(AS.sel),u=prompt('Paste the image link (https://…)');if(!u||!/^https?:\/\//i.test(u))break;try{const im=new Image();im.src=u.trim();await im.decode();n.w=im.naturalWidth;n.h=im.naturalHeight;}catch(x){toast('Could not load that image. It must be a direct, public image link.');break;}n.url=u.trim();AS.urls[n.id]=n.url;n.ext=((n.url.split('?')[0].match(/\.(png|jpe?g|webp|gif|svg|avif)$/i)||[])[1]||'png').toLowerCase();await phDone(n);break;}
+   case'phseed':{const k=phSeed();saveMeta();amRender();toast(k?'Added '+k+' placeholders in their folders':'Every placeholder is already in place');break;}
    case'dl':{const n=node(AS.sel),l=document.createElement('a');l.href=AS.urls[n.id];l.download=n.name+'.'+n.ext;l.click();break;}
    case'cut':openCutout();break;
    case'ph':AS.phase=t.dataset.v;amRender();break;
