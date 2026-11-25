@@ -3038,13 +3038,14 @@ async function fetchAssetFile(n){try{const o=await jget('assetfiles/'+n.id,20000
 async function assetsLoad(){
   let st=null;
   try{st=await dbGet('meta','state');if(st){AS.tree=st.tree||[];AS.scenes=st.scenes||{};AS.slots=st.slots||{};AS.rev=st.rev||0;}
-    for(const n of AS.tree)if(n.type==='asset'){const b=await dbGet('files',n.id);if(b)AS.urls[n.id]=URL.createObjectURL(b);}}catch(e){}
+    for(const n of AS.tree)if(n.type==='asset'){if(n.url){AS.urls[n.id]=n.url;continue;}const b=await dbGet('files',n.id);if(b)AS.urls[n.id]=URL.createObjectURL(b);}}catch(e){}
   // newest copy lives in the cloud (saved from the Game Book's Assets tab)
   const cl=await jget('assetmeta',6000);
   if(cl&&cl.json&&(cl.rev||0)>(AS.rev||0)){try{const m=JSON.parse(cl.json);AS.tree=m.tree||[];AS.scenes=m.scenes||{};AS.slots=m.slots||{};AS.rev=cl.rev;
     await dbPut('meta','state',Object.assign({},st||{},{tree:AS.tree,scenes:AS.scenes,slots:AS.slots,rev:cl.rev,cloudRev:cl.rev}));}catch(e){}}
   // fetch what the title and stall screens need first, the rest quietly in the background
   const need=new Set();['title','stall'].forEach(k=>{const sc=AS.scenes[AS.slots[k]];if(sc)sc.layers.forEach(l=>{if(l.asset)need.add(l.asset);});});
+  AS.tree.forEach(n=>{if(n.type==='asset'&&n.url)AS.urls[n.id]=n.url;});
   const missing=AS.tree.filter(n=>n.type==='asset'&&!AS.urls[n.id]);
   const first=missing.filter(n=>need.has(n.id)),rest=missing.filter(n=>!need.has(n.id));
   await Promise.all(first.map(fetchAssetFile));
