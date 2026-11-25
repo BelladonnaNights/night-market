@@ -2969,7 +2969,7 @@ function heroSprite(P,t){
   else{f=chain(d);if(!f.length){const h=hz();f=h.f;fl=h.fl;}}
   if(!f.length&&!idle)return null;
   let img,key;if(P.moving&&f.length){const o=f[((Math.floor(Math.max(0,t)*(P.run?12:8))%f.length)+f.length)%f.length];img=o.b;key=o.k;}else if(idle){img=idle;key='x_azlynn_idle';fl=P.face<0;}else{img=f[0].b;key=f[0].k;}
-  const sc=AS.slots['itemsz_'+key]!=null?itemScale(key):itemScale('x_azlynn_idle');
+  const cs=charScale('azlynn'),sc=cs!=null?cs:(AS.slots['itemsz_'+key]!=null?itemScale(key):itemScale('x_azlynn_idle'));
   return {img,fl,sc};
 }
 function drawHero(c,x,y,P,t){
@@ -3072,7 +3072,7 @@ function zTick(now){
   // hud
   const h=$('#zhint'),f=$('#zfound');
   if(h){if(near&&!MG){h.style.display='block';h.textContent='E · Gather '+near.name;}else h.style.display='none';}
-  if(f){const left=Z.nodes.filter(n=>!n.done).length;f.textContent=Z.got.length?('Gathered: '+Z.got.join(', ')+' · '+left+' glowing left'):'WASD to walk · Shift to run · E or click to gather · '+left+' glowing things nearby';}
+  if(f){const left=Z.nodes.filter(n=>!n.done).length;f.textContent=Z.got.length?('Gathered: '+Z.got.join(', ')+' · '+left+' glowing left'):'WASD to walk · Shift to run · E or click to gather · '+left+' glowing things nearby';if(/debug/.test(location.search)){const hs=heroSprite(P,t);f.textContent+=' | DEBUG sprite='+(hs?'yes':'NO')+' idleImg='+(itemUrl('x_azlynn_idle')?'yes':'NO')+' size='+(charScale('azlynn')==null?'unset':Math.round(charScale('azlynn')*100)+'%')+' assets='+AS.tree.length+' slots='+Object.keys(AS.slots).length+' cloudRev='+AS.rev;}}
 }
 
 /* ===== asset library + scene composer ===== */
@@ -3158,6 +3158,7 @@ function itemUrl(id){const a=id&&AS.slots['item_'+id];return (a&&AS.urls[a])||nu
 function itemImg(e,cls){const u=e&&itemUrl(e.id);return u?`<img class="iart ${cls||''}" src="${esc(u)}" alt="" draggable="false">`:'';}
 const _ib={};
 function itemBmp(id){const u=itemUrl(id);if(!u)return null;let o=_ib[u];if(!o){o=_ib[u]=new Image();o.src=u;}return o.complete&&o.naturalWidth?o:null;}
+function charScale(ch){const n=AS.tree.find(x=>x.type==='asset'&&x.name===ch+'_portrait_full'),v=n&&parseFloat(AS.slots['assetsz_'+n.id]);return v>0?v/100:null;}
 function itemScale(id){const v=parseFloat(AS.slots['itemsz_'+id]);return v>0?v/100:1;}
 function preloadItems(ids){return Promise.all(ids.map(id=>{const u=itemUrl(id);if(!u)return null;let o=_ib[u];if(!o){o=_ib[u]=new Image();o.src=u;}return o.complete?null:new Promise(r=>{o.addEventListener('load',r);o.addEventListener('error',r);});}));}
 function slotScene(name){const id=AS.slots[name];return id&&AS.scenes[id]&&AS.scenes[id].layers.length?id:null;}
