@@ -3143,7 +3143,7 @@ async function syncDown(){
   try{const v=(await f.DB.get(f.DB.ref(f.db,'assetmeta'))).val();
     if(v&&v.json&&(v.rev||0)>(AS.cloudRev||0)&&(v.rev||0)>=(AS.rev||0)){const m=JSON.parse(v.json);AS.tree=m.tree||[];AS.scenes=m.scenes||{};AS.slots=m.slots||{};AS.rev=v.rev;AS.cloudRev=v.rev;await dbPut('meta','state',stateObj());}
     if(!v&&!AS.tree.length&&!AS.rev){seedStarter(true);}
-    const miss=[];for(const n of AS.tree)if(n.type==='asset'&&!(await dbGet('files',n.id)))miss.push(n);
+    const miss=[];for(const n of AS.tree)if(n.type==='asset'){if(n.url){AS.urls[n.id]=n.url;continue;}if(!(await dbGet('files',n.id)))miss.push(n);}
     let k=0;for(const n of miss){cstat('Downloading from the cloud… '+(++k)+'/'+miss.length);const o=(await f.DB.get(f.DB.ref(f.db,'assetfiles/'+n.id))).val();if(o&&o.d){const b=unb64(o.d,o.e||n.ext);await dbPut('files',n.id,b);AS.urls[n.id]=URL.createObjectURL(b);}}
     if(cloudOn()&&(AS.rev>(AS.cloudRev||0)||AS.pending.length||AS.removed.length))await syncUp();
     else cstat(cloudOn()?'Saved to the cloud ✓':'Showing the cloud copy. Turn on Edit mode and sign in to save changes.');
@@ -3152,7 +3152,7 @@ async function syncDown(){
 }
 async function assetsLoad(){
   try{const st=await dbGet('meta','state');if(st){AS.tree=st.tree||[];AS.scenes=st.scenes||{};AS.slots=st.slots||{};AS.rev=st.rev||0;AS.cloudRev=st.cloudRev||0;AS.pending=st.pending||[];AS.removed=st.removed||[];}
-    for(const n of AS.tree)if(n.type==='asset'){const b=await dbGet('files',n.id);if(b)AS.urls[n.id]=URL.createObjectURL(b);}}catch(e){}
+    for(const n of AS.tree)if(n.type==='asset'){if(n.url){AS.urls[n.id]=n.url;continue;}const b=await dbGet('files',n.id);if(b)AS.urls[n.id]=URL.createObjectURL(b);}}catch(e){}
   if(!AS.tree.length){try{const r=await fetch('assets/manifest.json',{cache:'no-cache'});if(r.ok){const m=await r.json();AS.tree=m.tree||[];AS.scenes=m.scenes||{};AS.slots=m.slots||{};AS.remote=true;
     for(const n of AS.tree)if(n.type==='asset'){AS.urls[n.id]='assets/'+n.path;if(ADMIN){try{const f=await fetch('assets/'+n.path);if(f.ok){const b=await f.blob();await dbPut('files',n.id,b);AS.urls[n.id]=URL.createObjectURL(b);}}catch(e){}}}
     if(ADMIN)await saveMeta();}}catch(e){}}
@@ -3350,13 +3350,24 @@ function delNode(id){
   if(n.type==='scene'){delete AS.scenes[id];for(const k in AS.slots)if(AS.slots[k]===id)delete AS.slots[k];if(AS.scene===id)AS.scene=null;}
   AS.tree=AS.tree.filter(x=>x.id!==id);if(AS.sel===id)AS.sel=null;
 }
-async function addFiles(files,parent){
+async function addFiles(files,parent,sceneId){
   let n=0;for(const f of files){const ext=(f.name.split('.').pop()||'').toLowerCase();
     if(!(IMGX.test(ext)||MODX.test(ext)||AUDX.test(ext))){toast('Skipped '+f.name+' (unsupported type)');continue;}
     const id=uid();let w=0,h=0;const url=URL.createObjectURL(f);
     if(IMGX.test(ext)){try{const im=new Image();im.src=url;await im.decode();w=im.naturalWidth;h=im.naturalHeight;}catch(e){}}
-    await dbPut('files',id,f);mark(id);AS.urls[id]=url;AS.tree.push({id,type:'asset',name:f.name.replace(/\.[^.]+$/,''),ext,parent:parent||null,order:nextOrder(parent),size:f.size,w,h});if(parent)AS.open.add(parent);AS.sel=id;AS.scene=null;n++;}
+    await dbPut('files',id,f);mark(id);AS.urls[id]=url;AS.tree.push({id,type:'asset',name:f.name.replace(/\.[^.]+$/,''),ext,parent:parent||null,order:nextOrder(parent),size:f.size,w,h});if(parent)AS.open.add(parent);if(sceneId){AS.sel=null;AS.scene=sceneId;addAssetLayer(sceneId,id);}else{AS.sel=id;AS.scene=null;}n++;}
   if(n){await saveMeta();toast(n+' added');}amRender();
+}
+async function addUrl(url,parent,sceneId){
+  url=(url||'').trim();if(!url)return;
+  if(!/^https?:\/\//i.test(url)){toast('That needs to start with https://');return;}
+  let name=decodeURIComponent((url.split('?')[0].split('#')[0].split('/').pop()||'image')).replace(/\.[^.]+$/,'')||'image';
+  const ext=((url.split('?')[0].match(/\.(png|jpe?g|webp|gif|svg|avif)$/i)||[])[1]||'png').toLowerCase();
+  let w=0,h=0;toast('Checking the link…');
+  try{const im=new Image();im.src=url;await im.decode();w=im.naturalWidth;h=im.naturalHeight;}catch(e){toast('Could not load that image. It must be a direct, public image link.');return;}
+  const id=uid();AS.urls[id]=url;AS.tree.push({id,type:'asset',name,ext,parent:parent||null,order:nextOrder(parent),size:0,w,h,url});if(parent)AS.open.add(parent);
+  if(sceneId){AS.sel=null;AS.scene=sceneId;addAssetLayer(sceneId,id);}else{AS.sel=id;AS.scene=null;}
+  await saveMeta();toast('Linked “'+name+'”');amRender();
 }
 const kindOf=ext=>IMGX.test(ext)?'image':MODX.test(ext)?'3D model':'audio';
 const fmtSz=b=>b>1e6?(b/1e6).toFixed(1)+' MB':Math.round(b/1e3)+' KB';
@@ -3383,7 +3394,7 @@ async function mount(host){host.innerHTML='<div id="asm"><p class="am-empty">Loa
 function trRows(pid,depth){
   return kids(pid).map(n=>{
     const pad=10+depth*16,sel=(AS.sel===n.id||AS.scene===n.id)?'on':'';
-    if(n.type==='folder'){const op=AS.open.has(n.id),cur=AS.cur===n.id;return `<div class="tr f ${cur?'cur':''}" draggable="true" data-id="${n.id}" data-am="fsel" style="padding-left:${pad}px"><b class="car" data-am="tog" data-id="${n.id}">${op?'▾':'▸'}</b><span class="nm">${esc(n.name)}</span><span class="cnt">${kids(n.id).length}</span></div>`+(cur?`<div class="tact2" style="padding-left:${pad+20}px"><button data-am="newf" data-id="${n.id}">+ folder</button><button data-am="newsc" data-id="${n.id}">+ scene</button><button data-am="up" data-id="${n.id}">upload</button><button data-am="ren" data-id="${n.id}">rename</button><button data-am="del" data-id="${n.id}">delete</button></div>`:'')+(op?trRows(n.id,depth+1):'');}
+    if(n.type==='folder'){const op=AS.open.has(n.id),cur=AS.cur===n.id;return `<div class="tr f ${cur?'cur':''}" draggable="true" data-id="${n.id}" data-am="fsel" style="padding-left:${pad}px"><b class="car" data-am="tog" data-id="${n.id}">${op?'▾':'▸'}</b><span class="nm">${esc(n.name)}</span><span class="cnt">${kids(n.id).length}</span></div>`+(cur?`<div class="tact2" style="padding-left:${pad+20}px"><button data-am="newf" data-id="${n.id}">+ folder</button><button data-am="newsc" data-id="${n.id}">+ scene</button><button data-am="up" data-id="${n.id}">upload</button><button data-am="urlf" data-id="${n.id}">from URL</button><button data-am="ren" data-id="${n.id}">rename</button><button data-am="del" data-id="${n.id}">delete</button></div>`:'')+(op?trRows(n.id,depth+1):'');}
     if(n.type==='scene')return `<div class="tr s ${sel}" draggable="true" data-id="${n.id}" data-am="scene" style="padding-left:${pad+16}px"><i class="ico">▣</i><span class="nm">${esc(n.name)}</span><span class="tag">scene</span></div>`;
     const u=AS.urls[n.id];return `<div class="tr a ${sel}" draggable="true" data-id="${n.id}" data-am="asset" style="padding-left:${pad+16}px">${IMGX.test(n.ext)&&u?`<img src="${u}" class="th">`:`<i class="ico">${MODX.test(n.ext)?'◆':'♪'}</i>`}<span class="nm">${esc(n.name)}</span><span class="tag">${esc(n.ext)}</span></div>`;
   }).join('');
@@ -3392,7 +3403,7 @@ function amRender(){
   const a=document.getElementById('asm');if(!a)return;
   const sc=AS.scene&&AS.scenes[AS.scene]?AS.scene:null,as=AS.sel&&node(AS.sel)?node(AS.sel):null;
   a.innerHTML=`<div class="am-top"><b class="am-t">Assets &amp; Scenes</b><span class="am-sp"></span>
-   <button class="btn sm" data-am="newf" data-id="">New folder</button><button class="btn sm" data-am="up" data-id="${AS.cur||''}">Upload${AS.cur&&node(AS.cur)?' into “'+esc(node(AS.cur).name)+'”':''}</button><button class="btn sm" data-am="newsc" data-id="${AS.cur||''}">New scene</button><button class="btn sm" data-am="starter">Starter folders</button>
+   <button class="btn sm" data-am="newf" data-id="">New folder</button><button class="btn sm" data-am="up" data-id="${AS.cur||''}">Upload${AS.cur&&node(AS.cur)?' into “'+esc(node(AS.cur).name)+'”':''}</button><button class="btn sm" data-am="newsc" data-id="${AS.cur||''}">New scene</button><button class="btn sm" data-am="urlf" data-id="${AS.cur||''}">Add from URL</button><button class="btn sm" data-am="starter">Starter folders</button>
    <span class="am-sp"></span><span id="am-cloud" class="am-cloud">${esc(_cs.msg)}</span><button class="btn sm" data-am="sync">Sync</button><button class="btn sm" data-am="export">Backup .zip</button></div>
   <div class="am-body"><div class="am-tree" id="am-tree"><div class="tr root" data-id="" data-am="fsel">All files <span class="cnt">${AS.tree.filter(n=>n.type==='asset').length}</span></div>${trRows(null,0)||'<p class="am-empty">Nothing here yet. Make a folder (chapter), then upload PNGs and GLBs into it. Drag anything onto a folder to move it.</p>'}</div>
   <div class="am-mid" id="am-mid">${sc?amStage(sc):as?amPreview(as):'<div class="am-empty big">Pick an asset to preview it, or open a scene to build a screen from layers.<br><br>Tip: drop image files straight onto a folder.</div>'}</div>
@@ -3403,9 +3414,9 @@ function amRender(){
 function amHelp(){return `<div class="am-p"><h3>How this works</h3><p>Folders are your chapters and sections. Nest them as deep as you like. Drag to reorder or move.</p><p>Press <b>Starter folders</b> any time to add the full set of chapters and sections (it never duplicates or overwrites).</p><p><b>Scenes</b> are screens you build by stacking assets as layers (background, stall, lantern, glow…). Bind a scene to “Title” or “Stall” and the game shows it.</p><p>Everything is saved in this browser. <b>Export for GitHub</b> gives you a zip with an <code>assets</code> folder to put next to your index.html so players see it too.</p></div>`;}
 function amPreview(n){const u=AS.urls[n.id];return `<div class="am-prev">${IMGX.test(n.ext)&&u?`<img src="${u}" style="max-width:100%;max-height:100%;object-fit:contain;background:repeating-conic-gradient(#2a2038 0 25%,#1c1428 0 50%) 0 0/24px 24px">`:`<div class="am-empty big">${MODX.test(n.ext)?'3D model (shown in the 3D version later)':'Audio file'}<br>${esc(n.name)}.${esc(n.ext)}</div>`}</div>`;}
 function amInfo(n){
-  return `<div class="am-p"><h3>${esc(n.name)}</h3><div class="note" style="font-size:12.5px">${kindOf(n.ext)} · .${esc(n.ext)} · ${fmtSz(n.size||0)}${n.w?' · '+n.w+'×'+n.h+' px':''}</div>
-  <div class="fld"><label>Name</label><input data-ai="name" value="${esc(n.name)}"></div>
-  <div class="am-btns"><button class="btn sm" data-am="rename-asset">Rename</button><button class="btn sm" data-am="repl">Replace file</button><button class="btn sm" data-am="dl">Download</button>${IMGX.test(n.ext)?'<button class="btn sm" data-am="cut">Remove background</button>':''}<button class="btn sm danger" data-am="del" data-id="${n.id}">Delete</button></div>
+  return `<div class="am-p"><h3>${esc(n.name)}</h3><div class="note" style="font-size:12.5px">${kindOf(n.ext)} · .${esc(n.ext)} · ${n.url?'linked from a URL':fmtSz(n.size||0)}${n.w?' · '+n.w+'×'+n.h+' px':''}</div>
+  <div class="fld"><label>Name</label><input data-ai="name" value="${esc(n.name)}"></div>${n.url?`<div class="fld"><label>Link</label><input readonly value="${esc(n.url)}" onclick="this.select()"></div>`:''}
+  <div class="am-btns"><button class="btn sm" data-am="rename-asset">Rename</button><button class="btn sm" data-am="repl">Replace file</button><button class="btn sm" data-am="dl">Download</button>${n.url?'<button class="btn sm" data-am="chgurl">Change link</button>':(IMGX.test(n.ext)?'<button class="btn sm" data-am="cut">Remove background</button>':'')}<button class="btn sm danger" data-am="del" data-id="${n.id}">Delete</button></div>
   ${IMGX.test(n.ext)?'<p class="note" style="font-size:12px;margin-top:12px">Drag it from the left onto a scene to use it.</p>':''}</div>`;
 }
 function amStage(id){
@@ -3431,7 +3442,7 @@ function amLayers(id){
    ${L.kind==='glow'?`<div class="am-grid2"><div class="fld"><label>Glow colour</label><input type="color" data-lp="color" value="${L.color||'#ffd98a'}"></div><div class="fld"><label>Glow size px</label><input type="number" data-lp="size" value="${L.size||300}"></div></div>`:''}
    ${L.kind==='flies'?`<div class="fld"><label>Colour</label><input type="color" data-lp="color" value="${L.color||'#ffe9a6'}"></div>`:''}
    <div class="am-btns"><button class="btn sm" data-am="lfit">Fit width</button><button class="btn sm" data-am="lctr">Centre</button><button class="btn sm" data-am="ldup">Duplicate</button><button class="btn sm danger" data-am="ldel">Delete layer</button></div>`:'<p class="am-empty">Select a layer to edit it.</p>';
-  return `<div class="am-p"><div class="am-btns" style="margin-bottom:10px"><button class="btn sm" data-am="addglow">+ Glow</button><button class="btn sm" data-am="addflies">+ Fireflies</button></div>
+  return `<div class="am-p"><div class="am-btns" style="margin-bottom:10px"><button class="btn gold sm" data-am="lupload">+ Upload image</button><button class="btn gold sm" data-am="lurl">+ Image from URL</button><button class="btn sm" data-am="addglow">+ Glow</button><button class="btn sm" data-am="addflies">+ Fireflies</button></div>
    <div class="fld"><label>Backdrop colour</label><input type="color" data-sp="bg" value="${sc.bg||'#0e0916'}"></div>
    <div class="fld"><label>Use this scene as</label><div class="am-btns"><label class="chip"><input type="checkbox" data-slot="title" ${AS.slots.title===id?'checked':''}> Title screen</label><label class="chip"><input type="checkbox" data-slot="stall" ${AS.slots.stall===id?'checked':''}> Stall screen</label></div></div>
    <h3>Layers</h3><div class="lrows">${rows}</div><div class="am-props">${props}</div></div>`;
@@ -3443,7 +3454,7 @@ function curLayer(){const sc=AS.scenes[AS.scene];return sc&&sc.layers.find(l=>l.
 /* ----- events ----- */
 document.addEventListener('click',async e=>{
   const t=e.target.closest('[data-am]');if(!t||!document.getElementById('asm'))return;const a=t.dataset.am,id=t.dataset.id;
-  const pick=(parent)=>{const f=document.getElementById('am-file');f.onchange=()=>{addFiles([...f.files],parent||null);f.value='';};f.click();};
+  const pick=(parent,scn)=>{const f=document.getElementById('am-file');f.onchange=()=>{addFiles([...f.files],parent||null,scn||null);f.value='';};f.click();};
   switch(a){
    
    case'tog':e.stopPropagation();AS.open.has(id)?AS.open.delete(id):AS.open.add(id);amRender();break;
@@ -3456,7 +3467,7 @@ document.addEventListener('click',async e=>{
    case'ren':{const n=node(id),nm=prompt('Rename',n.name);if(nm){n.name=nm;saveMeta();amRender();}break;}
    case'del':{const n=node(id);if(n&&confirm('Delete “'+n.name+'”'+(n.type==='folder'?' and everything inside it':'')+'?')){delNode(id);saveMeta();amRender();}break;}
    case'rename-asset':{const n=node(AS.sel),v=document.querySelector('[data-ai=name]').value.trim();if(n&&v){n.name=v;saveMeta();amRender();}break;}
-   case'repl':{const f=document.getElementById('am-file');f.onchange=async()=>{const fl=f.files[0];if(!fl)return;const n=node(AS.sel);await dbPut('files',n.id,fl);mark(n.id);AS.urls[n.id]=URL.createObjectURL(fl);n.size=fl.size;n.ext=(fl.name.split('.').pop()||n.ext).toLowerCase();try{const im=new Image();im.src=AS.urls[n.id];await im.decode();n.w=im.naturalWidth;n.h=im.naturalHeight;}catch(x){}saveMeta();amRender();f.value='';};f.click();break;}
+   case'repl':{const f=document.getElementById('am-file');f.onchange=async()=>{const fl=f.files[0];if(!fl)return;const n=node(AS.sel);await dbPut('files',n.id,fl);mark(n.id);delete n.url;AS.urls[n.id]=URL.createObjectURL(fl);n.size=fl.size;n.ext=(fl.name.split('.').pop()||n.ext).toLowerCase();try{const im=new Image();im.src=AS.urls[n.id];await im.decode();n.w=im.naturalWidth;n.h=im.naturalHeight;}catch(x){}saveMeta();amRender();f.value='';};f.click();break;}
    case'dl':{const n=node(AS.sel),l=document.createElement('a');l.href=AS.urls[n.id];l.download=n.name+'.'+n.ext;l.click();break;}
    case'cut':openCutout();break;
    case'ph':AS.phase=t.dataset.v;amRender();break;
@@ -3471,6 +3482,10 @@ document.addEventListener('click',async e=>{
    case'addflies':addLayer(AS.scene,{kind:'flies',name:'Fireflies',color:'#ffe9a6',count:18,fx:'none'});amRender();break;
    case'export':exportAssets();break;
    case'starter':seedStarter();break;
+   case'urlf':{const u=prompt('Paste the image link (https://…)');if(u)addUrl(u,id||AS.cur||null,null);break;}
+   case'lurl':{const u=prompt('Paste the image link (https://…)\nExample: your Cloudflare R2 / custom-domain URL ending in .png');if(u){const sc=node(AS.scene);addUrl(u,sc&&sc.parent||null,AS.scene);}break;}
+   case'lupload':{const sc=node(AS.scene);pick(sc&&sc.parent||null,AS.scene);break;}
+   case'chgurl':{const n=node(AS.sel),u=prompt('New image link',n.url);if(u&&/^https?:\/\//i.test(u)){n.url=u.trim();AS.urls[n.id]=n.url;try{const im=new Image();im.src=n.url;await im.decode();n.w=im.naturalWidth;n.h=im.naturalHeight;}catch(e){}saveMeta();amRender();}break;}
    case'sync':if(cloudOn()){syncUp();}syncDown();break;
   }
 });
@@ -3499,6 +3514,7 @@ document.addEventListener('drop',async e=>{
   const r=e.target.closest&&e.target.closest('.tr'),st=e.target.closest&&e.target.closest('#am-st,#am-stage');
   const files=e.dataTransfer.files&&e.dataTransfer.files.length?[...e.dataTransfer.files]:null;const id=dragId||e.dataTransfer.getData('text/nm');
   if(!r&&!st&&!e.target.closest('#am-tree'))return;e.preventDefault();
+  if(files&&st&&AS.scene){const sc=node(AS.scene);addFiles(files,sc&&sc.parent||null,AS.scene);return;}
   if(files){let parent=null;if(r&&r.dataset.id){const nd=node(r.dataset.id);parent=nd&&nd.type==='folder'?nd.id:nd&&nd.parent;}addFiles(files,parent);return;}
   if(!id)return;
   if(st&&AS.scene){const s=document.getElementById('am-st'),k=+s.dataset.k||1,rc=s.getBoundingClientRect();addAssetLayer(AS.scene,id,(e.clientX-rc.left)/k,(e.clientY-rc.top)/k);dragId=null;return;}
@@ -3558,7 +3574,7 @@ function zipBin(files){
 async function exportAssets(){
   const safe=s=>String(s).replace(/[^\w\- .]+/g,'_').trim()||'x',used=new Set(),files=[],tree=[];
   const pathOf=n=>{const seg=[];let c=n;while(c){seg.unshift(safe(c.name));c=c.parent?node(c.parent):null;}return seg.join('/');};
-  for(const n of AS.tree){const o=Object.assign({},n);if(n.type==='asset'){let p=pathOf(n)+'.'+n.ext,i=1;while(used.has(p.toLowerCase()))p=pathOf(n)+'-'+(i++)+'.'+n.ext;used.add(p.toLowerCase());o.path=p;const b=await dbGet('files',n.id);if(b)files.push({name:'assets/'+p,data:new Uint8Array(await b.arrayBuffer())});}tree.push(o);}
+  for(const n of AS.tree){const o=Object.assign({},n);if(n.type==='asset'){let p=pathOf(n)+'.'+n.ext,i=1;while(used.has(p.toLowerCase()))p=pathOf(n)+'-'+(i++)+'.'+n.ext;used.add(p.toLowerCase());o.path=p;const b=n.url?null:await dbGet('files',n.id);if(b)files.push({name:'assets/'+p,data:new Uint8Array(await b.arrayBuffer())});}tree.push(o);}
   files.unshift({name:'assets/manifest.json',data:new TextEncoder().encode(JSON.stringify({v:1,tree,scenes:AS.scenes,slots:AS.slots},null,1))});
   const l=document.createElement('a');l.href=URL.createObjectURL(zipBin(files));l.download='night-market-assets.zip';l.click();toast('Unzip next to your index.html (it makes an “assets” folder)');
 }
