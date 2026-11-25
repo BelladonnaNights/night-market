@@ -2322,7 +2322,7 @@ const rnd2=(r,a)=>a[Math.floor(r()*a.length)];
 function portrait(c,opts){
   opts=opts||{};
   const psid=c.id&&slotScene('char_'+c.id);if(psid)return `<div class="pstage">${stageHtml(psid,'night')}</div>`;
-  {const rq=c.id&&D.requests.find(r=>r.name.toLowerCase()===String(c.id).toLowerCase()),pu=rq&&itemUrl(rq.id);if(pu)return `<img src="${esc(pu)}" style="height:100%;width:auto" alt="">`;}
+  {const rq=c.id&&D.requests.find(r=>r.name.toLowerCase()===String(c.id).toLowerCase()),pu=rq&&itemUrl(rq.id);if(pu)return `<img src="${esc(pu)}" style="width:100%;height:auto;display:block" alt="">`;}
   if(c.id&&ART.portrait[c.id])return `<img src="${ART.portrait[c.id]}" style="height:100%;width:auto" alt="">`;
   const {hair,skin,cloth,style}=c;const o=c.ghost?'opacity=".72"':'';
   let back='',front='';
@@ -2634,7 +2634,7 @@ function customerView(c){
   const shelf=inv.map(x=>{const used=selCount[x.k]||0,left=x.qty-used;
     return `<button class="item ${used?'sel':''} ${left<=0&&!used?'dis':''}" data-g="pick" data-k="${esc(x.k)}"><span class="c">×${left}</span>${itemImg(x.e,'tray')}<div class="n">${esc(x.name)}</div><div class="t"><span class="tier ${x.tier}">${x.tier}</span> · ${x.type==='craft'?esc(x.e.kind):'gathered'}</div></button>`;}).join('')||'<div class="lbl" style="padding:14px">Your pack is empty. Forage, then make something at the Bench.</div>';
   const counter=sk.length?sk.map(k=>`<span class="chip" style="font:700 13px var(--sans);padding:3px 10px;border-radius:9px;border:1px solid var(--line2);background:rgba(240,198,116,.1)">${esc(k.split('|')[0])} <span class="tier ${k.split('|')[1]}">${k.split('|')[1]}</span></span>`).join(' '):'<span class="lbl">Click items below to set them on the counter</span>';
-  return `<div class="cust ${S.tmp.fresh?'in':''}">${portrait(cast)}</div>
+  return `<div class="cust ${S.tmp.fresh?'in':''}" style="width:calc(min(300px,34vh)*${custScale(c)})">${portrait(cast)}</div>
    <div class="speech"><div class="who"><span class="nm">${esc(c.name)}</span><span class="badge" style="--c:${col}">${esc(c.kind)}</span><span class="sp"></span><span class="lbl">${S.queue.length} waiting</span></div>
     <div class="q">${R?esc(R.line):'“'+esc(c.ask)+'”'}</div></div>
    <div class="tray"><div class="actions"><span class="lbl">On the counter</span>${counter}<span class="sp"></span>
@@ -3551,6 +3551,7 @@ const _ib={};
 function itemBmp(id){const u=itemUrl(id);if(!u)return null;let o=_ib[u];if(!o){o=_ib[u]=new Image();o.src=u;}return o.complete&&o.naturalWidth?o:null;}
 function charSpeed(ch){const n=AS.tree.find(x=>x.type==='asset'&&x.name===ch+'_portrait_full'),v=n&&parseFloat(AS.slots['assetspd_'+n.id]);return v>0?v/100:1;}
 function charScale(ch){const n=AS.tree.find(x=>x.type==='asset'&&x.name===ch+'_portrait_full'),v=n&&parseFloat(AS.slots['assetsz_'+n.id]);return v>0?v/100:null;}
+function custScale(c){const rq=D.requests.find(r=>r.id===(c&&c.id))||D.requests.find(r=>r.name===(c&&c.name));if(!rq)return 1;let v=parseFloat(AS.slots['itemsz_'+rq.id]);if(!(v>0)){const x=AS.slots['item_'+rq.id];v=parseFloat(AS.slots['assetsz_'+x]);}return v>0?v/100:1;}
 function itemScale(id){const v=parseFloat(AS.slots['itemsz_'+id]);return v>0?v/100:1;}
 function preloadItems(ids){return Promise.all(ids.map(id=>{const u=itemUrl(id);if(!u)return null;let o=_ib[u];if(!o){o=_ib[u]=new Image();o.src=u;}return o.complete?null:new Promise(r=>{o.addEventListener('load',r);o.addEventListener('error',r);});}));}
 function slotScene(name){const id=AS.slots[name];return id&&AS.scenes[id]&&AS.scenes[id].layers.length?id:null;}
