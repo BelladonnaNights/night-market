@@ -3107,6 +3107,7 @@ async function assetsLoad(){
   await Promise.all(first.map(fetchAssetFile));
   (async()=>{for(const n of rest)await fetchAssetFile(n);})();
   if(!AS.tree.length){try{const r=await fetch('assets/manifest.json',{cache:'no-cache'});if(r.ok){const m=await r.json();AS.tree=m.tree||[];AS.scenes=m.scenes||{};AS.slots=m.slots||{};for(const n of AS.tree)if(n.type==='asset')AS.urls[n.id]='assets/'+n.path;}}catch(e){}}
+  AS.tree.forEach(n=>{if(n.type==='asset'){const k='x_'+n.name.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');if(/^x_azlynn_/.test(k)&&!AS.slots['item_'+k])AS.slots['item_'+k]=n.id;}});
   AS.ready=true;
 }
 /* ----- tree helpers ----- */
