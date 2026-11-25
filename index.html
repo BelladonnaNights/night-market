@@ -2385,6 +2385,25 @@ function normalize(){
   ['gathers','crafts','requests','upgrades','tiers','levels'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[];});
   D.lists=D.lists||{};['zones','kinds','moons','rarities','reqkinds','accuracy'].forEach(k=>{if(!Array.isArray(D.lists[k]))D.lists[k]=[];});
 }
+async function restCall(method,path,body){
+  const tok=FB.user?await FB.user.getIdToken():null;
+  const r=await fetch(FBCFG.databaseURL+'/'+path+'.json'+(tok?'?auth='+encodeURIComponent(tok):''),{method,headers:body!==undefined?{'Content-Type':'application/json'}:undefined,body:body!==undefined?JSON.stringify(body):undefined});
+  if(!r.ok){let t='';try{t=await r.text();}catch(e){}throw {code:r.status===401||r.status===403?'PERMISSION_DENIED':'HTTP '+r.status,message:t};}
+  return method==='GET'?r.json():null;
+}
+const dbSet=(path,val)=>FB.rest?restCall('PUT',path,val):FB.DB.set(FB.DB.ref(FB.db,path),val);
+const dbDel=path=>FB.rest?restCall('DELETE',path):FB.DB.remove(FB.DB.ref(FB.db,path));
+const dbGetV=async path=>FB.rest?restCall('GET',path):(await FB.DB.get(FB.DB.ref(FB.db,path))).val();
+function applySnap(v){
+  FB.state='live';
+  if(v&&v.json){
+    if((v.rev||0)>(D.rev||0)){
+      try{D=JSON.parse(v.json);normalize();D.rev=v.rev;try{localStorage.setItem(STORE,JSON.stringify(D));}catch(e){}
+        if(!fbBusy())render(true);}catch(e){}
+    }else if((v.rev||0)<(D.rev||0)&&FB.user)push();
+  }else if(FB.user)push();
+  updateFoot();
+}
 async function fbInit(){
   try{
     const base='https://www.gstatic.com/firebasejs/10.14.1/';
@@ -2393,24 +2412,15 @@ async function fbInit(){
     const app=A.initializeApp(FBCFG);
     FB.DB=DB;FB.AU=AU;FB.db=DB.getDatabase(app);FB.auth=AU.getAuth(app);FB.ref=DB.ref(FB.db,'gamebook');
     AU.onAuthStateChanged(FB.auth,u=>{FB.user=u;if(!u&&UI.edit)UI.edit=false;if(u&&FB.state==='live')push();render(true);});
-    setTimeout(()=>{if(FB.state==='loading'){FB.state='offline';FB.msg='The Realtime Database never answered. It probably has not been created yet (Firebase → Build → Realtime Database → Create Database).';updateFoot();}},9000);
-    DB.onValue(FB.ref,snap=>{
-      const v=snap.val();FB.state='live';
-      if(v&&v.json){
-        if((v.rev||0)>(D.rev||0)){
-          try{D=JSON.parse(v.json);normalize();D.rev=v.rev;try{localStorage.setItem(STORE,JSON.stringify(D));}catch(e){}
-            if(!fbBusy())render(true);}catch(e){}
-        }else if((v.rev||0)<(D.rev||0)&&FB.user)push();
-      }else if(FB.user)push();
-      updateFoot();
-    },err=>{FB.state='offline';FB.msg=err.message;updateFoot();});
+    setTimeout(async()=>{if(FB.state==='loading'){FB.rest=true;try{applySnap(await restCall('GET','gamebook'));}catch(e){FB.state='offline';FB.msg='The database did not answer: '+(e.code||e.message);updateFoot();}}},5000);
+    DB.onValue(FB.ref,snap=>applySnap(snap.val()),err=>{FB.state='offline';FB.msg=err.message;updateFoot();});
   }catch(e){FB.state='offline';FB.msg=String(e.message||e);updateFoot();}
 }
 function push(){
   if(!FB.user||FB.state!=='live')return;
   clearTimeout(FB.timer);FB.msg='Saving…';updateFoot();
   FB.timer=setTimeout(async()=>{
-    try{await FB.DB.set(FB.ref,{rev:D.rev,json:JSON.stringify(D)});FB.msg='';}
+    try{await dbSet('gamebook',{rev:D.rev,json:JSON.stringify(D)});FB.msg='';}
     catch(e){FB.msg='Could not save: '+(e.code||e.message);toast('Could not save to Firebase');}
     updateFoot();
   },500);
@@ -3097,7 +3107,7 @@ function flies(){
 loadData();normalize();
 flies();
 render();fbInit();
-window.__book={cfg:FBCFG,get data(){return D;},UI,render,save,fb:()=>FB,signin:()=>{if(FB.user){toast('Already signed in');}else if(FB.state==='live')openSignin();else toast('Still connecting to the cloud… try again in a moment');},exportX:buildXlsx,exportC:buildCsv};
+window.__book={dbSet,dbDel,dbGet:dbGetV,cfg:FBCFG,get data(){return D;},UI,render,save,fb:()=>FB,signin:()=>{if(FB.user){toast('Already signed in');}else if(FB.state==='live')openSignin();else toast('Still connecting to the cloud… try again in a moment');},exportX:buildXlsx,exportC:buildCsv};
 })();
 
 /* ===== ASSETS TAB (folders, images, scene composer) ===== */
@@ -3158,20 +3168,20 @@ async function syncUp(){
       if(!b){AS.pending=AS.pending.filter(x=>x!==id);continue;}
       if(b.size>9e6){cstat('“'+nd.name+'” is over 9 MB, too big for the cloud. Make it smaller.');toast('“'+nd.name+'” is over 9 MB: not saved to the cloud');AS.pending=AS.pending.filter(x=>x!==id);continue;}
       cstat('Saving to the cloud… '+(++n)+'/'+tot);
-      await DB.set(DB.ref(db,'assetfiles/'+id),{e:nd.ext,d:await b64(b)});AS.pending=AS.pending.filter(x=>x!==id);}
-    for(const id of AS.removed.slice()){await DB.remove(DB.ref(db,'assetfiles/'+id));AS.removed=AS.removed.filter(x=>x!==id);}
-    await DB.set(DB.ref(db,'assetmeta'),{rev:AS.rev,json:JSON.stringify({tree:AS.tree,scenes:AS.scenes,slots:AS.slots})});
+      await window.__book.dbSet('assetfiles/'+id,{e:nd.ext,d:await b64(b)});AS.pending=AS.pending.filter(x=>x!==id);}
+    for(const id of AS.removed.slice()){await window.__book.dbDel('assetfiles/'+id);AS.removed=AS.removed.filter(x=>x!==id);}
+    await window.__book.dbSet('assetmeta',{rev:AS.rev,json:JSON.stringify({tree:AS.tree,scenes:AS.scenes,slots:AS.slots})});
     AS.cloudRev=AS.rev;await dbPut('meta','state',stateObj());cstat('Saved to the cloud ✓');
   }catch(e){const c=String(e.code||e.message||'');cstat(/PERMISSION|permission/.test(c)?'The cloud refused the save: your Firebase database rules don’t allow your email to write. Update the rules (see my message).':'Cloud save failed: '+c);}
   _cs.busy=false;
 }
 async function syncDown(){
   const f=await waitFB(7000);if(!f||f.state!=='live'){cstat('Cloud not reachable right now. Working from this browser’s copy.');return;}
-  try{const v=(await f.DB.get(f.DB.ref(f.db,'assetmeta'))).val();
+  try{const v=await window.__book.dbGet('assetmeta');
     if(v&&v.json&&(v.rev||0)>(AS.cloudRev||0)&&(v.rev||0)>=(AS.rev||0)){const m=JSON.parse(v.json);AS.tree=m.tree||[];AS.scenes=m.scenes||{};AS.slots=m.slots||{};AS.rev=v.rev;AS.cloudRev=v.rev;await dbPut('meta','state',stateObj());}
     if(!v&&!AS.tree.length&&!AS.rev){seedStarter(true);}
     const miss=[];for(const n of AS.tree)if(n.type==='asset'){if(n.url){AS.urls[n.id]=n.url;continue;}if(!(await dbGet('files',n.id)))miss.push(n);}
-    let k=0;for(const n of miss){cstat('Downloading from the cloud… '+(++k)+'/'+miss.length);const o=(await f.DB.get(f.DB.ref(f.db,'assetfiles/'+n.id))).val();if(o&&o.d){const b=unb64(o.d,o.e||n.ext);await dbPut('files',n.id,b);AS.urls[n.id]=URL.createObjectURL(b);}}
+    let k=0;for(const n of miss){cstat('Downloading from the cloud… '+(++k)+'/'+miss.length);const o=await window.__book.dbGet('assetfiles/'+n.id);if(o&&o.d){const b=unb64(o.d,o.e||n.ext);await dbPut('files',n.id,b);AS.urls[n.id]=URL.createObjectURL(b);}}
     if(cloudOn()&&(AS.rev>(AS.cloudRev||0)||AS.pending.length||AS.removed.length))await syncUp();
     else cstat(cloudOn()?'Saved to the cloud ✓':'Showing the cloud copy. Turn on Edit mode and sign in to save changes.');
     amRender();
@@ -3597,13 +3607,13 @@ async function itFile(d,f){
   await dbPut('files',id,f);mark(id);AS.urls[id]=url;AS.tree.push({id,type:'asset',name:d.fname||d.label,ext,parent:par,order:nextOrder(par),size:f.size,w,h});
   itSet(d.key,id);toast('Added art for '+d.label);
 }
-async function itLink(d,url){
-  url=(url||'').trim();if(!url)return;if(!/^https?:\/\//i.test(url)){toast('That needs to start with https://');return;}
-  let w=0,h=0;toast('Checking the link…');
-  try{const im=new Image();im.src=url;await im.decode();w=im.naturalWidth;h=im.naturalHeight;}catch(e){toast('Could not load that image. It must be a direct, public image link.');return;}
+async function itLink(d,url,quiet){
+  url=(url||'').trim();if(!url)return false;if(!/^https?:\/\//i.test(url)){if(!quiet)toast('That needs to start with https://');return false;}
+  let w=0,h=0;if(!quiet)toast('Checking the link…');
+  try{const im=new Image();im.src=url;await im.decode();w=im.naturalWidth;h=im.naturalHeight;}catch(e){if(!quiet)toast('Could not load that image. It must be a direct, public image link.');return false;}
   const ext=((url.split('?')[0].match(/\.(png|jpe?g|webp|gif|svg|avif)$/i)||[])[1]||'png').toLowerCase(),id=uid(),par=ensureFolder(d.folder||['Items'].concat(d.grp));
   AS.urls[id]=url;AS.tree.push({id,type:'asset',name:d.fname||d.label,ext,parent:par,order:nextOrder(par),size:0,w,h,url});
-  itSet(d.key,id);toast('Linked art for '+d.label);
+  itSet(d.key,id);if(!quiet)toast('Linked art for '+d.label);return true;
 }
 function autoLinkItems(){
   let n=0;const keys=new Set(itDefs().map(d=>d.key));
@@ -3617,11 +3627,38 @@ function itRows(){
     return `<div class="itrow ${u?'has':''}"><div class="itth">${u?`<img src="${esc(u)}" alt="">`:'none'}</div><div class="itnm"><b>${esc(d.label)}</b><i>${esc(d.sub)}</i></div><div class="itbt"><button class="${isF?'gold':''}" data-am="itup" data-id="${esc(d.key)}">Upload PNG</button><button class="${isU?'gold':''}" data-am="iturl" data-id="${esc(d.key)}" ${isU?'title="'+esc(nd.url)+'"':''}>From URL</button>${u?`<input type="number" class="itsz" data-itsz="${esc(d.key)}" value="${sz}" min="10" max="500" step="10" title="Size in the game, % (100 = normal)">`:''}<button data-am="itclr" data-id="${esc(d.key)}" ${u?'':'disabled'} title="Remove this image from the item">✕</button>${d.custom?`<button data-am="itdel" data-id="${esc(d.key)}" title="Delete this custom item">delete</button>`:''}</div></div>`;}).join('')).join('')||'<p class="am-empty">No items match.</p>';
 }
 function itRender(){const b=document.getElementById('it-body');if(!b)return;const keep=b.scrollTop;b.innerHTML=itRows();b.scrollTop=keep;const all=itDefs(),n=all.filter(d=>itUrl(d.key)).length,c=document.getElementById('it-count');if(c)c.textContent=n+' of '+all.length+' have art';}
+
+function openBulkUrl(){
+  if(document.getElementById('am-bu'))return;
+  const m=document.createElement('div');m.id='am-bu';m.className='scrim';m.style.zIndex=320;
+  m.innerHTML=`<div class="modal" style="width:min(720px,96vw);max-height:92vh;overflow:auto"><div class="am-t" style="font-size:26px">Link many URLs at once</div>
+  <p style="color:var(--muted);font-size:13px;margin:4px 0 8px"><b>Option 1, a folder link (fastest for sprites).</b> If all of Azlynn’s frames sit in one Cloudflare folder, named azlynn_idle.png, azlynn_walk_right_1.png and so on, paste the folder address (ending in /). I’ll find every frame that exists there.</p>
+  <div class="fld"><input id="bu-base" placeholder="https://pub-xxxx.r2.dev/azlynn/" style="width:100%;padding:9px 12px;border-radius:10px;background:rgba(14,9,22,.7);border:1px solid var(--line);color:inherit"></div>
+  <p style="color:var(--muted);font-size:13px;margin:10px 0 4px"><b>Option 2, a list.</b> One per line: <code>slot name, link</code> (or just the link if the file is named after its slot). Item names and slot names both work, e.g. <code>Reed https://…/reed.png</code> or <code>https://…/azlynn_walk_up_3.png</code>.</p>
+  <textarea id="bu-list" rows="7" style="width:100%;padding:9px 12px;border-radius:10px;background:rgba(14,9,22,.7);border:1px solid var(--line);color:inherit;font:13px monospace" placeholder="Reed https://pub-xxxx.r2.dev/reed.png&#10;https://pub-xxxx.r2.dev/azlynn_walk_up_3.png"></textarea>
+  <div id="bu-out" style="font-size:13px;margin:8px 0;max-height:160px;overflow:auto"></div>
+  <div class="actions"><button class="btn gold" data-am="bugo">Link them</button><button class="btn" data-am="buclose">Close</button></div></div>`;
+  document.body.appendChild(m);
+}
+async function runBulkUrl(){
+  const out=document.getElementById('bu-out'),log=(ok,t)=>{out.insertAdjacentHTML('beforeend',`<div style="color:${ok?'#8bd3b0':'#e58585'}">${ok?'✓':'✗'} ${esc(t)}</div>`);};
+  out.innerHTML='';const defs=itDefs();let ok=0,bad=0;
+  const base=(document.getElementById('bu-base').value||'').trim();
+  const find=nm=>{const g=slug(nm);return defs.find(d=>d.key===nm||d.key==='x_'+g||slug(d.label)===g||(d.fname&&slug(d.fname)===g)||d.key===g);};
+  if(base){const b=base.endsWith('/')?base:base+'/';const jobs=defs.filter(d=>d.fname&&/^Azlynn/.test(d.fname));let n=0;
+    for(const d of jobs){const r=await itLink(d,b+slug(d.fname)+'.png',true);n++;if(r){ok++;log(true,d.fname);}}
+    log(ok>0,ok?ok+' sprite frames found in that folder.':'No azlynn_… PNGs were found at that folder address. Check the link and that the files are public.');}
+  const lines=(document.getElementById('bu-list').value||'').split('\n').map(x=>x.trim()).filter(Boolean);
+  for(const ln of lines){let nm,url;const m=ln.match(/^(.*?)[\s=,]+(https?:\/\/\S+)$/);if(m){nm=m[1].trim();url=m[2];}else if(/^https?:\/\//i.test(ln)){url=ln;nm=decodeURIComponent((ln.split('?')[0].split('/').pop()||'')).replace(/\.[^.]+$/,'');}else{bad++;log(false,'Skipped (no link): '+ln);continue;}
+    const d=find(nm);if(!d){bad++;log(false,'No slot or item called “'+nm+'”');continue;}
+    const r=await itLink(d,url,true);if(r){ok++;log(true,d.label);}else{bad++;log(false,d.label+': the link did not load as an image');}}
+  toast(ok+' linked'+(bad?', '+bad+' problem'+(bad>1?'s':''):''));
+}
 function openItems(){
   if(document.getElementById('am-items'))return;
   const m=document.createElement('div');m.id='am-items';m.className='scrim';m.style.zIndex=300;
   m.innerHTML=`<div class="modal" style="width:min(820px,96vw);height:90vh;display:flex;flex-direction:column"><div class="am-t" style="font-size:26px">Item art</div><p style="color:var(--muted);font-size:13px;margin:4px 0 0">Every gatherable, crafted good, upgrade, customer and extra gets its own picture. Upload a PNG or paste a link (Cloudflare etc.). Square PNGs with a clear background look best (about 256×256). The game shows these in the pack, bench, almanac, counter tray and on the glowing gather spots.</p>
-  <div class="itbar"><input id="it-q" placeholder="Search items…"><span id="it-count" style="font-size:12.5px;color:var(--muted)"></span><button class="btn sm" data-am="itadd">+ Add your own item</button><button class="btn sm gold" data-am="itbulk" title="Pick many files at once. Name each file after its slot, e.g. azlynn_walk_right_1.png">Bulk upload (sprite frames)</button></div>
+  <div class="itbar"><input id="it-q" placeholder="Search items…"><span id="it-count" style="font-size:12.5px;color:var(--muted)"></span><button class="btn sm" data-am="itadd">+ Add your own item</button><button class="btn sm gold" data-am="bulkurl" title="Paste a Cloudflare folder link or a list of links">Link URLs in bulk</button><button class="btn sm gold" data-am="itbulk" title="Pick many files at once. Name each file after its slot, e.g. azlynn_walk_right_1.png">Bulk upload (sprite frames)</button></div>
   <div id="it-body" style="flex:1;overflow:auto;padding-right:6px"></div><input type="file" id="it-file" accept=".png,.jpg,.jpeg,.webp,.gif,.svg,.avif" hidden><input type="file" id="it-bulk" accept=".png,.jpg,.jpeg,.webp,.gif,.svg,.avif" multiple hidden>
   <div class="actions" style="margin-top:10px"><button class="btn gold" data-am="closeitems">Done</button></div></div>`;
   document.body.appendChild(m);itRender();
@@ -3759,6 +3796,9 @@ document.addEventListener('click',async e=>{
    case'unlink':delete AS.slots[t.dataset.v];saveMeta();amRender();break;
    case'items':openItems();break;
    case'closeitems':{const m=document.getElementById('am-items');if(m)m.remove();amRender();break;}
+   case'bulkurl':openBulkUrl();break;
+   case'bugo':runBulkUrl();break;
+   case'buclose':{const m=document.getElementById('am-bu');if(m)m.remove();break;}
    case'itbulk':document.getElementById('it-bulk').click();break;
    case'itup':IT.target=id;document.getElementById('it-file').click();break;
    case'iturl':{const d=itDefs().find(x=>x.key===id);if(d){const cur=node(AS.slots['item_'+id]),u=prompt('Paste the image link for “'+d.label+'” (https://…)',cur&&cur.url||'');if(u)itLink(d,u);}break;}
