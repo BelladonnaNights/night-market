@@ -327,6 +327,7 @@ body.edit .hide-edit{display:none!important}
 .asm-host{height:calc(100vh - 190px);min-height:560px}
 .page.asmpage{max-width:none}
 .am-tree{display:flex;flex-direction:column;padding:0!important}.am-list{flex:1;overflow:auto;padding:6px 8px}.am-tools{flex:none;padding:10px;border-bottom:1px solid var(--line);background:rgba(14,9,22,.95)}.am-in{font-size:12.5px;color:var(--muted);margin-bottom:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.am-in b{color:var(--gold)}.am-tb{display:flex;flex-wrap:wrap;gap:6px}.am-tb button{font:700 12px var(--sans);padding:6px 12px;border-radius:99px;background:rgba(255,255,255,.08);color:inherit;border:1px solid var(--line);cursor:pointer}.am-tb button:hover:not(:disabled){background:var(--gold);color:#2a1a08}.am-tb button:disabled{opacity:.35;cursor:default}.am-tb .dn{color:var(--bad)}.am-links{display:flex;flex-wrap:wrap;gap:6px}.lk{display:inline-flex;gap:6px;align-items:center;padding:4px 6px 4px 11px;border-radius:99px;background:rgba(240,198,116,.16);border:1px solid var(--line2);font-size:12.5px}.lk button{border:0;background:rgba(255,255,255,.12);color:inherit;border-radius:50%;width:20px;height:20px;cursor:pointer}.lkrow{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:13.5px}.lkrow select{max-width:300px;padding:6px 9px;border-radius:9px;background:rgba(14,9,22,.7);border:1px solid var(--line);color:inherit}
+#am-walk{position:absolute;left:0;top:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
 .am-cloud{font-size:12.5px;color:var(--muted);max-width:360px}
 .am-top{display:flex;gap:8px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}.am-t{font:700 20px var(--serif);color:var(--gold)}.am-sp{flex:1}
 .am-body{flex:1;display:grid;grid-template-columns:minmax(250px,310px) 1fr minmax(250px,310px);min-height:0}
@@ -3450,14 +3451,15 @@ function amInfo(n){
 }
 function amStage(id){
   const sc=AS.scenes[id],tn=node(id);
-  return `<div class="am-sbar"><b>${esc(tn.name)}</b><span class="am-sp"></span>Preview as <span class="tabs" style="margin:0">${['day','dusk','night'].map(p=>`<button class="tab ${AS.phase===p?'on':''}" data-am="ph" data-v="${p}">${p}</button>`).join('')}</span></div>
+  return `<div class="am-sbar"><b>${esc(tn.name)}</b><button class="btn sm ${AS.walk?'gold':''}" data-am="walk">Walkable area${sc.walls&&sc.walls.length?' ✓':''}</button><span class="am-sp"></span>Preview as <span class="tabs" style="margin:0">${['day','dusk','night'].map(p=>`<button class="tab ${AS.phase===p?'on':''}" data-am="ph" data-v="${p}">${p}</button>`).join('')}</span></div>
   <div class="am-stagewrap" id="am-sw"><div class="stage edit" id="am-stage">${stageInner(id)}</div></div>
   <div class="am-sbar" style="font-size:12px;opacity:.8">Drag assets from the left onto the picture. Drag layers to move. The game crops the edges to fit any screen, so keep important things toward the middle.</div>`;
 }
-function stageInner(id){const sc=AS.scenes[id],[W,H]=dimsOf(id);return `<div class="st" id="am-st" style="width:${W}px;height:${H}px;background:${sc.bg||'#0e0916'}">${sc.layers.map(l=>layerHtml(l,AS.phase,true)).join('')}</div><div class="guide"></div>`;}
-function fitEdit(){const sw=document.getElementById('am-sw'),st=document.getElementById('am-st');if(!sw||!st||!AS.scene)return;const [W,H]=dimsOf(AS.scene);const k=Math.min(sw.clientWidth/W,sw.clientHeight/H);const s=document.getElementById('am-stage');s.style.width=W*k+'px';s.style.height=H*k+'px';st.style.transform=`scale(${k})`;st.style.transformOrigin='0 0';st.style.left='0';st.style.top='0';st.dataset.k=k;}
+function stageInner(id){const sc=AS.scenes[id],[W,H]=dimsOf(id);return `<div class="st" id="am-st" style="width:${W}px;height:${H}px;background:${sc.bg||'#0e0916'}">${sc.layers.map(l=>layerHtml(l,AS.phase,true)).join('')}</div><div class="guide"></div>${AS.walk?'<canvas id="am-walk"></canvas>':''}`;}
+function fitEdit(){const sw=document.getElementById('am-sw'),st=document.getElementById('am-st');if(!sw||!st||!AS.scene)return;const [W,H]=dimsOf(AS.scene);const k=Math.min(sw.clientWidth/W,sw.clientHeight/H);const s=document.getElementById('am-stage');s.style.width=W*k+'px';s.style.height=H*k+'px';st.style.transform=`scale(${k})`;st.style.transformOrigin='0 0';st.style.left='0';st.style.top='0';st.dataset.k=k;drawWalk();}
 function stageRefresh(){const id=AS.scene,s=document.getElementById('am-stage');if(!s||!id)return;s.innerHTML=stageInner(id);fitEdit();}
 function amLayers(id){
+  if(AS.walk)return amWalk(id);
   const sc=AS.scenes[id],L=sc.layers.find(l=>l.id===AS.layer);
   const rows=sc.layers.slice().reverse().map(l=>`<div class="lrow ${AS.layer===l.id?'on':''}" data-am="lsel" data-id="${l.id}"><span class="nm">${esc(l.name||'layer')}</span>${l.fx&&l.fx!=='none'?'<span class="tag">'+esc(l.fx)+'</span>':''}<button data-am="lvis" data-id="${l.id}" title="Show/hide">${l.hidden?'○':'●'}</button><button data-am="lup" data-id="${l.id}" title="Bring forward">↑</button><button data-am="ldn" data-id="${l.id}" title="Send back">↓</button></div>`).join('')||'<p class="am-empty">No layers yet. Drag an image onto the picture, or add a built-in.</p>';
   const num=(p,lab,min,max,step)=>`<div class="fld"><label>${lab}</label><div class="rng"><input type="range" data-lp="${p}" min="${min}" max="${max}" step="${step||1}" value="${L[p]==null?(p==='s'?100:p==='op'?1:50):L[p]}"><input type="number" data-lp="${p}" step="${step||1}" value="${L[p]==null?(p==='s'?100:p==='op'?1:50):L[p]}"></div></div>`;
@@ -3492,6 +3494,69 @@ function openLinks(){
   document.body.appendChild(m);
 }
 document.addEventListener('change',e=>{const t=e.target;if(t.dataset&&t.dataset.lk){if(t.value){AS.slots[t.dataset.lk]=t.value;const sc=AS.scenes[t.value],sl=SLOTS.find(x=>x.id===t.dataset.lk);if(sc&&!sc.layers.length&&sl)sc.size=sl.size;}else delete AS.slots[t.dataset.lk];saveMeta();}});
+/* ----- walkable-area editor ----- */
+AS.wtool='pencil';AS.walkSize=40;AS.walkW=14;AS.walk=false;AS.draft=null;
+function paintShape(c,s){c.save();c.globalCompositeOperation=s.t==='erase'?'destination-out':'source-over';c.fillStyle=c.strokeStyle='#fff';c.lineCap=c.lineJoin='round';const P=s.pts||[];
+  if((s.t==='brush'||s.t==='erase'||s.t==='wall')&&P.length){c.lineWidth=s.t==='wall'?s.w:s.r*2;c.beginPath();if(P.length===1){c.arc(P[0][0],P[0][1],c.lineWidth/2,0,7);c.fill();}else{c.moveTo(P[0][0],P[0][1]);for(let i=1;i<P.length;i++)c.lineTo(P[i][0],P[i][1]);c.stroke();}}
+  else if(s.t==='poly'&&P.length>2){c.beginPath();c.moveTo(P[0][0],P[0][1]);for(let i=1;i<P.length;i++)c.lineTo(P[i][0],P[i][1]);c.closePath();c.fill();}
+  else if(s.t==='rect'){c.fillRect(s.x,s.y,s.w,s.h);}
+  c.restore();}
+function draftShape(d){if(!d)return null;if(d.tool==='wall'&&d.pts.length)return {t:'wall',pts:d.pts,w:AS.walkW};if(d.tool==='poly'&&d.pts.length>2)return {t:'poly',pts:d.pts};if(d.tool==='rect'&&d.rect)return Object.assign({t:'rect'},d.rect);if((d.tool==='pencil'||d.tool==='eraser')&&d.pts.length)return {t:d.tool==='eraser'?'erase':'brush',r:AS.walkSize,pts:d.pts};return null;}
+function drawWalk(){
+  const cv=document.getElementById('am-walk');if(!cv||!AS.scene)return;const sc=AS.scenes[AS.scene],[W,H]=dimsOf(AS.scene);
+  if(cv.width!==W){cv.width=W;cv.height=H;}const c=cv.getContext('2d');c.clearRect(0,0,W,H);
+  const tmp=document.createElement('canvas');tmp.width=W;tmp.height=H;const q=tmp.getContext('2d');(sc.walls||[]).forEach(s=>paintShape(q,s));const ds=draftShape(AS.draft);if(ds)paintShape(q,ds);
+  c.drawImage(tmp,0,0);c.globalCompositeOperation='source-in';c.fillStyle='rgba(235,70,70,.5)';c.fillRect(0,0,W,H);c.globalCompositeOperation='source-over';
+  c.strokeStyle='#ffb347';c.lineWidth=3;(sc.walls||[]).forEach(s=>{if(s.t==='wall'){c.beginPath();s.pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.stroke();}});
+  const d=AS.draft;if(d&&d.pts&&d.pts.length&&(d.tool==='wall'||d.tool==='poly')){c.strokeStyle='#fff';c.setLineDash([12,9]);c.lineWidth=3;c.beginPath();d.pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));if(d.cursor)c.lineTo(d.cursor[0],d.cursor[1]);c.stroke();c.setLineDash([]);d.pts.forEach((p,i)=>{c.fillStyle=i===0&&d.tool==='poly'?'#ffd98a':'#fff';c.beginPath();c.arc(p[0],p[1],i===0?11:7,0,7);c.fill();});}
+  if(sc.spawn){c.fillStyle='#5ad18a';c.strokeStyle='#fff';c.lineWidth=4;c.beginPath();c.arc(sc.spawn.x,sc.spawn.y,24,0,7);c.fill();c.stroke();c.fillStyle='#fff';c.font='bold 26px sans-serif';c.textAlign='center';c.fillText('START',sc.spawn.x,sc.spawn.y-34);}
+}
+function amWalk(id){
+  const sc=AS.scenes[id],n=(sc.walls||[]).length;
+  const tb=(v,l)=>`<button class="btn sm ${AS.wtool===v?'gold':''}" data-am="wtool" data-v="${v}">${l}</button>`;
+  const help={pencil:'Drag to paint places she can’t walk.',eraser:'Drag over red to un-block it.',wall:'Click points to lay a wall. Double-click (or Enter) to finish. She can’t cross it and has to walk around.',poly:'Click the corners of an area. Click the first (gold) dot, double-click or press Enter to close and fill it.',rect:'Drag a box to block a rectangle.',start:'Click where Azlynn starts when she walks in.'};
+  return `<div class="am-p"><h3>Walkable area</h3><p>Red = Azlynn can’t go there. Everything else is walkable. ${n} shape${n===1?'':'s'} so far.</p>
+  <div class="am-btns">${tb('pencil','Pencil')}${tb('eraser','Eraser')}${tb('wall','Wall line')}${tb('poly','Fill area')}${tb('rect','Box')}${tb('start','Start point')}</div>
+  <p style="margin-top:10px"><b>${{pencil:'Pencil',eraser:'Eraser',wall:'Wall line',poly:'Fill area',rect:'Box',start:'Start point'}[AS.wtool]}:</b> ${help[AS.wtool]}</p>
+  <div class="fld"><label>Pencil / eraser size</label><div class="rng"><input type="range" data-wp="walkSize" min="8" max="200" value="${AS.walkSize}"><input type="number" data-wp="walkSize" value="${AS.walkSize}"></div></div>
+  <div class="fld"><label>Wall thickness</label><div class="rng"><input type="range" data-wp="walkW" min="4" max="80" value="${AS.walkW}"><input type="number" data-wp="walkW" value="${AS.walkW}"></div></div>
+  <div class="am-btns"><button class="btn sm" data-am="wundo">Undo (Ctrl+Z)</button><button class="btn sm danger" data-am="wclear">Clear all</button><button class="btn gold sm" data-am="wdone">Done</button></div>
+  <p class="note" style="font-size:12px;margin-top:12px">This only works for scenes linked to a Foraging map. Saved with the scene.</p></div>`;
+}
+function wpt(e){const cv=document.getElementById('am-walk'),r=cv.getBoundingClientRect();return [Math.round((e.clientX-r.left)/r.width*cv.width),Math.round((e.clientY-r.top)/r.height*cv.height)];}
+function finishDraft(){const d=AS.draft;if(!d)return;const sc=AS.scenes[AS.scene];sc.walls=sc.walls||[];
+  if(d.tool==='wall'&&d.pts.length>=2)sc.walls.push({t:'wall',pts:d.pts,w:AS.walkW});else if(d.tool==='poly'&&d.pts.length>=3)sc.walls.push({t:'poly',pts:d.pts});
+  AS.draft=null;saveMeta();drawWalk();const rp=document.getElementById('am-right');if(rp)rp.innerHTML=amLayers(AS.scene);}
+document.addEventListener('pointerdown',e=>{
+  if(e.target.id!=='am-walk'||!AS.walk)return;e.preventDefault();const sc=AS.scenes[AS.scene],p=wpt(e),T=AS.wtool,cv=e.target;
+  if(T==='start'){sc.spawn={x:p[0],y:p[1]};saveMeta();drawWalk();return;}
+  if(T==='wall'||T==='poly'){const d=AS.draft&&AS.draft.tool===T?AS.draft:(AS.draft={tool:T,pts:[]});
+    if(T==='poly'&&d.pts.length>=3&&Math.hypot(p[0]-d.pts[0][0],p[1]-d.pts[0][1])<24){finishDraft();return;}
+    const now=Date.now(),l=d.pts[d.pts.length-1];
+    if(d.pts.length>=2&&AS._lp&&now-AS._lt<380&&Math.hypot(p[0]-AS._lp[0],p[1]-AS._lp[1])<14){finishDraft();AS._lp=null;return;}
+    if(!l||Math.hypot(p[0]-l[0],p[1]-l[1])>6)d.pts.push(p);AS._lt=now;AS._lp=p;drawWalk();return;}
+  if(T==='rect'){AS.draft={tool:'rect',x0:p[0],y0:p[1],rect:null,pts:[]};}
+  else AS.draft={tool:T,pts:[p]};
+  cv.setPointerCapture(e.pointerId);drawWalk();
+});
+document.addEventListener('pointermove',e=>{
+  if(e.target.id!=='am-walk'||!AS.walk||!AS.draft)return;const d=AS.draft,p=wpt(e);
+  if(d.tool==='wall'||d.tool==='poly'){d.cursor=p;drawWalk();return;}
+  if(!(e.buttons&1))return;
+  if(d.tool==='rect'){d.rect={x:Math.min(d.x0,p[0]),y:Math.min(d.y0,p[1]),w:Math.abs(p[0]-d.x0),h:Math.abs(p[1]-d.y0)};}
+  else{const l=d.pts[d.pts.length-1];if(!l||Math.hypot(p[0]-l[0],p[1]-l[1])>Math.max(5,AS.walkSize/4))d.pts.push(p);}
+  drawWalk();
+});
+document.addEventListener('pointerup',e=>{
+  const d=AS.draft;if(!AS.walk||!d||d.tool==='wall'||d.tool==='poly')return;const sc=AS.scenes[AS.scene];sc.walls=sc.walls||[];
+  if(d.tool==='rect'){if(d.rect&&d.rect.w>8&&d.rect.h>8)sc.walls.push(Object.assign({t:'rect'},d.rect));}
+  else if(d.pts.length)sc.walls.push({t:d.tool==='eraser'?'erase':'brush',r:AS.walkSize,pts:d.pts});
+  AS.draft=null;saveMeta();drawWalk();const rp=document.getElementById('am-right');if(rp)rp.innerHTML=amLayers(AS.scene);
+});
+document.addEventListener('dblclick',e=>{if(e.target.id==='am-walk'&&AS.walk)finishDraft();});
+document.addEventListener('keydown',e=>{if(!AS.walk||!document.getElementById('am-walk'))return;if(e.key==='Enter'){finishDraft();}
+  else if(e.key==='Escape'){AS.draft=null;drawWalk();}
+  else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){const sc=AS.scenes[AS.scene];if(sc.walls&&sc.walls.length){sc.walls.pop();saveMeta();drawWalk();}e.preventDefault();}});
 /* ----- events ----- */
 document.addEventListener('click',async e=>{
   const t=e.target.closest('[data-am]');if(!t||!document.getElementById('asm'))return;const a=t.dataset.am,id=t.dataset.id;
@@ -3501,7 +3566,7 @@ document.addEventListener('click',async e=>{
    case'tog':e.stopPropagation();AS.open.has(id)?AS.open.delete(id):AS.open.add(id);amRender();break;
    case'fsel':{const same=(AS.cur||'')===(id||'');AS.cur=id||null;if(id){if(same&&AS.open.has(id))AS.open.delete(id);else AS.open.add(id);}AS.sel=null;AS.scene=null;amRender();break;}
    case'asset':AS.sel=id;AS.scene=null;AS.cur=node(id).parent;amRender();break;
-   case'scene':AS.scene=id;AS.sel=null;AS.layer=null;AS.cur=node(id).parent;amRender();break;
+   case'scene':AS.walk=false;AS.draft=null;AS.scene=id;AS.sel=null;AS.layer=null;AS.cur=node(id).parent;amRender();break;
    case'newf':{const nm=prompt('Folder name (a chapter, section, or anything)','New folder');if(!nm)break;AS.tree.push({id:uid(),type:'folder',name:nm,parent:id||null,order:nextOrder(id||null)});if(id)AS.open.add(id);saveMeta();amRender();break;}
    case'newsc':{const nm=prompt('Scene name','Stall – night');if(!nm)break;const n={id:uid(),type:'scene',name:nm,parent:id||null,order:nextOrder(id||null)};AS.tree.push(n);AS.scenes[n.id]={bg:'#0e0916',layers:[]};if(id)AS.open.add(id);AS.scene=n.id;AS.sel=null;AS.layer=null;saveMeta();amRender();break;}
    case'up':pick(id||null);break;
@@ -3523,6 +3588,11 @@ document.addEventListener('click',async e=>{
    case'addflies':addLayer(AS.scene,{kind:'flies',name:'Fireflies',color:'#ffe9a6',count:18,fx:'none'});amRender();break;
    case'export':exportAssets();break;
    case'starter':seedStarter();break;
+   case'walk':AS.walk=!AS.walk;AS.draft=null;AS.layer=null;amRender();break;
+   case'wtool':finishDraft();AS.wtool=t.dataset.v;AS.draft=null;amRender();break;
+   case'wundo':{const sc=AS.scenes[AS.scene];if(sc.walls&&sc.walls.length){sc.walls.pop();saveMeta();drawWalk();amRender();}break;}
+   case'wclear':{const sc=AS.scenes[AS.scene];if(sc.walls&&sc.walls.length&&confirm('Clear every blocked area and wall in this scene?')){sc.walls=[];saveMeta();amRender();}break;}
+   case'wdone':AS.walk=false;AS.draft=null;amRender();break;
    case'link':{const s=document.getElementById('am-linksel').value;if(!s)break;const sl=SLOTS.find(x=>x.id===s),sc=AS.scenes[AS.scene];if(!sc.layers.length&&sl)sc.size=sl.size;AS.slots[s]=AS.scene;saveMeta();amRender();toast('Linked to: '+slotLabel(s)+((sl&&(sc.size||'screen')!==sl.size)?' (shape differs from what that place expects)':''));break;}
    case'unlink':delete AS.slots[t.dataset.v];saveMeta();amRender();break;
    case'links':openLinks();break;
@@ -3538,6 +3608,7 @@ document.addEventListener('input',e=>{
   const t=e.target;if(!document.getElementById('asm'))return;
   if(t.dataset.lp){const l=curLayer();if(!l)return;const p=t.dataset.lp;let v=t.value;if(['x','y','s','rot','op','fxa','fxs','size'].includes(p))v=parseFloat(v)||0;if(p==='flip')v=v==='1'?1:0;l[p]=v;
     document.querySelectorAll(`[data-lp="${p}"]`).forEach(o=>{if(o!==t)o.value=v;});stageRefresh();saveSoon();if(p==='fx'||p==='name'){if(t.tagName==='SELECT')amRender();}}
+  else if(t.dataset.wp){AS[t.dataset.wp]=parseFloat(t.value)||1;document.querySelectorAll(`[data-wp="${t.dataset.wp}"]`).forEach(o=>{if(o!==t)o.value=t.value;});}
   else if(t.dataset.sp){AS.scenes[AS.scene][t.dataset.sp]=t.value;if(t.dataset.sp==='size'){amRender();}else stageRefresh();saveSoon();}
 });
 document.addEventListener('change',e=>{const t=e.target;if(!document.getElementById('asm'))return;
