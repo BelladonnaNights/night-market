@@ -1,7 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>The Night Market</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>:root{--bg:#0e0916;--card:#1b1327;--card2:#251a35;--line:rgba(240,198,116,.16);--line2:rgba(240,198,116,.42);--gold:#f0c674;--amber:#e8a33d;--plum:#8a5aae;--text:#f2e9db;--muted:#ab9ec0;--faint:#7d7092;--ok:#7fc8a0;--bad:#e58585;
 --serif:'Cormorant Garamond','Cormorant',Georgia,serif;--sans:'Nunito Sans','Nunito',system-ui,-apple-system,'Segoe UI',sans-serif}
@@ -114,6 +113,8 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}input,
 @keyframes flya{0%{opacity:0;transform:translate(0,0)}15%{opacity:.9}50%{opacity:.35;transform:translate(var(--x),var(--y))}85%{opacity:.9}100%{opacity:0}}
 .glow{animation:glow 3.2s ease-in-out infinite}@keyframes glow{50%{opacity:.7}}
 @media (max-width:700px){.hud .brand{display:none}.vn-text{font-size:19px}.vn-char{height:62%}.item{min-width:100px}.speech .q{font-size:18px}}
+
+@keyframes pulse{0%,100%{transform:scale(.85);opacity:.8}50%{transform:scale(1.15);opacity:1}}
 </style></head><body>
 <div id="game"></div><div id="overlay"></div><div id="story"></div><div id="toast"></div>
 <script type="application/json" id="gamedata">{
@@ -2532,7 +2533,7 @@ function render(){
 }
 function questHtml(){
   if(flag('night_one_done'))return '';
-  const steps=[['Meet Wren at Stall 13','met_wren'],['Open the almanac','opened_almanac'],['Gather 2 reeds and 1 herb','gathered'],['Bring them to Wren','wren_gave'],['Make your first candle','crafted_candle'],['Sell it at full dark','moth_served']];
+  const steps=[['Meet Wren at Stall 13','met_wren'],['Open the almanac','opened_almanac'],['Pick 2 reeds (marsh) and rosemary (garden)','gathered'],['Bring them to Wren','wren_gave'],['Make your first candle','crafted_candle'],['Sell it at full dark','moth_served']];
   return `<div class="quest"><h4>Night One</h4><ul style="margin:0;padding:0">${steps.map(([t,f])=>`<li class="${flag(f)?'done':''}"><i>${flag(f)?'✓':''}</i>${t}</li>`).join('')}</ul></div>`;
 }
 function mainView(){
@@ -2544,9 +2545,9 @@ function mainView(){
     if(!c){body=`<div class="center"><h2>The lanterns are low</h2><p>No one is waiting. ${S.sold?`You have sold ${S.sold} things so far.`:''}</p><div class="actions" style="justify-content:center"><button class="btn gold" data-g="close">Close the stall</button></div></div>`;}
     else body=customerView(c);
   }else if(ph==='dusk'){
-    body=`<div class="center"><h2>Dusk</h2><p>The lanterns are waking. Gather, make, and open the stall when you are ready.</p><div class="actions" style="justify-content:center"><button class="btn" data-g="forage">Forage (temporary)</button><button class="btn gold" data-g="open">Open the stall</button></div></div>`;
+    body=`<div class="center"><h2>Dusk</h2><p>The lanterns are waking. Gather, make, and open the stall when you are ready.</p><div class="actions" style="justify-content:center"><button class="btn" data-g="forage">Go foraging</button><button class="btn gold" data-g="open">Open the stall</button></div></div>`;
   }else{
-    body=`<div class="center"><h2>Day ${S.day}</h2><p>The market sleeps. Gather what you can until the light turns.</p><div class="actions" style="justify-content:center"><button class="btn" data-g="forage">Forage (temporary)</button><button class="btn gold" data-g="dusk">Wait for dusk</button></div></div>`;
+    body=`<div class="center"><h2>Day ${S.day}</h2><p>The market sleeps. Gather what you can until the light turns.</p><div class="actions" style="justify-content:center"><button class="btn" data-g="forage">Go foraging</button><button class="btn gold" data-g="dusk">Wait for dusk</button></div></div>`;
   }
   return h+body+`<div id="artfront">${stallFront(ph)}</div>`+(S.cur&&ph==='night'?'':questHtml());
 }
@@ -2624,13 +2625,13 @@ document.addEventListener('click',e=>{
     case'close':if(S.phase==='night'&&!S.cur&&!$('#overlay').firstChild)closeNight();else closeModal();break;
     case'open':openStall();break;
     case'dusk':setPhase('dusk');break;
-    case'forage':forage();break;
+    case'forage':renderZones();break;
     case'pick':{const k=t.dataset.k;const inv=S.inv[k]||0;const used=sel().filter(x=>x===k).length;if(S.tmp.locked)break;if(used<inv)sel().push(k);else{const ix=sel().indexOf(k);if(ix>-1)sel().splice(ix,1);}render();break;}
     case'offer':if(!S.tmp.locked)offer();break;
     case'away':if(!S.tmp.locked)sendAway();break;
     case'bench':renderBench();break;
     case'bkind':benchKind=t.dataset.v;renderBench();break;
-    case'craft':craft(t.dataset.id);break;
+    case'craft':startCraft(t.dataset.id);break;
     case'pack':renderPack();break;
     case'almanac':renderAlmanac();break;
     case'atab':almTab=t.dataset.v;renderAlmanac();break;
@@ -2642,6 +2643,107 @@ document.addEventListener('click',e=>{
   }
 });
 document.addEventListener('change',e=>{const t=e.target;if(t.dataset&&t.dataset.g==='speed'){S.textSpeed=Number(t.value);save();}});
+
+/* ===== hands-on actions: timing minigame, foraging scene, crafting steps ===== */
+const STEPS={
+ Candle:['Melt the wax low','Set the wick straight','Pour slow','Let it settle, trim the wick'],
+ Incense:['Grind the herbs','Bind with resin','Roll and shape'],
+ Charm:['Gather the threads','Knot with intent','Tie it off'],
+ Brew:['Heat the water','Add the herbs','Steep, watch the colour'],
+ Salve:['Warm the oil','Stir in the herbs slowly','Pour and set'],
+ Lantern:['Cut the frame','Fit the glass','Light the wick'],
+ Craft:['Measure','Shape it','Finish'],Keepsake:['Choose the pieces','Arrange','Seal'],Story:['Listen','Write','Fold']
+};
+const TIERS_BY=s=>s>=.9?'Perfect':s>=.72?'Fine':s>=.4?'Proper':'Improper';
+const ZONEV={'Marsh':'The marsh edge','Garden and hedgerow':'Garden and hedgerow','Woods':'The wood','Canal and shore':'Canal and shore','Town':'Town lanes'};
+let MG=null;
+function miniRun(title,steps,hint,done){
+  MG={steps,i:0,sc:[],pos:0,dir:1,run:false,title,hint,done,center:.5,w:.2};
+  miniStep();
+}
+function miniStep(){
+  const m=MG;if(m.i>=m.steps.length){const avg=m.sc.reduce((a,b)=>a+b,0)/m.sc.length;const d=m.done;MG=null;cancelAnimationFrame(window._mgraf);d(avg);return;}
+  m.center=.28+Math.random()*.44;m.w=Math.max(.1,.2-.012*(S.level-1));m.pos=0;m.dir=1;m.speed=.55+Math.random()*.35+.06*m.i;m.run=true;m.last=performance.now();
+  $('#overlay').innerHTML=`<div class="scrim"><div class="modal narrow" style="text-align:center"><div class="eyebrow">${esc(m.title)}</div><h2>${esc(m.steps[m.i])}</h2>
+   <div class="note" style="margin:6px 0 14px">${m.hint?esc(m.hint)+'<br>':''}Click, tap or press Space when the marker is in the gold.</div>
+   <div id="mgbar" style="position:relative;height:34px;border-radius:99px;background:rgba(14,9,22,.8);border:1px solid var(--line);overflow:hidden">
+    <div style="position:absolute;top:0;bottom:0;left:${(m.center-m.w/2)*100}%;width:${m.w*100}%;background:linear-gradient(#f0c674,#b5862f);opacity:.85"></div>
+    <div style="position:absolute;top:0;bottom:0;left:${(m.center-m.w/8)*100}%;width:${m.w/4*100}%;background:#fff4c8;opacity:.9"></div>
+    <div id="mgmark" style="position:absolute;top:-2px;bottom:-2px;width:6px;background:#fff;border-radius:3px;box-shadow:0 0 10px #fff"></div></div>
+   <div class="lbl" style="margin:12px 0">Step ${m.i+1} of ${m.steps.length}</div><button class="btn gold" id="mgbtn">Now</button></div></div>`;
+  const tick=t=>{if(!MG||!MG.run)return;const dt=(t-m.last)/1000;m.last=t;m.pos+=m.dir*m.speed*dt;if(m.pos>=1){m.pos=1;m.dir=-1;}if(m.pos<=0){m.pos=0;m.dir=1;}
+    const el=$('#mgmark');if(el)el.style.left=`calc(${m.pos*100}% - 3px)`;window._mgraf=requestAnimationFrame(tick);};
+  window._mgraf=requestAnimationFrame(tick);
+}
+function miniHit(){
+  const m=MG;if(!m||!m.run)return;m.run=false;
+  const d=Math.abs(m.pos-m.center);const sc=d<=m.w/8?1:d<=m.w/2?.75-(d-m.w/8)/(m.w/2-m.w/8)*.3:Math.max(0,.4-(d-m.w/2)*2);
+  m.sc.push(sc);const bar=$('#mgbar');if(bar)bar.style.outline='2px solid '+(sc>=.72?'#9ad6a8':sc>=.4?'#f0c674':'#e58585');
+  const b=$('#mgbtn');if(b)b.textContent=sc>=.9?'Perfect':sc>=.72?'Good':sc>=.4?'Fine':'Missed';
+  setTimeout(()=>{m.i++;if(MG===m)miniStep();},550);
+}
+document.addEventListener('click',e=>{if(e.target.closest('#mgbtn')||e.target.id==='mgbar')miniHit();});
+document.addEventListener('keydown',e=>{if(MG&&e.code==='Space'){e.preventDefault();miniHit();}});
+
+/* ----- crafting by hand ----- */
+function startCraft(id){
+  const c=D.crafts.find(x=>x.id===id);if(!c||!canMake(c))return;
+  const steps=(STEPS[c.kind]||STEPS.Craft).slice();
+  if(c.level>=3)steps.push('Final touch');
+  miniRun(c.name,steps,c.method||'',avg=>{
+    parseIng(c.ingredients).forEach(p=>takeItems(p.name,p.qty));
+    let tier=TIERS_BY(avg);
+    const wrong=!(c.moon==='Any'||c.moon===moonOf(S.day));
+    if(wrong){const r=['Improper','Proper','Fine','Perfect'];tier=r[Math.max(0,r.indexOf(tier)-1)];}
+    addItem(c.name,1,tier);save();closeModal();
+    toast(`Made ${c.name} · ${tier}`+(wrong?' (wrong moon cost a tier)':''));
+    if(c.name==='Reed Wick Candle'&&!flag('crafted_candle'))playScene('first_candle',()=>render());else{render();renderBench();}
+  });
+}
+
+/* ----- foraging by hand ----- */
+let FZ=null;
+function renderZones(){
+  const zs=Object.keys(ZONEV);
+  openModal(`${X}<div class="eyebrow">${S.phase==='day'?'Daylight':'Dusk'}</div><h2>Where will you go?</h2><div class="note" style="margin:8px 0">Each place grows different things. Click what glows.</div>
+  <div class="grid">${zs.map(z=>{const n=D.gathers.filter(g=>g.zone===z&&g.source==='Gather').length;return `<div class="rcard" style="--c:${listColor('zones',z)}"><h4>${esc(ZONEV[z])}</h4><p>${n} things to find</p><div class="actions"><button class="btn gold sm" data-g="zone" data-z="${esc(z)}">Go</button></div></div>`;}).join('')}</div>`);
+}
+function enterZone(z){
+  const pool=D.gathers.filter(g=>g.zone===z&&g.source==='Gather');
+  const want=[];
+  if(!flag('gathered')){if(z==='Marsh'){want.push('Reed','Reed','Reed');}if(z==='Garden and hedgerow')want.push('Rosemary','Rosemary');}
+  while(want.length<7)want.push(rnd(pool).name);
+  const nodes=want.slice(0,7).map((n,i)=>({n,x:8+Math.random()*80,y:38+Math.random()*48,done:false,i}));
+  FZ={z,nodes,got:[]};drawZone();
+}
+function drawZone(){
+  const f=FZ,col=listColor('zones',f.z);
+  const bg=f.z==='Marsh'?stallBack('dusk','Waxing'):marshBack?marshBack():stallBack('dusk','Waxing');
+  const left=f.nodes.filter(n=>!n.done).length;
+  $('#overlay').innerHTML=`<div class="scrim"><div class="modal" style="padding:0;overflow:hidden;max-width:1000px"><div style="position:relative;height:min(70vh,520px);background:linear-gradient(#2a1a3c,#1a2a28 70%,#0d1a14)">
+   <div style="position:absolute;inset:0;opacity:.55">${bg}</div>
+   <div style="position:absolute;left:14px;top:12px;z-index:3"><span class="eyebrow">${esc(ZONEV[f.z])}</span><div class="lbl">${f.got.length?'Found: '+esc(f.got.join(', ')):'Click the glowing things'}</div></div>
+   <button class="ibtn x" data-g="zleave" style="z-index:3">✕</button>
+   ${f.nodes.map(n=>n.done?'':`<button data-g="node" data-i="${n.i}" title="Something glows here" style="position:absolute;left:${n.x}%;top:${n.y}%;width:44px;height:44px;margin:-22px;border-radius:50%;border:0;cursor:pointer;z-index:3;background:radial-gradient(circle,#fff4c8 0%,${col} 40%,transparent 72%);box-shadow:0 0 22px ${col};animation:pulse 1.8s ease-in-out infinite"></button>`).join('')}
+   <div style="position:absolute;left:0;right:0;bottom:14px;text-align:center;z-index:3"><button class="btn sm" data-g="${left?'zleave':'zdone'}">${left?'Leave':'Head back'}</button> <button class="btn sm gold" data-g="zagain">Walk further (new spot)</button></div>
+  </div></div></div>`;
+}
+function pickNode(i){
+  const n=FZ.nodes[i];if(!n||n.done)return;const g=D.gathers.find(x=>x.name===n.n);
+  const steps=[ (g&&/root|dig/i.test(g.name+g.when))?'Loosen the earth':'Pick gently' ];
+  miniRun(g?g.name:n.n,steps,g?(g.corr||''):'',avg=>{
+    const t=TIERS_BY(avg);n.done=true;addItem(n.n,1,t);FZ.got.push(n.n+(t!=='Proper'?' ('+t+')':''));
+    if(!flag('gathered')&&haveCount('Reed')>=2&&haveCount('Rosemary')>=1){S.flags.gathered=true;toast('You have what Wren asked for');}
+    save();drawZone();
+  });
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-g]');if(!t)return;const a=t.dataset.g;
+  if(a==='zone'){enterZone(t.dataset.z);}
+  else if(a==='node'){pickNode(+t.dataset.i);}
+  else if(a==='zagain'&&FZ){enterZone(FZ.z);}
+  else if(a==='zleave'||a==='zdone'){FZ=null;closeModal();render();}
+},true);
 
 /* ===== admin: jump anywhere. Open with ?admin in the URL (or localStorage nm-admin=1). ===== */
 function renderAdmin(){
