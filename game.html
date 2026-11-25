@@ -1,0 +1,2720 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The Night Market</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>:root{--bg:#0e0916;--card:#1b1327;--card2:#251a35;--line:rgba(240,198,116,.16);--line2:rgba(240,198,116,.42);--gold:#f0c674;--amber:#e8a33d;--plum:#8a5aae;--text:#f2e9db;--muted:#ab9ec0;--faint:#7d7092;--ok:#7fc8a0;--bad:#e58585;
+--serif:'Cormorant Garamond','Cormorant',Georgia,serif;--sans:'Nunito Sans','Nunito',system-ui,-apple-system,'Segoe UI',sans-serif}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:15px/1.5 var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}input,select,textarea{font:inherit;color:var(--text)}
+#game{position:fixed;inset:0;display:grid;grid-template-rows:auto 1fr auto}
+.hud{position:relative;z-index:20;display:flex;gap:10px;align-items:center;padding:10px 16px;background:linear-gradient(180deg,rgba(14,9,22,.92),rgba(14,9,22,.55));border-bottom:1px solid var(--line);flex-wrap:wrap}
+.hud .brand{font:700 22px var(--serif);color:var(--gold);margin-right:6px}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:5px 13px;border-radius:99px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-weight:700;font-size:13.5px;white-space:nowrap}
+.pill b{color:var(--gold);font-family:var(--serif);font-size:18px;font-weight:700}
+.sp{flex:1}
+.ibtn{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--gold)}
+.ibtn:hover{border-color:var(--line2);background:rgba(240,198,116,.1)}
+#main{position:relative;overflow:hidden;min-height:0}
+#artback,#artfront{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#artfront{z-index:4}
+.cust{position:absolute;left:50%;bottom:21%;transform:translateX(-50%);z-index:3;width:min(300px,34vh);transition:.5s}
+.cust.in{animation:walkin .6s ease-out}
+@keyframes walkin{from{opacity:0;transform:translateX(-30%)}to{opacity:1;transform:translateX(-50%)}}
+.speech{position:absolute;z-index:6;left:50%;top:4%;transform:translateX(-50%);width:min(620px,92%);padding:16px 22px;border-radius:20px;background:linear-gradient(160deg,rgba(43,31,63,.96),rgba(26,18,38,.96));border:1px solid var(--line2);box-shadow:0 18px 50px rgba(0,0,0,.5)}
+.speech .who{display:flex;gap:10px;align-items:center;margin-bottom:6px}
+.speech .nm{font:700 24px var(--serif)}
+.speech .q{font:italic 500 21px/1.35 var(--serif);color:#eadff7}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:99px;font:800 11px var(--sans);letter-spacing:.04em;color:var(--c,var(--gold));border:1px solid color-mix(in srgb,var(--c,var(--gold)) 40%,transparent);background:color-mix(in srgb,var(--c,var(--gold)) 12%,transparent)}
+.tray{position:absolute;z-index:6;left:0;right:0;bottom:0;padding:12px 16px 14px;background:linear-gradient(0deg,rgba(14,9,22,.96) 70%,rgba(14,9,22,0));display:grid;gap:10px}
+.trayrow{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;align-items:stretch}
+.lbl{font:800 10px var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+.item{--c:var(--gold);flex:none;min-width:116px;max-width:170px;padding:8px 12px;border-radius:14px;border:1px solid var(--line);background:linear-gradient(160deg,var(--card2),var(--card));text-align:left;transition:.15s;position:relative}
+.item:hover{border-color:var(--line2);transform:translateY(-2px)}
+.item.sel{border-color:var(--gold);box-shadow:0 0 0 2px rgba(240,198,116,.25),0 0 20px rgba(240,198,116,.2)}
+.item .n{font:700 17px/1.1 var(--serif)}
+.item .t{font-size:11.5px;color:var(--muted)}
+.item .c{position:absolute;right:8px;top:6px;font:700 13px var(--serif);color:var(--gold)}
+.item.dis{opacity:.45}
+.tier{font:800 9.5px var(--sans);letter-spacing:.12em;text-transform:uppercase}
+.tier.Improper{color:#d6a05a}.tier.Proper{color:#9fc7a8}.tier.Fine{color:#8ec9e8}.tier.Perfect{color:#e8a0e0}.tier.Ruined{color:#a06060}
+.btn{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 18px;border-radius:99px;font-weight:800;font-size:14px;border:1px solid var(--line);background:rgba(255,255,255,.05);white-space:nowrap}
+.btn:hover{border-color:var(--line2);background:rgba(240,198,116,.1)}
+.btn.gold{border:0;color:#2a1a08;background:linear-gradient(135deg,#f6d98c,#e8a33d);box-shadow:0 6px 22px rgba(232,163,61,.28)}
+.btn.gold:hover{filter:brightness(1.07)}
+.btn.sm{height:32px;padding:0 13px;font-size:13px}
+.btn.off{opacity:.4;pointer-events:none}
+.btn.danger{color:var(--bad);border-color:rgba(229,133,133,.35)}
+.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.dock{position:relative;z-index:20;display:flex;gap:8px;justify-content:center;padding:10px 12px;background:linear-gradient(0deg,rgba(14,9,22,.95),rgba(14,9,22,.6));border-top:1px solid var(--line);flex-wrap:wrap}
+.dock .btn{height:42px}
+.dock .btn.on{background:rgba(240,198,116,.16);border-color:var(--line2);color:var(--gold)}
+.center{position:absolute;z-index:6;left:50%;top:38%;transform:translate(-50%,-50%);text-align:center;width:min(560px,92%)}
+.center h2{font:700 clamp(34px,5vw,54px)/1 var(--serif);margin:0 0 8px;background:linear-gradient(180deg,#fff3d6,#f0c674 70%,#d99a3e);-webkit-background-clip:text;background-clip:text;color:transparent}
+.center p{color:#d5c9e5;font-size:17px;margin:0 0 16px}
+.quest{position:absolute;z-index:7;left:14px;top:12px;width:min(280px,60vw);padding:12px 14px;border-radius:16px;background:rgba(14,9,22,.82);border:1px solid var(--line);backdrop-filter:blur(6px)}
+.quest h4{margin:0 0 6px;font:700 19px var(--serif);color:var(--gold);display:flex;justify-content:space-between}
+.quest li{list-style:none;display:flex;gap:9px;align-items:flex-start;font-size:13.5px;color:var(--muted);padding:2px 0}
+.quest li i{flex:none;width:15px;height:15px;border-radius:5px;border:1.5px solid var(--line2);margin-top:3px;display:grid;place-items:center;font-style:normal;font-size:11px;color:#2a1a08}
+.quest li.done{color:var(--faint);text-decoration:line-through}.quest li.done i{background:var(--gold)}
+.speech ~ .quest{display:none}
+/* overlays */
+#overlay:empty,#story:empty{display:none}
+.scrim{position:fixed;inset:0;z-index:100;background:rgba(8,5,14,.76);backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;padding:4vh 14px;overflow:auto;animation:fade .18s}
+@keyframes fade{from{opacity:0}}
+.modal{width:min(880px,100%);border-radius:24px;background:linear-gradient(165deg,#2b1f3f,#1a1226 55%);border:1px solid var(--line2);box-shadow:0 40px 120px rgba(0,0,0,.65);padding:26px 28px;position:relative;animation:rise .22s cubic-bezier(.2,.8,.2,1)}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}}
+.modal.narrow{width:min(560px,100%)}
+.modal h2{font:700 38px/1 var(--serif);margin:0 0 4px}
+.modal .x{position:absolute;right:16px;top:16px}
+.eyebrow{font:800 11px var(--sans);letter-spacing:.28em;color:var(--gold);text-transform:uppercase}
+.tabs{display:flex;gap:6px;margin:14px 0;flex-wrap:wrap}
+.tab{padding:6px 14px;border-radius:99px;border:1px solid var(--line);color:var(--muted);font-weight:700;font-size:13px}
+.tab.on{background:var(--gold);color:#2a1a08;border-color:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.rcard{--c:var(--gold);padding:14px 16px;border-radius:16px;border:1px solid var(--line);background:linear-gradient(160deg,var(--card2),var(--card));position:relative;overflow:hidden}
+.rcard::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,var(--c),transparent 80%)}
+.rcard h4{font:700 21px/1.1 var(--serif);margin:0 0 4px}
+.rcard p{margin:4px 0;color:var(--muted);font-size:13.5px}
+.rcard.lock{opacity:.45}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}
+.chip{padding:2px 9px;border-radius:9px;border:1px solid var(--line);background:rgba(255,255,255,.05);font:700 12px var(--sans)}
+.chip.have{border-color:rgba(127,200,160,.5);color:var(--ok)}.chip.miss{border-color:rgba(229,133,133,.4);color:var(--bad)}
+.safety{padding:8px 11px;border-radius:10px;background:rgba(229,133,133,.08);border:1px solid rgba(229,133,133,.25);color:#f0c8c8;font-size:12.5px;margin-top:6px}
+.fld{display:grid;gap:4px;margin:8px 0}.fld label{font:800 10px var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+.fld input,.fld select{padding:8px 11px;border-radius:10px;background:rgba(14,9,22,.6);border:1px solid var(--line);outline:0;min-width:0}
+.fld input:focus,.fld select:focus{border-color:var(--gold)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.adm{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.adm section{padding:14px 16px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+.adm h3{margin:0 0 6px;font:700 22px var(--serif);color:var(--gold)}
+.note{padding:10px 13px;border-radius:12px;background:rgba(240,198,116,.06);border:1px solid var(--line);color:#e4d8c5;font-size:13.5px}
+#toast{position:fixed;left:50%;bottom:90px;transform:translate(-50%,20px);z-index:300;padding:10px 20px;border-radius:99px;background:#2d2142;border:1px solid var(--line2);color:var(--gold);font-weight:800;opacity:0;transition:.25s;pointer-events:none}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+.gain{position:absolute;z-index:9;left:50%;top:44%;transform:translateX(-50%);font:700 46px var(--serif);color:var(--gold);text-shadow:0 0 24px rgba(240,198,116,.7);animation:gain 1.4s ease-out forwards;pointer-events:none}
+@keyframes gain{from{opacity:0;transform:translate(-50%,20px)}20%{opacity:1}to{opacity:0;transform:translate(-50%,-60px)}}
+/* story */
+#story{position:fixed;inset:0;z-index:150;background:#000}
+.vn-bg{position:absolute;inset:0}
+.vn-bg svg{width:100%;height:100%;display:block}
+.vn-char{position:absolute;bottom:0;height:78%;transition:.4s;display:flex;align-items:flex-end}
+.vn-char.left{left:6%}.vn-char.right{right:6%}.vn-char.center{left:50%;transform:translateX(-50%)}
+.vn-char svg{height:100%;width:auto}.vn-char.dim{filter:brightness(.55)}
+.vn-box{position:absolute;left:50%;bottom:3%;transform:translateX(-50%);width:min(940px,95%);min-height:150px;padding:20px 28px 18px;border-radius:22px;background:linear-gradient(160deg,rgba(43,31,63,.96),rgba(22,15,32,.97));border:1px solid var(--line2);box-shadow:0 20px 60px rgba(0,0,0,.6);cursor:pointer}
+.vn-name{position:absolute;left:24px;top:-17px;padding:4px 18px;border-radius:99px;font:700 22px var(--serif);background:linear-gradient(135deg,#f6d98c,#e8a33d);color:#2a1a08;box-shadow:0 6px 20px rgba(232,163,61,.3)}
+.vn-text{font:500 22px/1.45 var(--serif);color:#f2e9db;min-height:64px;white-space:pre-wrap}
+.vn-text.narr{color:#cdbfe0;font-style:italic}
+.vn-next{position:absolute;right:20px;bottom:10px;color:var(--gold);animation:bob 1s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(4px)}}
+.vn-choices{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);width:min(640px,92%);display:grid;gap:10px;z-index:5}
+.vn-choice{padding:14px 20px;border-radius:16px;text-align:left;font:600 20px var(--serif);background:linear-gradient(160deg,rgba(43,31,63,.97),rgba(26,18,38,.97));border:1px solid var(--line2);transition:.15s}
+.vn-choice:hover{border-color:var(--gold);transform:translateX(4px);background:rgba(240,198,116,.12)}
+.vn-tools{position:absolute;right:14px;top:12px;display:flex;gap:8px;z-index:6}
+.fly{position:absolute;width:4px;height:4px;border-radius:50%;background:#ffe3a0;box-shadow:0 0 10px 3px rgba(255,214,130,.55);opacity:0;animation:flya var(--d) ease-in-out var(--dl) infinite}
+@keyframes flya{0%{opacity:0;transform:translate(0,0)}15%{opacity:.9}50%{opacity:.35;transform:translate(var(--x),var(--y))}85%{opacity:.9}100%{opacity:0}}
+.glow{animation:glow 3.2s ease-in-out infinite}@keyframes glow{50%{opacity:.7}}
+@media (max-width:700px){.hud .brand{display:none}.vn-text{font-size:19px}.vn-char{height:62%}.item{min-width:100px}.speech .q{font-size:18px}}
+</style></head><body>
+<div id="game"></div><div id="overlay"></div><div id="story"></div><div id="toast"></div>
+<script type="application/json" id="gamedata">{
+ "rev": 1795499770918,
+ "meta": {
+  "title": "The Night Market",
+  "subtitle": "Game Book",
+  "tagline": "Everything we gather, brew, bind and sell, rooted in real folklore and old herbal craft.",
+  "disclaimer": "Everything here follows real folklore and traditional herbal use as closely as we can. It is for the game and for storytelling, not medical advice. Some plants here are toxic or interact with medicines, and each entry says so."
+ },
+ "sections": {
+  "overview": {
+   "title": "Overview",
+   "blurb": "The market at a glance."
+  },
+  "gather": {
+   "title": "Gathering",
+   "blurb": "Everything you can pick, dig, trade or be given, by zone."
+  },
+  "recipes": {
+   "title": "Recipes & Spells",
+   "blurb": "What to make, what goes in it, and when the moon is right."
+  },
+  "goods": {
+   "title": "Stall Goods",
+   "blurb": "What Stall 13 sells and what each thing earns, done properly or not."
+  },
+  "requests": {
+   "title": "Requests",
+   "blurb": "Who comes to the counter, what ails them, and what they will pay."
+  },
+  "upgrades": {
+   "title": "Stall Upgrades",
+   "blurb": "Ways to make Stall 13 more yours."
+  },
+  "rules": {
+   "title": "Rules",
+   "blurb": "Quality tiers and Stall Standing. Change a number and every price follows."
+  }
+ },
+ "lists": {
+  "zones": [
+   {
+    "name": "Marsh",
+    "color": "#4fb5a0"
+   },
+   {
+    "name": "Garden and hedgerow",
+    "color": "#9ac46a"
+   },
+   {
+    "name": "Woods",
+    "color": "#c9a24a"
+   },
+   {
+    "name": "Canal and shore",
+    "color": "#6c9bd8"
+   },
+   {
+    "name": "Town",
+    "color": "#d98a5a"
+   },
+   {
+    "name": "Reward",
+    "color": "#b58be0"
+   }
+  ],
+  "kinds": [
+   {
+    "name": "Candle",
+    "color": "#f0c674"
+   },
+   {
+    "name": "Incense",
+    "color": "#c9a0dc"
+   },
+   {
+    "name": "Charm",
+    "color": "#8bd3b0"
+   },
+   {
+    "name": "Brew",
+    "color": "#e08fa0"
+   },
+   {
+    "name": "Salve",
+    "color": "#e6a86c"
+   },
+   {
+    "name": "Lantern",
+    "color": "#ffd98a"
+   },
+   {
+    "name": "Craft",
+    "color": "#a9b4c9"
+   },
+   {
+    "name": "Keepsake",
+    "color": "#e8b4cf"
+   },
+   {
+    "name": "Story",
+    "color": "#9d8bd8"
+   }
+  ],
+  "moons": [
+   {
+    "name": "Any",
+    "color": "#a99bbd"
+   },
+   {
+    "name": "New",
+    "color": "#7d7ad0"
+   },
+   {
+    "name": "Waxing",
+    "color": "#d6b86a"
+   },
+   {
+    "name": "Full",
+    "color": "#f6e7b4"
+   },
+   {
+    "name": "Waning",
+    "color": "#c58fb7"
+   }
+  ],
+  "rarities": [
+   {
+    "name": "Common",
+    "color": "#a99bbd"
+   },
+   {
+    "name": "Uncommon",
+    "color": "#7fc8a0"
+   },
+   {
+    "name": "Rare",
+    "color": "#f0c674"
+   }
+  ],
+  "reqkinds": [
+   {
+    "name": "Ailment",
+    "color": "#e08fa0"
+   },
+   {
+    "name": "Worry",
+    "color": "#9fb4e8"
+   },
+   {
+    "name": "Wish",
+    "color": "#f0c674"
+   },
+   {
+    "name": "Favor",
+    "color": "#8bd3b0"
+   },
+   {
+    "name": "Haunting",
+    "color": "#b58be0"
+   }
+  ],
+  "accuracy": [
+   {
+    "name": "Traditional",
+    "color": "#7fc8a0"
+   },
+   {
+    "name": "Inspired",
+    "color": "#e6c06a"
+   },
+   {
+    "name": "Game-only",
+    "color": "#c9a0dc"
+   }
+  ]
+ },
+ "tiers": [
+  {
+   "name": "Ruined",
+   "mult": 0,
+   "desc": "Wrong ingredient entirely, burnt, or left unfinished overnight."
+  },
+  {
+   "name": "Improper",
+   "mult": 0.4,
+   "desc": "Rushed steep, wrong moon, a gather over a day old, or a substitute ingredient."
+  },
+  {
+   "name": "Proper",
+   "mult": 1,
+   "desc": "Right ingredients, right method, any moon."
+  },
+  {
+   "name": "Fine",
+   "mult": 1.5,
+   "desc": "Proper, made under the best moon for that recipe."
+  },
+  {
+   "name": "Perfect",
+   "mult": 2.5,
+   "desc": "Fine, plus a premium ingredient (beeswax, same-day gather) and no rushing."
+  }
+ ],
+ "levels": [
+  {
+   "level": 1,
+   "name": "Lit Stall",
+   "earn": "Light Stall 13 on Night One",
+   "opens": "Tier 1 wares and the first requests"
+  },
+  {
+   "level": 2,
+   "name": "Regular Hours",
+   "earn": "Help 3 customers and sell 10 goods",
+   "opens": "Tier 2: salves, syrups, charms, candles and lanterns"
+  },
+  {
+   "level": 3,
+   "name": "Known Name",
+   "earn": "Help 8 different customers and finish one favor",
+   "opens": "Tier 3: tonics, saining, pendulums, lockets, the Duchess favor"
+  },
+  {
+   "level": 4,
+   "name": "Favoured",
+   "earn": "The moth-winged visitor trusts you, and Fenn's lantern is lit",
+   "opens": "Memory Candle, Calling Lantern, the hauntings"
+  },
+  {
+   "level": 5,
+   "name": "Keeper's Hand",
+   "earn": "Wren gives you the key",
+   "opens": "Keeper's Lantern, and the market's own requests"
+  }
+ ],
+ "gathers": [
+  {
+   "id": "g-reed",
+   "name": "Reed",
+   "latin": "Phragmites australis",
+   "zone": "Marsh",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Water",
+   "lore": "Marsh reeds and rushes were peeled, dried and dipped in fat to make rushlights, the cheap candle of old cottages.",
+   "safety": "",
+   "accuracy": "Inspired",
+   "notes": ""
+  },
+  {
+   "id": "g-bog-moss",
+   "name": "Bog Moss",
+   "latin": "Sphagnum",
+   "zone": "Marsh",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Water",
+   "lore": "Sphagnum soaks up many times its weight in water and was used as a wound dressing as late as the First World War.",
+   "safety": "Never actually brewed. The tea is a game-only comfort.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-glowcap",
+   "name": "Glowcap",
+   "latin": "Armillaria (foxfire)",
+   "zone": "Marsh",
+   "when": "Night only",
+   "rarity": "Uncommon",
+   "source": "Gather",
+   "corr": "Moon · Water",
+   "lore": "Foxfire is the real glow of some rotting-wood fungi. Marsh folk took it for will-o'-the-wisps and spirit lights.",
+   "safety": "Never eat wild fungi.",
+   "accuracy": "Inspired",
+   "notes": ""
+  },
+  {
+   "id": "g-meadowsweet",
+   "name": "Meadowsweet",
+   "latin": "Filipendula ulmaria",
+   "zone": "Marsh",
+   "when": "Summer",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Venus · Water",
+   "lore": "Strewn on floors for its sweet scent and held sacred in old Celtic lands. It contains salicylates, aspirin's chemical family, and was brewed for aches and fevers.",
+   "safety": "Avoid if allergic to aspirin or pregnant.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-marshmallow-root",
+   "name": "Marshmallow Root",
+   "latin": "Althaea officinalis",
+   "zone": "Marsh",
+   "when": "Autumn root",
+   "rarity": "Uncommon",
+   "source": "Gather",
+   "corr": "Venus · Water",
+   "lore": "Its slippery mucilage has soothed coughs and sore throats for centuries.",
+   "safety": "May slow the absorption of other medicines taken with it.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-valerian",
+   "name": "Valerian",
+   "latin": "Valeriana officinalis",
+   "zone": "Marsh",
+   "when": "Autumn root, dug at dusk",
+   "rarity": "Uncommon",
+   "source": "Gather",
+   "corr": "Venus · Water",
+   "lore": "A sleep and calm herb since ancient Greece. Cats love the smell. Folklore links the root to love and harmony.",
+   "safety": "Causes drowsiness. Do not combine with sedatives.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-sweet-violet",
+   "name": "Sweet Violet",
+   "latin": "Viola odorata",
+   "zone": "Marsh",
+   "when": "Spring, at dusk",
+   "rarity": "Rare",
+   "source": "Gather",
+   "corr": "Venus · Water",
+   "lore": "Candied and steeped for centuries. A flower of modesty and remembrance, and an old remedy for coughs.",
+   "safety": "Only the flowers and leaves are used.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-rosemary",
+   "name": "Rosemary",
+   "latin": "Salvia rosmarinus",
+   "zone": "Garden and hedgerow",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Sun · Fire",
+   "lore": "Rosemary for remembrance: worn at weddings and funerals, burned to cleanse sickrooms, tucked under pillows against bad dreams.",
+   "safety": "Avoid large amounts in pregnancy.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-lavender",
+   "name": "Lavender",
+   "latin": "Lavandula angustifolia",
+   "zone": "Garden and hedgerow",
+   "when": "Summer",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Mercury · Air",
+   "lore": "Sewn into pillows and linen for calm and sleep, and hung in doorways to cleanse and welcome.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-chamomile",
+   "name": "Chamomile",
+   "latin": "Matricaria chamomilla",
+   "zone": "Garden and hedgerow",
+   "when": "Summer",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Sun · Water",
+   "lore": "One of the Anglo-Saxon Nine Herbs, called maythen. A gentle herb for the stomach, nerves and sleep.",
+   "safety": "Avoid if allergic to daisies or ragweed.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-mint",
+   "name": "Mint",
+   "latin": "Mentha",
+   "zone": "Garden and hedgerow",
+   "when": "Summer",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Mercury · Air",
+   "lore": "Settles the stomach and clears the head. Rubbed on tables to welcome guests and carried for luck.",
+   "safety": "Strong mint can aggravate heartburn.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-sage",
+   "name": "Sage",
+   "latin": "Salvia officinalis",
+   "zone": "Garden and hedgerow",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Jupiter · Air",
+   "lore": "The name means to save. Old herbals prize it for wisdom and long life, and a sage gargle for sore throats is still common.",
+   "safety": "Avoid in pregnancy and in large doses.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-thyme",
+   "name": "Thyme",
+   "latin": "Thymus vulgaris",
+   "zone": "Garden and hedgerow",
+   "when": "Summer",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Venus · Air",
+   "lore": "Roman soldiers bathed in thyme for courage and medieval ladies embroidered thyme sprigs for their knights. A sprig under the pillow is said to keep nightmares off.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-calendula",
+   "name": "Calendula",
+   "latin": "Calendula officinalis",
+   "zone": "Garden and hedgerow",
+   "when": "Summer",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Sun · Fire",
+   "lore": "The marigold opens and closes with the sun. Flowers steeped in oil soothe dry, cracked skin.",
+   "safety": "Avoid if allergic to the daisy family.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-comfrey",
+   "name": "Comfrey",
+   "latin": "Symphytum officinale",
+   "zone": "Garden and hedgerow",
+   "when": "Summer",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Saturn · Water",
+   "lore": "Called knitbone for its old use on bruises and sprains.",
+   "safety": "External use only, on unbroken skin. Never eaten.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-plantain",
+   "name": "Plantain",
+   "latin": "Plantago major",
+   "zone": "Garden and hedgerow",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Venus · Earth",
+   "lore": "Waybread grows beside every path. Bruised leaves were pressed on stings and scrapes, and it is one of the Anglo-Saxon Nine Herbs.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-mugwort",
+   "name": "Mugwort",
+   "latin": "Artemisia vulgaris",
+   "zone": "Garden and hedgerow",
+   "when": "Summer",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Venus · Earth",
+   "lore": "The eldest of the Nine Herbs. Travelers put it in their shoes against weariness, and it is stuffed into pillows for vivid dreams.",
+   "safety": "Avoid in pregnancy. Bitter, so use small amounts.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-elderflower",
+   "name": "Elderflower",
+   "latin": "Sambucus nigra",
+   "zone": "Garden and hedgerow",
+   "when": "Late spring",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Venus · Water",
+   "lore": "The elder was thought to be guarded by the Elder Mother, and you asked leave before cutting. Flowers are brewed for colds and fevers.",
+   "safety": "Raw berries, leaves and bark are toxic. Use flowers only.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-yarrow",
+   "name": "Yarrow",
+   "latin": "Achillea millefolium",
+   "zone": "Garden and hedgerow",
+   "when": "Summer",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Venus · Water",
+   "lore": "Named for Achilles, who used it on wounds. Also carried for courage and used in divination.",
+   "safety": "Avoid in pregnancy. Allergy risk for the daisy family.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-rosehip",
+   "name": "Rosehip",
+   "latin": "Rosa canina",
+   "zone": "Garden and hedgerow",
+   "when": "Autumn",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Venus · Water",
+   "lore": "Rich in vitamin C. The rose is the old flower of love and the heart.",
+   "safety": "Remove the irritating seed hairs.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-hawthorn-berry",
+   "name": "Hawthorn Berry",
+   "latin": "Crataegus monogyna",
+   "zone": "Garden and hedgerow",
+   "when": "Autumn",
+   "rarity": "Uncommon",
+   "source": "Gather",
+   "corr": "Mars · Fire",
+   "lore": "A faerie tree, unlucky to cut or to bring blossom indoors. The berries have been used for the heart since the Middle Ages.",
+   "safety": "Can interact with heart and blood-pressure medicines.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-st-john-s-wort",
+   "name": "St John's Wort",
+   "latin": "Hypericum perforatum",
+   "zone": "Garden and hedgerow",
+   "when": "Midsummer",
+   "rarity": "Uncommon",
+   "source": "Gather",
+   "corr": "Sun · Fire",
+   "lore": "Picked on St John's Eve against evil. Flowers steeped in oil turn blood red and were used on burns and sore skin.",
+   "safety": "Interacts with many medicines and makes skin sun-sensitive.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-pine-resin",
+   "name": "Pine Resin",
+   "latin": "Pinus",
+   "zone": "Woods",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Sun · Fire",
+   "lore": "Burned as incense for cleansing and purification, and used as a sticky sealer for small wounds.",
+   "safety": "Burn only on charcoal, with a window open.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-hazel-twig",
+   "name": "Hazel Twig",
+   "latin": "Corylus avellana",
+   "zone": "Woods",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Mercury · Air",
+   "lore": "Hazel is the classic wood for dowsing rods and wands. In Irish myth, hazelnuts held all wisdom.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-thistle",
+   "name": "Thistle",
+   "latin": "Cirsium",
+   "zone": "Woods",
+   "when": "Summer",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Mars · Fire",
+   "lore": "A prickly guardian, planted and hung for protection.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-fern",
+   "name": "Fern",
+   "latin": "Dryopteris",
+   "zone": "Woods",
+   "when": "Midsummer night",
+   "rarity": "Rare",
+   "source": "Gather",
+   "corr": "Mercury · Earth",
+   "lore": "Ferns bear no visible flowers or seeds, so folk said the seed appears only on Midsummer Eve and gives invisibility to whoever catches it.",
+   "safety": "Do not eat ferns. Bracken is toxic.",
+   "accuracy": "Inspired",
+   "notes": ""
+  },
+  {
+   "id": "g-raven-feather",
+   "name": "Raven Feather",
+   "latin": "Corvus corax",
+   "zone": "Woods",
+   "when": "Any, found only",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Saturn · Air",
+   "lore": "Ravens are old omen birds. Shed feathers go into witch's ladders and make quills.",
+   "safety": "Only take feathers you find. In many places it is illegal to keep wild bird feathers.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-birch-bark",
+   "name": "Birch Bark",
+   "latin": "Betula pendula",
+   "zone": "Woods",
+   "when": "Any",
+   "rarity": "Uncommon",
+   "source": "Gather",
+   "corr": "Venus · Water",
+   "lore": "Birch is the tree of new beginnings and cleansing, source of besoms. Its papery bark has been written on.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-rowan-twig",
+   "name": "Rowan Twig",
+   "latin": "Sorbus aucuparia",
+   "zone": "Woods",
+   "when": "Any",
+   "rarity": "Uncommon",
+   "source": "Gather",
+   "corr": "Sun · Fire",
+   "lore": "Each berry carries a tiny pentagram. Twigs bound with red thread were hung over doors against witchcraft.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-juniper",
+   "name": "Juniper",
+   "latin": "Juniperus communis",
+   "zone": "Woods",
+   "when": "Any",
+   "rarity": "Uncommon",
+   "source": "Gather",
+   "corr": "Sun · Fire",
+   "lore": "In Scottish saining, juniper was burned through house and byre on New Year's morning to cleanse and protect.",
+   "safety": "Avoid in pregnancy.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-oak-gall",
+   "name": "Oak Gall",
+   "latin": "Quercus",
+   "zone": "Woods",
+   "when": "Autumn",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Jupiter · Fire",
+   "lore": "The marble-like growths on oak. Crushed galls and iron make iron gall ink, used for most medieval manuscripts.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-willow-bark",
+   "name": "Willow Bark",
+   "latin": "Salix alba",
+   "zone": "Canal and shore",
+   "when": "Spring",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Moon · Water",
+   "lore": "White willow bark contains salicin, an ancestor of aspirin. Willow is also the moon's tree and a tree of mourning.",
+   "safety": "Avoid with aspirin allergy. Not for children.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-hag-stone",
+   "name": "Hag Stone",
+   "latin": "",
+   "zone": "Canal and shore",
+   "when": "Any",
+   "rarity": "Uncommon",
+   "source": "Gather",
+   "corr": "Moon · Water",
+   "lore": "A stone worn through by water with a natural hole. Hung over doors and beds against nightmares and hags; looking through one is said to show what is hidden.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-sea-glass",
+   "name": "Sea Glass",
+   "latin": "",
+   "zone": "Canal and shore",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Moon · Water",
+   "lore": "Glass smoothed by the tide and tucked into charms as mermaid's tears or sea luck.",
+   "safety": "",
+   "accuracy": "Inspired",
+   "notes": ""
+  },
+  {
+   "id": "g-driftwood",
+   "name": "Driftwood",
+   "latin": "",
+   "zone": "Canal and shore",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Water · Moon",
+   "lore": "Sea-washed wood, prized for wands, altars and amulets.",
+   "safety": "",
+   "accuracy": "Inspired",
+   "notes": ""
+  },
+  {
+   "id": "g-clay",
+   "name": "Clay",
+   "latin": "",
+   "zone": "Canal and shore",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Saturn · Earth",
+   "lore": "Earth clay for pots and poppets, the oldest craft there is.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-freshwater-pearl",
+   "name": "Freshwater Pearl",
+   "latin": "",
+   "zone": "Canal and shore",
+   "when": "Any",
+   "rarity": "Rare",
+   "source": "Gather",
+   "corr": "Moon · Water",
+   "lore": "Pearls are the moon's own gem in old lore, for love, purity and wisdom.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-sea-salt",
+   "name": "Sea Salt",
+   "latin": "",
+   "zone": "Canal and shore",
+   "when": "Low tide",
+   "rarity": "Common",
+   "source": "Gather",
+   "corr": "Earth · Water",
+   "lore": "Salt lines on thresholds, salt thrown over the shoulder, salt in protective bottles. One of the most widespread protective materials in folk belief.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-wax-ends",
+   "name": "Wax Ends",
+   "latin": "",
+   "zone": "Town",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Trade with Wren",
+   "corr": "Sun · Fire",
+   "lore": "Leftover candle ends, melted down and poured again.",
+   "safety": "",
+   "accuracy": "Inspired",
+   "notes": ""
+  },
+  {
+   "id": "g-beeswax",
+   "name": "Beeswax",
+   "latin": "",
+   "zone": "Town",
+   "when": "Any",
+   "rarity": "Uncommon",
+   "source": "Trade with Wren",
+   "corr": "Sun · Fire",
+   "lore": "Beeswax was the church candle, burning clean and sweet. Also the base of old salves.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-copper-wire",
+   "name": "Copper Wire",
+   "latin": "",
+   "zone": "Town",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Buy or trade in town",
+   "corr": "Venus · Earth",
+   "lore": "Copper is Venus's metal in alchemy, used in love charms and wands.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-ribbon",
+   "name": "Ribbon",
+   "latin": "",
+   "zone": "Town",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Buy or trade in town",
+   "corr": "Venus · Air",
+   "lore": "Ribbons tie charms shut and mark them as yours.",
+   "safety": "",
+   "accuracy": "Inspired",
+   "notes": ""
+  },
+  {
+   "id": "g-red-thread",
+   "name": "Red Thread",
+   "latin": "",
+   "zone": "Town",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Buy or trade in town",
+   "corr": "Mars · Fire",
+   "lore": "Red wool thread tied in knots is an old protective charm in Britain and Ireland, often paired with rowan.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-iron-nail",
+   "name": "Iron Nail",
+   "latin": "",
+   "zone": "Town",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Scavenge in town",
+   "corr": "Mars · Fire",
+   "lore": "Cold iron is said to turn faerie folk and spirits. Horseshoe nails were kept and nails put in witch bottles.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-honey",
+   "name": "Honey",
+   "latin": "",
+   "zone": "Town",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Buy or trade in town",
+   "corr": "Sun · Water",
+   "lore": "The oldest sweetener, mildly antibacterial and used in cough remedies. Also sweetens jars and spells.",
+   "safety": "Never give to babies under one year old.",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-olive-oil",
+   "name": "Olive Oil",
+   "latin": "",
+   "zone": "Town",
+   "when": "Any",
+   "rarity": "Common",
+   "source": "Buy or trade in town",
+   "corr": "Sun · Fire",
+   "lore": "The old base oil for herb infusions, and an anointing oil in many traditions.",
+   "safety": "",
+   "accuracy": "Traditional",
+   "notes": ""
+  },
+  {
+   "id": "g-glow-moth-scale",
+   "name": "Glow Moth Scale",
+   "latin": "",
+   "zone": "Reward",
+   "when": "Given by the moth-winged visitor",
+   "rarity": "Rare",
+   "source": "Gift",
+   "corr": "Moon · Air",
+   "lore": "A scale that holds a faint light. Invented for the game.",
+   "safety": "",
+   "accuracy": "Game-only",
+   "notes": ""
+  }
+ ],
+ "crafts": [
+  {
+   "id": "c-reed-wick-candle",
+   "name": "Reed Wick Candle",
+   "kind": "Candle",
+   "level": 1,
+   "ingredients": "Wax Ends + Reed",
+   "method": "Melt low, set the reed wick straight, pour slow.",
+   "moon": "Any",
+   "purpose": "Opening ware. A calm room.",
+   "price": 6,
+   "improper": "Crooked wick, smoky flame, sputters out in a draught.",
+   "sells": true,
+   "accuracy": "Game-only",
+   "lore": "Real rushlights used dried reeds dipped in fat. This wax version is for fun.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-resin-incense",
+   "name": "Resin Incense",
+   "kind": "Incense",
+   "level": 1,
+   "ingredients": "Pine Resin + Rosemary",
+   "method": "Crush the resin with the rosemary and burn a pinch on a charcoal disc.",
+   "moon": "Any",
+   "purpose": "Cleansing a room.",
+   "price": 7,
+   "improper": "Too much resin: acrid smoke that waters the eyes.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Burning resin and herbs to cleanse air and ritual space is one of the oldest practices there is.",
+   "safety": "Ventilate. Never leave burning unattended.",
+   "notes": ""
+  },
+  {
+   "id": "c-rowan-cross",
+   "name": "Rowan Cross",
+   "kind": "Charm",
+   "level": 1,
+   "ingredients": "Rowan Twig + Red Thread",
+   "method": "Bind two twigs in an equal-armed cross with red thread, wrapping over and under.",
+   "moon": "Any",
+   "purpose": "Keeping ill luck and witching from the door.",
+   "price": 5,
+   "improper": "Thread tied in the wrong colour, or twigs cut without asking: no protection.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "A Scottish and Irish house charm, hung over the door or byre.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-hag-stone-charm",
+   "name": "Hag Stone Charm",
+   "kind": "Charm",
+   "level": 1,
+   "ingredients": "Hag Stone + Red Thread",
+   "method": "Thread the stone on red cord, tie nine knots, hang it by the bed or door.",
+   "moon": "Any",
+   "purpose": "Luck, and a ward against bad dreams.",
+   "price": 6,
+   "improper": "A stone with no hole: just a stone on a string.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Holed stones were hung in stables and bedrooms to keep nightmares and hags away.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-bog-moss-tea",
+   "name": "Bog Moss Tea",
+   "kind": "Brew",
+   "level": 1,
+   "ingredients": "Bog Moss",
+   "method": "Steep in hot water, never boil.",
+   "moon": "Any",
+   "purpose": "Chest cough, river fog.",
+   "price": 6,
+   "improper": "Boiled instead of steeped: bitter, and it does not clear a chest.",
+   "sells": true,
+   "accuracy": "Game-only",
+   "lore": "A comforting invention. Real sphagnum is a wound dressing, not a tea.",
+   "safety": "Game only. Do not brew real sphagnum.",
+   "notes": ""
+  },
+  {
+   "id": "c-mint-tea",
+   "name": "Mint Tea",
+   "kind": "Brew",
+   "level": 1,
+   "ingredients": "Mint + Honey",
+   "method": "Pour hot water over fresh leaves, cover, steep five minutes, stir in honey.",
+   "moon": "Any",
+   "purpose": "Upset stomach and heavy meals.",
+   "price": 5,
+   "improper": "Steeped too long and uncovered: weak and grassy.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Mint has been served after meals to settle digestion since ancient Greece.",
+   "safety": "Strong mint can aggravate heartburn.",
+   "notes": ""
+  },
+  {
+   "id": "c-chamomile-tisane",
+   "name": "Chamomile Tisane",
+   "kind": "Brew",
+   "level": 1,
+   "ingredients": "Chamomile + Honey",
+   "method": "Steep the flowers covered for ten minutes so the oils stay in the cup.",
+   "moon": "Any",
+   "purpose": "Calm, easy sleep.",
+   "price": 5,
+   "improper": "Uncovered and over-steeped: bitter, no calm.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "A classic bedtime herb for nerves and sleep.",
+   "safety": "Avoid if allergic to daisies or ragweed.",
+   "notes": ""
+  },
+  {
+   "id": "c-clay-jar",
+   "name": "Clay Jar",
+   "kind": "Craft",
+   "level": 2,
+   "ingredients": "Clay",
+   "method": "Pinch the clay, shape the walls, dry in shade, then fire.",
+   "moon": "Any",
+   "purpose": "Holds salves, syrups and brews.",
+   "price": 8,
+   "improper": "Cracks in the firing: leaks.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Clay vessels held remedies and charms in every old culture.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-sage-honey-throat-tea",
+   "name": "Sage & Honey Throat Tea",
+   "kind": "Brew",
+   "level": 2,
+   "ingredients": "Sage + Honey + Clay Jar",
+   "method": "Steep a few leaves, cool a little, and stir in honey. May also be gargled.",
+   "moon": "Any",
+   "purpose": "A raw or sore throat.",
+   "price": 10,
+   "improper": "Too strong: bitter and drying.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Sage gargles are a long-standing remedy for sore throats.",
+   "safety": "Avoid in pregnancy and large amounts.",
+   "notes": ""
+  },
+  {
+   "id": "c-marshmallow-cough-syrup",
+   "name": "Marshmallow Cough Syrup",
+   "kind": "Brew",
+   "level": 2,
+   "ingredients": "Marshmallow Root + Honey + Clay Jar",
+   "method": "Soak the root in cold water overnight, strain, and warm gently with honey.",
+   "moon": "Any",
+   "purpose": "A dry, tickling cough.",
+   "price": 14,
+   "improper": "Boiled hard: loses its slippery, soothing quality.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "The cold-water soak is the traditional way to draw out the soothing mucilage.",
+   "safety": "Not for babies under one year old because of the honey.",
+   "notes": ""
+  },
+  {
+   "id": "c-elderflower-fever-tea",
+   "name": "Elderflower Fever Tea",
+   "kind": "Brew",
+   "level": 2,
+   "ingredients": "Elderflower + Yarrow + Mint",
+   "method": "Steep equal parts hot and covered for ten minutes, sip warm and sweat it out.",
+   "moon": "Any",
+   "purpose": "Colds and fevers.",
+   "price": 15,
+   "improper": "Brewed from the wrong part of the elder: unwell, not well.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Elderflower, yarrow and peppermint is the classic old composition for colds and fevers.",
+   "safety": "Avoid yarrow in pregnancy. Use flowers only, never raw berries.",
+   "notes": ""
+  },
+  {
+   "id": "c-willow-pain-draught",
+   "name": "Willow Pain Draught",
+   "kind": "Brew",
+   "level": 2,
+   "ingredients": "Willow Bark + Meadowsweet + Clay Jar",
+   "method": "Simmer the bark gently for fifteen minutes, add meadowsweet off the heat, strain.",
+   "moon": "Waning",
+   "purpose": "Aches, sore joints and low fevers.",
+   "price": 15,
+   "improper": "Not simmered: weak, with no ease in it.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Both plants contain salicylates, the chemical family behind aspirin.",
+   "safety": "Avoid with aspirin allergy. Not for children.",
+   "notes": ""
+  },
+  {
+   "id": "c-plantain-poultice",
+   "name": "Plantain Poultice",
+   "kind": "Salve",
+   "level": 2,
+   "ingredients": "Plantain + Honey",
+   "method": "Bruise fresh leaves, press on the spot with a dab of honey, cover with cloth.",
+   "moon": "Any",
+   "purpose": "Scrapes, stings and bites.",
+   "price": 9,
+   "improper": "Wilted leaves: no use.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Chewed or bruised waybread leaves were pressed on stings and scrapes in country medicine.",
+   "safety": "For small scrapes only. See a healer for deep wounds.",
+   "notes": ""
+  },
+  {
+   "id": "c-yarrow-salve",
+   "name": "Yarrow Salve",
+   "kind": "Salve",
+   "level": 2,
+   "ingredients": "Yarrow + Beeswax + Olive Oil + Clay Jar",
+   "method": "Warm the oil with yarrow, strain, melt in beeswax, pour into the jar.",
+   "moon": "Any",
+   "purpose": "Cuts and grazes.",
+   "price": 11,
+   "improper": "Oil too hot: scorched herb, brown and bitter.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Yarrow was the soldier's wound herb, named for Achilles.",
+   "safety": "Avoid yarrow in pregnancy.",
+   "notes": ""
+  },
+  {
+   "id": "c-calendula-salve",
+   "name": "Calendula Salve",
+   "kind": "Salve",
+   "level": 2,
+   "ingredients": "Calendula + Beeswax + Olive Oil + Clay Jar",
+   "method": "Infuse petals in warm oil for hours, strain, melt in beeswax, pour.",
+   "moon": "Any",
+   "purpose": "Dry, cracked and sore skin.",
+   "price": 12,
+   "improper": "Damp petals in the oil: it spoils.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Calendula-infused oil and salve is a long-standing skin remedy.",
+   "safety": "Avoid if allergic to the daisy family.",
+   "notes": ""
+  },
+  {
+   "id": "c-comfrey-salve",
+   "name": "Comfrey Salve",
+   "kind": "Salve",
+   "level": 2,
+   "ingredients": "Comfrey + Beeswax + Olive Oil + Clay Jar",
+   "method": "Infuse leaf in warm oil, strain, melt in beeswax, pour.",
+   "moon": "Waning",
+   "purpose": "Bruises and sprains.",
+   "price": 12,
+   "improper": "Used on a broken-skinned wound: not for that.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Called knitbone, comfrey was used for bruises and sprains.",
+   "safety": "External use only, on unbroken skin, short-term.",
+   "notes": ""
+  },
+  {
+   "id": "c-st-john-s-wort-oil",
+   "name": "St John's Wort Oil",
+   "kind": "Salve",
+   "level": 2,
+   "ingredients": "St John's Wort + Olive Oil + Clay Jar",
+   "method": "Pack the flowers in oil, leave in the sun for weeks until it turns red.",
+   "moon": "Waxing",
+   "purpose": "Burns and sore skin.",
+   "price": 16,
+   "improper": "Pressed too soon: not red, not ready.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "The blood-red oil from Midsummer flowers was a traditional burn remedy.",
+   "safety": "Makes skin sun-sensitive. Interacts with many medicines.",
+   "notes": ""
+  },
+  {
+   "id": "c-hush-candle",
+   "name": "Hush Candle",
+   "kind": "Candle",
+   "level": 2,
+   "ingredients": "Beeswax + Lavender + Reed",
+   "method": "Press dried lavender into the wax as it sets.",
+   "moon": "Waning",
+   "purpose": "Calms a restless room.",
+   "price": 16,
+   "improper": "Wet lavender: it sputters and smells scorched.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Lavender has been used for calm and sleep since Roman times.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-hearth-candle",
+   "name": "Hearth Candle",
+   "kind": "Candle",
+   "level": 2,
+   "ingredients": "Beeswax + Rosemary + Pine Resin",
+   "method": "Melt, stir in crushed rosemary and a little resin, pour while warm.",
+   "moon": "Waxing",
+   "purpose": "A blessing for a home and its fire.",
+   "price": 15,
+   "improper": "Too much resin: spits and smokes.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Rosemary and resin have long been burned in homes for cleansing and welcome.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-courage-sachet",
+   "name": "Courage Sachet",
+   "kind": "Charm",
+   "level": 2,
+   "ingredients": "Thyme + Yarrow + Ribbon",
+   "method": "Dry the herbs, tie them in cloth with a ribbon, carry it near the heart.",
+   "moon": "Waxing",
+   "purpose": "Steadies a shaking nerve.",
+   "price": 12,
+   "improper": "Damp herbs: musty by morning.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Thyme was the herb of courage for Roman soldiers and medieval knights.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-dream-pillow",
+   "name": "Dream Pillow",
+   "kind": "Charm",
+   "level": 2,
+   "ingredients": "Lavender + Mugwort + Chamomile + Ribbon",
+   "method": "Stuff a small pillow with dried herbs and tie it with a ribbon.",
+   "moon": "New",
+   "purpose": "Sleep with good dreams.",
+   "price": 16,
+   "improper": "Fresh, damp herbs: musty, restless sleep.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Herb pillows for sleep and vivid dreams are an old tradition.",
+   "safety": "Mugwort should be avoided in pregnancy.",
+   "notes": ""
+  },
+  {
+   "id": "c-witch-bottle",
+   "name": "Witch Bottle",
+   "kind": "Charm",
+   "level": 2,
+   "ingredients": "Clay Jar + Iron Nail + Thistle + Sea Salt",
+   "method": "Fill the jar with nail, thorn and salt, seal it, bury by the threshold.",
+   "moon": "Waning",
+   "purpose": "Guards a doorstep from harm.",
+   "price": 18,
+   "improper": "Not sealed: the ward leaks away.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Witch bottles were buried under hearths and doorways in 17th century England.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-witch-s-ladder",
+   "name": "Witch's Ladder",
+   "kind": "Charm",
+   "level": 2,
+   "ingredients": "Red Thread + Raven Feather",
+   "method": "Tie nine knots in a cord, setting a feather into each as you go.",
+   "moon": "Any",
+   "purpose": "Holds a tangle or a bad run of luck.",
+   "price": 14,
+   "improper": "Knots slip: the luck unravels.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "A knotted cord with feathers, used for binding and for wishes.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-plain-speaking-tea",
+   "name": "Plain Speaking Tea",
+   "kind": "Brew",
+   "level": 2,
+   "ingredients": "Sage + Mint + Honey",
+   "method": "Steep the leaves together, sweeten to taste.",
+   "moon": "Any",
+   "purpose": "Clears the throat and steadies speech.",
+   "price": 15,
+   "improper": "Over-steeped: bitter and dry.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Sage was the herb of wisdom and good speech, mint of a clear head.",
+   "safety": "Avoid sage in pregnancy.",
+   "notes": ""
+  },
+  {
+   "id": "c-oak-gall-ink",
+   "name": "Oak Gall Ink",
+   "kind": "Craft",
+   "level": 2,
+   "ingredients": "Oak Gall + Iron Nail",
+   "method": "Crush the galls, steep, add rust from the iron, strain.",
+   "moon": "Any",
+   "purpose": "Dark, lasting ink.",
+   "price": 10,
+   "improper": "No iron: grey and fades.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Iron gall ink was the standard writing ink for over a thousand years.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-feather-quill",
+   "name": "Feather Quill",
+   "kind": "Craft",
+   "level": 2,
+   "ingredients": "Raven Feather + Oak Gall Ink",
+   "method": "Cut the shaft at an angle, shape the nib, dip.",
+   "moon": "Any",
+   "purpose": "A writing quill.",
+   "price": 12,
+   "improper": "Poor cut: it blots and tears the page.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Quills were the writing pens of the medieval world.",
+   "safety": "Only use found feathers.",
+   "notes": ""
+  },
+  {
+   "id": "c-hazel-wand",
+   "name": "Hazel Wand",
+   "kind": "Craft",
+   "level": 2,
+   "ingredients": "Hazel Twig + Copper Wire",
+   "method": "Cut a straight, thumb-thick twig, peel it, wrap the copper at the handle.",
+   "moon": "Any",
+   "purpose": "A wand or dowsing rod.",
+   "price": 13,
+   "improper": "Cut green and bent: it warps.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Hazel was the classic wand and dowsing wood.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-glowcap-lantern",
+   "name": "Glowcap Lantern",
+   "kind": "Lantern",
+   "level": 2,
+   "ingredients": "Glowcap + Sea Glass + Copper Wire",
+   "method": "Set the glowcap in a glass cage and wire it shut.",
+   "moon": "Waxing",
+   "purpose": "A soft light that does not burn.",
+   "price": 18,
+   "improper": "Glowcap left to dry: it dims.",
+   "sells": true,
+   "accuracy": "Inspired",
+   "lore": "Foxfire is a real faint glow of rotting wood fungus. The lantern is the game's own.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-valerian-sleep-draught",
+   "name": "Valerian Sleep Draught",
+   "kind": "Brew",
+   "level": 3,
+   "ingredients": "Valerian + Chamomile + Honey + Clay Jar",
+   "method": "Steep the root a long time, covered. Add chamomile and honey.",
+   "moon": "New",
+   "purpose": "Deep sleep after hard nights.",
+   "price": 28,
+   "improper": "Short steep: no effect.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Valerian is one of the oldest sleep herbs.",
+   "safety": "Drowsiness. Do not combine with sedatives.",
+   "notes": ""
+  },
+  {
+   "id": "c-mugwort-dream-tea",
+   "name": "Mugwort Dream Tea",
+   "kind": "Brew",
+   "level": 3,
+   "ingredients": "Mugwort + Chamomile + Honey",
+   "method": "Steep a small pinch, covered. The taste is bitter, so sweeten.",
+   "moon": "New",
+   "purpose": "Vivid dreams.",
+   "price": 32,
+   "improper": "Too much mugwort: bitter, restless nights.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Mugwort is the herb of dreams and travelers.",
+   "safety": "Avoid in pregnancy.",
+   "notes": ""
+  },
+  {
+   "id": "c-hawthorn-heart-cordial",
+   "name": "Hawthorn Heart Cordial",
+   "kind": "Brew",
+   "level": 3,
+   "ingredients": "Hawthorn Berry + Rosehip + Honey + Clay Jar",
+   "method": "Simmer berries and hips gently, strain, stir in honey, jar it.",
+   "moon": "Full",
+   "purpose": "Heaviness of heart, grief and heartache.",
+   "price": 34,
+   "improper": "Boiled hard: loses its sweetness.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Hawthorn has been the heart herb since the Middle Ages.",
+   "safety": "Can interact with heart medicines.",
+   "notes": ""
+  },
+  {
+   "id": "c-saining-bundle",
+   "name": "Saining Bundle",
+   "kind": "Incense",
+   "level": 3,
+   "ingredients": "Juniper + Rosemary + Red Thread",
+   "method": "Tie the sprigs with red thread, dry, and burn one end, carrying it through every room.",
+   "moon": "New",
+   "purpose": "Clears a heavy house.",
+   "price": 30,
+   "improper": "Damp sprigs: smoulder and fail.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Scottish saining with juniper cleansed home and byre at New Year.",
+   "safety": "Avoid in pregnancy. Never leave burning unattended.",
+   "notes": ""
+  },
+  {
+   "id": "c-finder-s-pendulum",
+   "name": "Finder's Pendulum",
+   "kind": "Charm",
+   "level": 3,
+   "ingredients": "Copper Wire + Red Thread + Hag Stone",
+   "method": "Thread the stone on a cord of red thread, wire the top, hold steady over a map.",
+   "moon": "Waxing",
+   "purpose": "Finds what is lost.",
+   "price": 40,
+   "improper": "Held with a shaking hand: it spins on its own.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Pendulums and dowsing are old methods for finding lost things and water.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-fern-seed-charm",
+   "name": "Fern Seed Charm",
+   "kind": "Charm",
+   "level": 3,
+   "ingredients": "Fern + Red Thread + Rowan Twig",
+   "method": "Catch the fern frond at midnight on Midsummer, wrap in cloth, tie with red thread.",
+   "moon": "Full",
+   "purpose": "Slipping past unseen.",
+   "price": 55,
+   "improper": "Not caught at midnight: it does nothing.",
+   "sells": true,
+   "accuracy": "Inspired",
+   "lore": "Midsummer folklore said fern seed made its holder invisible.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-pearl-locket",
+   "name": "Pearl Locket",
+   "kind": "Keepsake",
+   "level": 3,
+   "ingredients": "Freshwater Pearl + Copper Wire + Ribbon",
+   "method": "Wire the pearl into a setting and hang it on a ribbon.",
+   "moon": "Full",
+   "purpose": "A keepsake for someone loved.",
+   "price": 55,
+   "improper": "Loose wire: the pearl slips away.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Pearls are the moon's gem for love and purity.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-story-lantern",
+   "name": "Story Lantern",
+   "kind": "Lantern",
+   "level": 3,
+   "ingredients": "Glowcap Lantern + Sea Glass + Raven Feather",
+   "method": "Add sea glass and a feather to the lantern.",
+   "moon": "Full",
+   "purpose": "Tells a story in light.",
+   "price": 60,
+   "improper": "Too many pieces crowd the light.",
+   "sells": true,
+   "accuracy": "Inspired",
+   "lore": "The game's own, built on real foxfire and feather folklore.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-wren-s-key",
+   "name": "Wren's Key",
+   "kind": "Story",
+   "level": 3,
+   "ingredients": "3 Iron Nail + Birch Bark + Copper Wire",
+   "method": "Weave nail, bark and wire into a key.",
+   "moon": "Any",
+   "purpose": "Opens Wren's door.",
+   "price": null,
+   "improper": "",
+   "sells": false,
+   "accuracy": "Game-only",
+   "lore": "Invented for the game.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-calling-lantern",
+   "name": "Calling Lantern",
+   "kind": "Lantern",
+   "level": 4,
+   "ingredients": "Glowcap Lantern + Glow Moth Scale",
+   "method": "Hang the scale from the lantern.",
+   "moon": "Full",
+   "purpose": "Calls the lost.",
+   "price": 45,
+   "improper": "Hung crooked: the light wavers.",
+   "sells": true,
+   "accuracy": "Game-only",
+   "lore": "Invented for the game.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-memory-candle",
+   "name": "Memory Candle",
+   "kind": "Candle",
+   "level": 4,
+   "ingredients": "Beeswax + Rosemary + Sweet Violet",
+   "method": "Press rosemary and violet into the wax as it sets.",
+   "moon": "Full",
+   "purpose": "Remembers the dead.",
+   "price": 80,
+   "improper": "Wet petals: the wax spoils.",
+   "sells": true,
+   "accuracy": "Traditional",
+   "lore": "Rosemary for remembrance and violets for modest love, both old mourning herbs.",
+   "safety": "",
+   "notes": ""
+  },
+  {
+   "id": "c-keeper-s-lantern",
+   "name": "Keeper's Lantern",
+   "kind": "Lantern",
+   "level": 5,
+   "ingredients": "Calling Lantern + Pearl Locket + Birch Bark",
+   "method": "Set the locket in the lantern's frame.",
+   "moon": "Full",
+   "purpose": "The market's own light.",
+   "price": 150,
+   "improper": "",
+   "sells": true,
+   "accuracy": "Game-only",
+   "lore": "Invented for the game.",
+   "safety": "",
+   "notes": ""
+  }
+ ],
+ "upgrades": [
+  {
+   "id": "u-new-awning",
+   "name": "New Awning",
+   "stall": "Stall 13",
+   "ingredients": "Ribbon + Driftwood",
+   "effect": "",
+   "notes": ""
+  },
+  {
+   "id": "u-display-shelves",
+   "name": "Display Shelves",
+   "stall": "Stall 13",
+   "ingredients": "Driftwood + Copper Wire",
+   "effect": "",
+   "notes": ""
+  },
+  {
+   "id": "u-lantern-string",
+   "name": "Lantern String",
+   "stall": "Stall 13",
+   "ingredients": "3 Glowcap Lantern",
+   "effect": "",
+   "notes": ""
+  }
+ ],
+ "requests": [
+  {
+   "id": "r-pell-the-ferryman",
+   "name": "Pell the ferryman",
+   "kind": "Ailment",
+   "level": 1,
+   "ask": "Three weeks of river fog and this cough will not quit. Got anything for the chest?",
+   "answer": "Bog Moss Tea",
+   "pay": 8,
+   "wrong": "A bare reed: he keeps it (pays 0).",
+   "notes": "A fun pick. For a real cough, see Marshmallow Cough Syrup."
+  },
+  {
+   "id": "r-maribel-the-baker",
+   "name": "Maribel the baker",
+   "kind": "Wish",
+   "level": 1,
+   "ask": "Luck for the oven this week. The loaves keep falling.",
+   "answer": "Hag Stone Charm",
+   "pay": 9,
+   "wrong": "A plain stone: no luck.",
+   "notes": "Holed stones were hung in kitchens for luck."
+  },
+  {
+   "id": "r-the-moth-winged-visitor",
+   "name": "The moth-winged visitor",
+   "kind": "Favor",
+   "level": 1,
+   "ask": "A candle, at full dark. They will not say what it is for.",
+   "answer": "Reed Wick Candle",
+   "pay": 30,
+   "wrong": "Any other candle: they leave it on the counter.",
+   "notes": ""
+  },
+  {
+   "id": "r-bess-the-ferry-cook",
+   "name": "Bess the ferry cook",
+   "kind": "Ailment",
+   "level": 1,
+   "ask": "My stomach turns every time the barge rocks. Something to settle it?",
+   "answer": "Mint Tea",
+   "pay": 7,
+   "wrong": "Tea without mint: she thanks you and stays queasy.",
+   "notes": ""
+  },
+  {
+   "id": "r-marta-the-weaver",
+   "name": "Marta the weaver",
+   "kind": "Ailment",
+   "level": 1,
+   "ask": "I lie awake counting threads. Something to help me rest?",
+   "answer": "Chamomile Tisane",
+   "pay": 7,
+   "wrong": "Strong mint: wakes her further.",
+   "notes": ""
+  },
+  {
+   "id": "r-dov-the-fiddler",
+   "name": "Dov the fiddler",
+   "kind": "Worry",
+   "level": 2,
+   "ask": "I freeze every time I play for the room. My hands shake.",
+   "answer": "Courage Sachet",
+   "pay": 15,
+   "wrong": "A candle: nice, no help.",
+   "notes": ""
+  },
+  {
+   "id": "r-sister-alder",
+   "name": "Sister Alder",
+   "kind": "Ailment",
+   "level": 2,
+   "ask": "My throat is raw from the hymns.",
+   "answer": "Sage & Honey Throat Tea",
+   "pay": 12,
+   "wrong": "Mint tea: kind but not enough.",
+   "notes": ""
+  },
+  {
+   "id": "r-tobias-the-ferry-boy",
+   "name": "Tobias the ferry-boy",
+   "kind": "Ailment",
+   "level": 2,
+   "ask": "Skinned my knee on the landing.",
+   "answer": "Plantain Poultice",
+   "pay": 10,
+   "wrong": "A salve with beeswax, not needed for a scrape.",
+   "notes": ""
+  },
+  {
+   "id": "r-rook-the-blacksmith",
+   "name": "Rook the blacksmith",
+   "kind": "Ailment",
+   "level": 2,
+   "ask": "Burned my forearm on the forge.",
+   "answer": "St John's Wort Oil",
+   "pay": 18,
+   "wrong": "A poultice of mint: no.",
+   "notes": ""
+  },
+  {
+   "id": "r-corin-the-cooper",
+   "name": "Corin the cooper",
+   "kind": "Ailment",
+   "level": 2,
+   "ask": "A barrel rolled over my shin and it is black and blue.",
+   "answer": "Comfrey Salve",
+   "pay": 14,
+   "wrong": "Calendula salve: soothes, no mending.",
+   "notes": ""
+  },
+  {
+   "id": "r-brannoch-the-hen-wife",
+   "name": "Brannoch the hen-wife",
+   "kind": "Worry",
+   "level": 2,
+   "ask": "The house has felt cold and unlucky since the frost.",
+   "answer": "Hearth Candle",
+   "pay": 20,
+   "wrong": "A Hush Candle: she loses her fire.",
+   "notes": ""
+  },
+  {
+   "id": "r-old-ines",
+   "name": "Old Ines",
+   "kind": "Ailment",
+   "level": 2,
+   "ask": "I cannot sleep. Not since the spring.",
+   "answer": "Dream Pillow",
+   "pay": 20,
+   "wrong": "Strong mint tea keeps her awake.",
+   "notes": ""
+  },
+  {
+   "id": "r-garrick-the-dockhand",
+   "name": "Garrick the dockhand",
+   "kind": "Worry",
+   "level": 2,
+   "ask": "Something follows the boats. I want it kept off my doorstep.",
+   "answer": "Witch Bottle",
+   "pay": 30,
+   "wrong": "Only a salt pouch: not enough.",
+   "notes": ""
+  },
+  {
+   "id": "r-hale-the-lamplighter",
+   "name": "Hale the lamplighter",
+   "kind": "Worry",
+   "level": 2,
+   "ask": "I freeze when I must speak at the guild.",
+   "answer": "Plain Speaking Tea",
+   "pay": 20,
+   "wrong": "Chamomile: he stays calm and still silent.",
+   "notes": ""
+  },
+  {
+   "id": "r-teodor-the-net-mender",
+   "name": "Teodor the net-mender",
+   "kind": "Worry",
+   "level": 2,
+   "ask": "Everything tangles and no knot holds. Bad luck.",
+   "answer": "Witch's Ladder",
+   "pay": 16,
+   "wrong": "A plain cord: no luck in it.",
+   "notes": ""
+  },
+  {
+   "id": "r-mags-the-fishwife",
+   "name": "Mags the fishwife",
+   "kind": "Ailment",
+   "level": 2,
+   "ask": "A fever since yesterday. Aching and hot.",
+   "answer": "Elderflower Fever Tea",
+   "pay": 18,
+   "wrong": "A cold compress: no.",
+   "notes": ""
+  },
+  {
+   "id": "r-nell-the-washerwoman",
+   "name": "Nell the washerwoman",
+   "kind": "Ailment",
+   "level": 2,
+   "ask": "A dry cough that keeps me up at night.",
+   "answer": "Marshmallow Cough Syrup",
+   "pay": 18,
+   "wrong": "Mint tea: no.",
+   "notes": ""
+  },
+  {
+   "id": "r-hob-the-ploughman",
+   "name": "Hob the ploughman",
+   "kind": "Ailment",
+   "level": 2,
+   "ask": "My joints ache before every rain.",
+   "answer": "Willow Pain Draught",
+   "pay": 18,
+   "wrong": "A plain tea: no.",
+   "notes": ""
+  },
+  {
+   "id": "r-pru-the-dairymaid",
+   "name": "Pru the dairymaid",
+   "kind": "Ailment",
+   "level": 2,
+   "ask": "My hands are cracked and raw from winter.",
+   "answer": "Calendula Salve",
+   "pay": 14,
+   "wrong": "A comfrey salve: wrong for skin.",
+   "notes": ""
+  },
+  {
+   "id": "r-edric-the-scribe",
+   "name": "Edric the scribe",
+   "kind": "Wish",
+   "level": 2,
+   "ask": "I need a quill and ink that will not fade.",
+   "answer": "Feather Quill + Oak Gall Ink",
+   "pay": 28,
+   "wrong": "Shop ink: fades.",
+   "notes": ""
+  },
+  {
+   "id": "r-bryn-the-tanner-s-daughter",
+   "name": "Bryn the tanner's daughter",
+   "kind": "Wish",
+   "level": 3,
+   "ask": "I lost my mother's ring. I cannot find it anywhere.",
+   "answer": "Finder's Pendulum",
+   "pay": 50,
+   "wrong": "A wand: he waves it, nothing.",
+   "notes": ""
+  },
+  {
+   "id": "r-linnet",
+   "name": "Linnet",
+   "kind": "Ailment",
+   "level": 3,
+   "ask": "My heart feels heavy since he left.",
+   "answer": "Hawthorn Heart Cordial",
+   "pay": 40,
+   "wrong": "Honey alone: sweet, nothing more.",
+   "notes": ""
+  },
+  {
+   "id": "r-the-marsh-cottage-family",
+   "name": "The Marsh Cottage family",
+   "kind": "Ailment",
+   "level": 3,
+   "ask": "The house has felt heavy since the flood. We want it cleared.",
+   "answer": "Saining Bundle",
+   "pay": 38,
+   "wrong": "A candle: no.",
+   "notes": ""
+  },
+  {
+   "id": "r-anwen-the-midwife",
+   "name": "Anwen the midwife",
+   "kind": "Ailment",
+   "level": 3,
+   "ask": "Broken sleep after long births. Chamomile is not enough.",
+   "answer": "Valerian Sleep Draught",
+   "pay": 36,
+   "wrong": "Chamomile: not enough.",
+   "notes": ""
+  },
+  {
+   "id": "r-sorrel-the-seer",
+   "name": "Sorrel the seer",
+   "kind": "Wish",
+   "level": 3,
+   "ask": "I want to dream true.",
+   "answer": "Mugwort Dream Tea",
+   "pay": 36,
+   "wrong": "Chamomile: calm but dull.",
+   "notes": ""
+  },
+  {
+   "id": "r-fenwick-the-apprentice",
+   "name": "Fenwick the apprentice",
+   "kind": "Wish",
+   "level": 3,
+   "ask": "I need to slip past the master unseen tonight.",
+   "answer": "Fern Seed Charm",
+   "pay": 55,
+   "wrong": "A ribbon: he gets caught.",
+   "notes": ""
+  },
+  {
+   "id": "r-isolde",
+   "name": "Isolde",
+   "kind": "Favor",
+   "level": 3,
+   "ask": "Something to wear for the one I love.",
+   "answer": "Pearl Locket",
+   "pay": 70,
+   "wrong": "A ribbon: she waits.",
+   "notes": ""
+  },
+  {
+   "id": "r-the-duchess",
+   "name": "The Duchess",
+   "kind": "Favor",
+   "level": 3,
+   "ask": "A lantern that tells a story.",
+   "answer": "Story Lantern",
+   "pay": 80,
+   "wrong": "A plain lantern: she is unimpressed.",
+   "notes": ""
+  },
+  {
+   "id": "r-fenn",
+   "name": "Fenn",
+   "kind": "Favor",
+   "level": 4,
+   "ask": "A light to call across the marsh.",
+   "answer": "Calling Lantern",
+   "pay": 55,
+   "wrong": "A candle: it blows out in the reeds.",
+   "notes": ""
+  },
+  {
+   "id": "r-the-shade-at-the-edge-of-the-lamplight",
+   "name": "The shade at the edge of the lamplight",
+   "kind": "Haunting",
+   "level": 4,
+   "ask": "Light something for what I have lost.",
+   "answer": "Memory Candle",
+   "pay": 110,
+   "wrong": "Any other candle: the shade turns away.",
+   "notes": ""
+  }
+ ]
+}</script>
+<script type="text/plain" id="scenes">=== arrival
+@bg market_dusk
+narrator: The token is warm in your hand. It has been warm since the road bent toward the town, though the evening is cold.
+narrator: You did not expect a market. The town looked asleep. But as the last light goes, lanterns open one by one along the canal, and stalls you could swear were not there are suddenly there, and open.
+narrator: At the far end, one stall has no lantern at all. Its counter is bare wood. A woman stands beside it as if she has been waiting a very long time.
+@show wren right
+wren: You have her token.
+@show player left
+player: It was my parent's. They never said a word about a market.
+wren: No. They wouldn't have.
+wren: Your parent and I were friends. For a very long time.
++ "Ask what this place is" -> what
++ "Ask about my parent" -> parent
++ "Say nothing. Look at the stall." -> stall
+:what
+wren: The market keeps its own hours. It likes company. It likes to be remembered.
+wren: That is all anyone has ever managed to tell me, and I have kept it longer than most.
+@goto cont
+:parent
+wren: They came once, after their partner died. They left with the token and a promise to come back.
+wren: They did not manage it. I am sorry.
+@rel wren 1
+@goto cont
+:stall
+wren: Stall Thirteen. It is yours, if you want it.
+@set arrival_silent
+@goto cont
+:cont
+wren: The habits your parent gave you. The herbs, the wax, the quiet work with your hands. They are the whole trade here.
+wren: Gather what you can. Make a candle. Come back when the lanterns are full.
+@set met_wren
+@end
+
+=== wren_bring
+@bg market_dusk
+@show wren right
+@show player left
+wren: Reeds. A sprig of rosemary. Good. Rosemary for remembering, the old ones said.
+wren: You will want wax. Take these. Market scraps, but they burn true.
+@give "Wax Ends" 2
+wren: Melt it low. Set the reed straight. Do not rush it.
+@set wren_gave
+@end
+
+=== wren_chat
+@bg market_dusk
+@show wren right
+@show player left
+wren: The stall is yours. Open it when the lanterns are full.
+wren: I will be here.
+@end
+
+=== first_candle
+@bg stall
+narrator: The flame takes the reed slowly, then steadies. It is not a grand light. It is a small, honest one.
+narrator: It is yours.
+@set crafted_candle
+@end
+
+=== moth_done
+@bg stall
+@show moth right
+@show player left
+moth: Thank you. Most do not ask what it is for.
+player: What is it for?
+moth: To be lit when it is quiet. So someone knows we were here.
+narrator: The candle burns small and steady between you. Somewhere down the canal, a bell with no tower rings once.
+@set moth_served
+@end
+
+=== night_one_end
+@bg market_dusk
+@show wren right
+@show player left
+wren: The lanterns are fuller than they have been in a long while.
+player: I only sold one candle.
+wren: Yes. It is a start.
++ "Ask who the visitor was" -> who
++ "Ask if you can stay" -> stay
+:who
+wren: Someone who was here once. They come back when someone lights the quiet.
+@goto fin
+:stay
+wren: The stall is yours. For as long as you wish to keep it.
+@rel wren 1
+@goto fin
+:fin
+narrator: Night One ends. The market sleeps, or pretends to.
+@set night_one_done
+@end
+
+=== test_features
+@bg marsh_night
+@show fenn left
+@show wren right
+fenn: A test of choices, flags and relationships.
++ "Raise a hand" -> hand
++ "Walk away" -> away
++ "A secret option" -> secret if met_wren
+:hand
+fenn: Hello.
+@rel fenn 1
+@goto done
+:away
+narrator: You leave without a word.
+@goto done
+:secret
+wren: Only shown because you met Wren.
+:done
+@end
+</script>
+<script>
+/* ===== THE NIGHT MARKET · core: data feed, state, helpers ===== */
+const FB_URL='https://night-market-7d13a-default-rtdb.firebaseio.com/gamebook.json';
+const SAVE_KEY='nm-save-v1', CACHE_KEY='nm-data-cache-v1';
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clone=o=>JSON.parse(JSON.stringify(o));
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const ADMIN=/[?&]admin\b/.test(location.search)||localStorage.getItem('nm-admin')==='1';
+
+/* ---------- data (the Game Book) ---------- */
+let D=null, IDX=null, DATAINFO={source:'embedded',rev:0,cloudRev:null,error:''};
+function setData(obj,source){
+  D=obj;
+  ['gathers','crafts','requests','upgrades','tiers','levels'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[];});
+  D.lists=D.lists||{};['zones','kinds','moons','rarities','reqkinds','accuracy'].forEach(k=>{if(!Array.isArray(D.lists[k]))D.lists[k]=[];});
+  IDX=new Map();
+  D.gathers.forEach(g=>IDX.set(g.name.toLowerCase(),{type:'gather',e:g}));
+  D.crafts.forEach(c=>IDX.set(c.name.toLowerCase(),{type:'craft',e:c}));
+  DATAINFO.source=source;DATAINFO.rev=D.rev||0;
+}
+function loadEmbedded(){
+  let emb=JSON.parse($('#gamedata').textContent);
+  let use=emb,src='embedded';
+  try{const c=JSON.parse(localStorage.getItem(CACHE_KEY)||'null');if(c&&(c.rev||0)>(emb.rev||0)){use=c;src='cache';}}catch(e){}
+  setData(use,src);
+}
+async function fetchCloud(){
+  try{
+    const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),5000);
+    const r=await fetch(FB_URL,{signal:ctl.signal,cache:'no-store'});clearTimeout(t);
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const v=await r.json();
+    if(!v||!v.json)throw new Error('no book in the cloud yet');
+    const obj=JSON.parse(v.json);obj.rev=v.rev||obj.rev||0;
+    DATAINFO.cloudRev=obj.rev;DATAINFO.error='';
+    if((obj.rev||0)>(D.rev||0)||DATAINFO.force){
+      setData(obj,'cloud');try{localStorage.setItem(CACHE_KEY,JSON.stringify(obj));}catch(e){}
+      return true;
+    }
+    return false;
+  }catch(e){DATAINFO.error=String(e.message||e);return false;}
+}
+function parseIng(str){
+  return String(str||'').split('+').map(s=>s.trim()).filter(Boolean).map(p=>{
+    const m=p.match(/^(\d+)\s+(.+)$/);const qty=m?parseInt(m[1],10):1,name=m?m[2]:p;
+    let r=IDX.get(name.toLowerCase());
+    if(!r&&name.toLowerCase().endsWith('s'))r=IDX.get(name.toLowerCase().slice(0,-1));
+    return {qty,name:r?r.e.name:name,r};
+  });
+}
+const listColor=(l,n)=>{const x=(D.lists[l]||[]).find(i=>i.name===n);return x?x.color:'#a99bbd';};
+const tierNames=()=>D.tiers.map(t=>t.name);
+const tierMult=n=>{const t=D.tiers.find(x=>x.name===n);return t?Number(t.mult):1;};
+const tierRank=n=>Math.max(0,tierNames().indexOf(n));
+const lvName=n=>{const l=D.levels.find(x=>x.level==n);return l?l.name:'Level '+n;};
+const MOONS=['New','Waxing','Full','Waning'];
+const moonOf=day=>MOONS[Math.floor(((day-1)%8)/2)];
+const LEVEL_EARN=[0,50,180,450,1000];
+
+/* ---------- state ---------- */
+const DEFAULT=()=>({v:1,day:1,phase:'dusk',coins:0,earned:0,level:1,inv:{},flags:{},rel:{},sold:0,
+  mode:'cozy',strict:{Ailment:true,Worry:true,Wish:false,Favor:true,Haunting:true,'Walk-in':true},
+  queue:[],cur:null,lastSeen:{},scenesSeen:{},started:false,textSpeed:26,tmp:{}});
+let S=DEFAULT();
+function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){}}
+function load(){try{const v=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(v&&v.v===1){S=Object.assign(DEFAULT(),v);S.strict=Object.assign(DEFAULT().strict,v.strict||{});return true;}}catch(e){}return false;}
+const flag=n=>!!S.flags[n];
+const PLAYER=()=>S.flags.__name||'Azlynn';
+
+/* ---------- inventory: key = name|Tier ---------- */
+const key=(n,t)=>n+'|'+(t||'Proper');
+function addItem(name,n,tier){const k=key(name,tier);S.inv[k]=(S.inv[k]||0)+(n||1);}
+function haveCount(name){let c=0;for(const k in S.inv)if(k.split('|')[0]===name)c+=S.inv[k];return c;}
+function takeItems(name,n){ // lowest tier first
+  let left=n;const ks=Object.keys(S.inv).filter(k=>k.split('|')[0]===name).sort((a,b)=>tierRank(a.split('|')[1])-tierRank(b.split('|')[1]));
+  for(const k of ks){const t=Math.min(left,S.inv[k]);S.inv[k]-=t;left-=t;if(S.inv[k]<=0)delete S.inv[k];if(left<=0)break;}
+  return left<=0;
+}
+function invList(){return Object.keys(S.inv).map(k=>{const [name,tier]=k.split('|');const r=IDX.get(name.toLowerCase());return {k,name,tier,qty:S.inv[k],type:r?r.type:'?',e:r?r.e:null};}).sort((a,b)=>(a.type===b.type?a.name.localeCompare(b.name):a.type==='craft'?-1:1));}
+
+/* ---------- toast + gain ---------- */
+let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2200);}
+
+/* ===== art: code-painted placeholders. Swap for Canva paintings via ART.* image URLs ===== */
+const ART={bg:{}, portrait:{}}; // e.g. ART.bg.market_dusk='art/market_dusk.jpg'; ART.portrait.wren='art/wren.png'
+const seeded=s=>{let h=2166136261;for(const c of String(s))h=Math.imul(h^c.charCodeAt(0),16777619);return()=>{h+=0x6D2B79F5;let t=Math.imul(h^h>>>15,1|h);t^=t+Math.imul(t^t>>>7,61|t);return((t^t>>>14)>>>0)/4294967296;};};
+const CAST={
+ azlynn:{name:'Azlynn',hair:'#c2412d',skin:'#e8c1a0',cloth:'#7c2a2a',style:0},
+ wren:{name:'Wren',hair:'#d8d5ea',skin:'#d9b79a',cloth:'#6b3f8a',style:1},
+ fenn:{name:'Fenn',hair:'#3b2f2a',skin:'#d4a98a',cloth:'#3e5545',style:2},
+ moth:{name:'The moth-winged visitor',hair:'#b9a7dc',skin:'#e6dcef',cloth:'#5d4a86',style:3,wings:true},
+ shade:{name:'The shade',hair:'#8d8aa8',skin:'#a9a6c4',cloth:'#4b4866',style:3,ghost:true},
+ narrator:{name:'',hair:'#000',skin:'#000',cloth:'#000',style:0}
+};
+function castFor(id,fallbackName){
+  id=String(id||'').toLowerCase();
+  if(id==='player'||id==='p')return Object.assign({id:'azlynn'},CAST.azlynn,{name:PLAYER()});
+  if(CAST[id])return Object.assign({id},CAST[id]);
+  const r=seeded(id);const skins=['#f0cfb2','#e3b894','#c99772','#a8754f','#7a523a'];const hairs=['#2a1d1a','#5a3a22','#9a6a3a','#c2412d','#cfc7d8','#1d1a2a','#e0b86a'];const cloths=['#6b3f8a','#3e5545','#7c2a2a','#34506e','#8a6a2a','#5d4a86','#2f5a52'];
+  return {id,name:fallbackName||id,skin:rnd2(r,skins),hair:rnd2(r,hairs),cloth:rnd2(r,cloths),style:Math.floor(r()*4)};
+}
+const rnd2=(r,a)=>a[Math.floor(r()*a.length)];
+function portrait(c,opts){
+  opts=opts||{};
+  if(c.id&&ART.portrait[c.id])return `<img src="${ART.portrait[c.id]}" style="height:100%;width:auto" alt="">`;
+  const {hair,skin,cloth,style}=c;const o=c.ghost?'opacity=".72"':'';
+  let back='',front='';
+  if(style===0){back=`<path d="M50 125 C38 60 68 38 100 38 C132 38 162 60 150 125 L156 262 L44 262 Z" fill="${hair}"/>`;front=`<path d="M56 110 C58 72 80 56 100 56 C124 56 142 72 144 110 C124 86 100 80 56 110Z" fill="${hair}"/>`;}
+  else if(style===1){back=`<circle cx="100" cy="36" r="22" fill="${hair}"/><path d="M54 122 C46 66 70 46 100 46 C130 46 154 66 146 122 C140 150 60 150 54 122Z" fill="${hair}"/>`;front=`<path d="M56 108 C60 74 80 60 100 60 C122 60 140 74 144 108 C122 90 104 84 56 108Z" fill="${hair}"/>`;}
+  else if(style===2){front=`<path d="M54 112 C50 66 76 50 100 50 C126 50 152 66 146 112 C140 90 120 78 100 78 C80 78 60 90 54 112Z" fill="${hair}"/>`;}
+  else {back=`<path d="M40 150 C34 70 66 28 100 28 C134 28 166 70 160 150 L170 280 L30 280 Z" fill="${cloth}"/>`;front=`<path d="M62 112 C66 82 82 70 100 70 C118 70 134 82 138 112 C124 100 112 96 100 96 C88 96 76 100 62 112Z" fill="${hair}" opacity=".9"/>`;}
+  const wings=c.wings?`<g opacity=".55"><path d="M30 210 C-10 120 10 60 70 150Z" fill="#cdbbf0"/><path d="M170 210 C210 120 190 60 130 150Z" fill="#cdbbf0"/></g>`:'';
+  return `<svg viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg" ${o}>${wings}${back}
+  <path d="M16 300 C16 232 58 202 100 202 C142 202 184 232 184 300Z" fill="${cloth}"/>
+  <path d="M84 202 C90 226 110 226 116 202 L112 240 L88 240Z" fill="${skin}" opacity=".35"/>
+  <rect x="88" y="168" width="24" height="42" rx="10" fill="${skin}"/>
+  <ellipse cx="100" cy="120" rx="42" ry="52" fill="${skin}"/>${front}
+  <ellipse cx="84" cy="124" rx="4.2" ry="5.2" fill="#2a1a22"/><ellipse cx="116" cy="124" rx="4.2" ry="5.2" fill="#2a1a22"/>
+  <circle cx="85.4" cy="122" r="1.4" fill="#fff"/><circle cx="117.4" cy="122" r="1.4" fill="#fff"/>
+  <path d="M90 148 C97 154 103 154 110 148" stroke="#8a4a4a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+  <ellipse cx="74" cy="140" rx="8" ry="5" fill="#e88a8a" opacity=".22"/><ellipse cx="126" cy="140" rx="8" ry="5" fill="#e88a8a" opacity=".22"/></svg>`;
+}
+const SKY={day:['#f9d69a','#e9955a','#7b5a8a'],dusk:['#2b1a4a','#a04a72','#f0a050'],night:['#07050f','#150e2c','#2a1a4d']};
+function stallBack(phase,moon){
+  phase=phase||'night';const sk=SKY[phase]||SKY.night;const r=seeded('stars'+phase);
+  let stars='';if(phase!=='day')for(let i=0;i<70;i++)stars+=`<circle cx="${r()*1600|0}" cy="${r()*380|0}" r="${(r()*1.6+.4).toFixed(1)}" fill="#fff" opacity="${(r()*.6+.2).toFixed(2)}"/>`;
+  const lit=phase==='day'?.12:phase==='dusk'?.7:1;
+  let town='';const r2=seeded('town');
+  for(let i=0;i<14;i++){const x=i*120-20,h=140+r2()*170,w=90+r2()*30;town+=`<path d="M${x} 560 V${560-h} l${w/2} -34 l${w/2} 34 V560Z" fill="#1b1230"/>`;
+    for(let j=0;j<3;j++)if(r2()<.8)town+=`<rect x="${x+14+j*26}" y="${560-h+30+r2()*50|0}" width="12" height="16" rx="2" fill="#ffc977" opacity="${(lit*(r2()*.5+.5)).toFixed(2)}"/>`;}
+  const mp=moon;const moonSvg=phase==='day'?'':(`<g transform="translate(1340 110)"><circle r="54" fill="#fff3cf" opacity=".95"/>${mp==='New'?'<circle r="54" fill="#120b25" opacity=".92"/>':mp==='Waxing'?'<path d="M0 -54 A54 54 0 0 0 0 54 A30 54 0 0 1 0 -54Z" fill="#120b25" opacity=".9" transform="translate(-0 0)"/>':mp==='Waning'?'<path d="M0 -54 A54 54 0 0 1 0 54 A30 54 0 0 0 0 -54Z" fill="#120b25" opacity=".9"/>':''}<circle r="70" fill="#ffe9a8" opacity=".12"/></g>`);
+  let bulbs='';for(let i=0;i<17;i++){const x=40+i*93,y=70+Math.sin(i*.9)*18+ (i%2?10:0);bulbs+=`<g class="glow" style="animation-delay:${(i*.37).toFixed(2)}s"><circle cx="${x}" cy="${y+30}" r="26" fill="#ffc15a" opacity="${(lit*.18).toFixed(2)}"/><circle cx="${x}" cy="${y+30}" r="7" fill="#ffd98a" opacity="${(.35+lit*.65).toFixed(2)}"/></g>`;}
+  return `<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg"><defs>
+   <linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sk[0]}"/><stop offset=".55" stop-color="${sk[1]}"/><stop offset="1" stop-color="${sk[2]}"/></linearGradient>
+   <linearGradient id="aw" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#a0522d"/><stop offset=".5" stop-color="#e8a33d"/><stop offset="1" stop-color="#a0522d"/></linearGradient></defs>
+   <rect width="1600" height="900" fill="url(#sk)"/>${stars}${moonSvg}${town}
+   <path d="M0 560 H1600 V900 H0Z" fill="#1a1024"/>
+   <path d="M20 90 Q800 190 1580 90" stroke="#4a3560" stroke-width="3" fill="none"/>${bulbs}
+   <g><path d="M330 330 L1270 330 L1330 470 L270 470Z" fill="#4d2a62"/>${Array.from({length:9},(_,i)=>`<path d="M${330+i*104.4} 330 L${1270-(8-i)*104.4+ (i%2?0:0)} 330 L${1330-(8-i)*131.2} 470 L${270+i*131.2} 470Z" fill="${i%2?'#e8a33d':'#7a3f8f'}" opacity=".96"/>`).join('')}
+    <path d="M270 470 q50 36 100 0 q50 36 100 0 q50 36 100 0 q50 36 100 0 q50 36 100 0 q50 36 100 0 q50 36 100 0 q50 36 100 0 q50 36 100 0 q50 36 100 0 q50 36 100 0 q50 36 100 0 L1330 470Z" fill="#5a2f6e"/>
+    <rect x="300" y="470" width="22" height="330" fill="#3a2418"/><rect x="1278" y="470" width="22" height="330" fill="#3a2418"/>
+    <rect x="322" y="470" width="956" height="330" fill="#241632" opacity=".92"/>
+    <g opacity="${(.5+lit*.5).toFixed(2)}"><rect x="360" y="520" width="190" height="14" rx="4" fill="#6b4a2c"/><rect x="1050" y="520" width="190" height="14" rx="4" fill="#6b4a2c"/>
+     ${[0,1,2,3,4].map(i=>`<rect x="${380+i*34}" y="${486}" width="20" height="34" rx="6" fill="${['#c9a24a','#4fb5a0','#b58be0','#d98a5a','#9fb4e8'][i]}" opacity=".85"/>`).join('')}
+     ${[0,1,2,3,4].map(i=>`<rect x="${1070+i*34}" y="${486}" width="20" height="34" rx="6" fill="${['#9fb4e8','#d98a5a','#c9a24a','#b58be0','#4fb5a0'][i]}" opacity=".85"/>`).join('')}</g></g>
+  </svg>`;
+}
+function stallFront(phase){
+  const lit=phase==='day'?.15:phase==='dusk'?.7:1;
+  const lant=(x)=>`<g transform="translate(${x} 560)"><line x1="0" y1="-120" x2="0" y2="-30" stroke="#4a3560" stroke-width="3"/><circle r="90" fill="#ffb347" opacity="${(lit*.2).toFixed(2)}" class="glow"/><rect x="-22" y="-30" width="44" height="64" rx="12" fill="#ffd98a" opacity="${(.4+lit*.6).toFixed(2)}"/><rect x="-26" y="-36" width="52" height="10" rx="4" fill="#3a2418"/><rect x="-26" y="30" width="52" height="10" rx="4" fill="#3a2418"/></g>`;
+  return `<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg"><defs>
+   <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a4a2a"/><stop offset="1" stop-color="#3d2415"/></linearGradient>
+   <linearGradient id="cloth" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5b2f6f"/><stop offset="1" stop-color="#2d1840"/></linearGradient></defs>
+   ${lant(250)}${lant(1350)}
+   <path d="M0 720 H1600 V900 H0Z" fill="#24162e"/>
+   <rect x="180" y="640" width="1240" height="40" rx="10" fill="url(#wood)"/>
+   <rect x="200" y="680" width="1200" height="220" fill="url(#cloth)"/>
+   <path d="M200 680 q75 40 150 0 q75 40 150 0 q75 40 150 0 q75 40 150 0 q75 40 150 0 q75 40 150 0 q75 40 150 0 q75 40 150 0Z" fill="#3b2050"/>
+   <rect x="640" y="760" width="320" height="64" rx="12" fill="none" stroke="#f0c674" stroke-opacity=".5" stroke-width="3"/><text x="800" y="803" text-anchor="middle" font-family="Cormorant Garamond,Georgia,serif" font-size="40" font-weight="700" fill="#f0c674" fill-opacity=".85">STALL 13</text>
+   <ellipse cx="800" cy="650" rx="300" ry="20" fill="#ffc15a" opacity="${(lit*.14).toFixed(2)}"/>
+  </svg>`;
+}
+function marshBack(){const r=seeded('marsh');let reeds='';for(let i=0;i<60;i++){const x=r()*1600,h=160+r()*220;reeds+=`<path d="M${x} 900 Q${x+r()*30-15} ${900-h/2} ${x+r()*40-20} ${900-h}" stroke="#2f5a46" stroke-width="${2+r()*3}" fill="none" opacity=".8"/>`;}
+  return `<svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="mk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#08141a"/><stop offset=".6" stop-color="#143a3a"/><stop offset="1" stop-color="#0b2420"/></linearGradient></defs><rect width="1600" height="900" fill="url(#mk)"/><circle cx="1180" cy="170" r="60" fill="#e8f2d8" opacity=".85"/>${reeds}<ellipse cx="800" cy="860" rx="900" ry="120" fill="#0c3030" opacity=".8"/>${[0,1,2,3,4].map(i=>`<circle class="glow" cx="${300+i*260}" cy="${640+(i%2)*40}" r="9" fill="#bff5d8"/><circle cx="${300+i*260}" cy="${640+(i%2)*40}" r="38" fill="#7fe0b8" opacity=".12"/>`).join('')}</svg>`;}
+function bgArt(name){
+  if(ART.bg[name])return `<img src="${ART.bg[name]}" style="width:100%;height:100%;object-fit:cover" alt="">`;
+  if(name==='marsh_night')return marshBack();
+  if(name==='black')return '<div style="background:#000;width:100%;height:100%"></div>';
+  const ph=name==='market_dusk'?'dusk':name==='market_day'?'day':'night';
+  return stallBack(ph,moonOf(S.day))+'<div style="position:absolute;inset:0">'+stallFront(ph)+'</div>';
+}
+function fireflies(n){let h='';for(let i=0;i<n;i++)h+=`<span class="fly" style="left:${Math.random()*100}%;top:${30+Math.random()*60}%;--x:${(Math.random()*120-60)|0}px;--y:${(Math.random()*-110-20)|0}px;--d:${9+Math.random()*9}s;--dl:${-Math.random()*14}s"></span>`;return h;}
+
+/* ===== story-scene engine (visual novel) =====
+Script format (one block per scene):
+  === scene_id
+  @bg market_dusk | market_day | stall | marsh_night | black
+  @show wren right|left|center     @hide wren     @dim wren
+  wren: A line of dialogue.        (no "name:" = narration; {p} = player name)
+  + "A choice" -> label            (consecutive + lines make one menu; add  if flag / ifnot flag)
+  :label                           @goto label     @end
+  @set flag [value]  @unset flag   @rel wren 1     @give "Wax Ends" 2 [Tier]   @coins 5
+  @if flag -> label   @ifnot flag -> label
+*/
+function parseScenes(txt){
+  const out={};let cur=null;
+  txt.split(/\r?\n/).forEach(raw=>{
+    const line=raw.trim();if(!line||line.startsWith('//'))return;
+    let m=line.match(/^===\s*(\S+)/);if(m){cur=out[m[1]]={id:m[1],lines:[],labels:{}};return;}
+    if(!cur)return;
+    if(line.startsWith(':')){cur.labels[line.slice(1).trim()]=cur.lines.length;return;}
+    if(line.startsWith('@')){const p=line.slice(1).match(/"[^"]*"|\S+/g)||[];cur.lines.push({t:'cmd',c:p[0],a:p.slice(1).map(x=>x.replace(/^"|"$/g,''))});return;}
+    if(line.startsWith('+')){m=line.match(/^\+\s*"([^"]+)"\s*->\s*(\S+)(?:\s+(if|ifnot)\s+(\S+))?/);if(m)cur.lines.push({t:'ch',text:m[1],to:m[2],cond:m[3],flag:m[4]});return;}
+    m=line.match(/^([A-Za-z_][\w ]{0,24}):\s+(.*)$/);
+    if(m)cur.lines.push({t:'say',who:m[1].trim().toLowerCase(),text:m[2]});else cur.lines.push({t:'say',who:'narrator',text:line});
+  });
+  return out;
+}
+let SCENES={};
+const subst=t=>String(t).replace(/\{p\}/g,PLAYER());
+let VN=null;
+function playScene(id,onEnd){
+  const sc=SCENES[id];if(!sc){toast('No scene: '+id);onEnd&&onEnd();return;}
+  VN={sc,i:0,bg:'black',chars:{},typing:null,done:false,onEnd,wait:null};
+  const root=$('#story');
+  root.innerHTML=`<div class="vn-bg" id="vnbg"></div><div id="vnflies" style="position:absolute;inset:0;pointer-events:none">${fireflies(14)}</div><div id="vnchars"></div>
+   <div class="vn-tools"><button class="btn sm" data-vn="skip">Skip scene</button></div>
+   <div class="vn-choices" id="vnch" style="display:none"></div>
+   <div class="vn-box" id="vnbox" data-vn="adv"><div class="vn-name" id="vnname"></div><div class="vn-text" id="vntext"></div><div class="vn-next">▼</div></div>`;
+  S.scenesSeen[id]=true;vnStep();
+}
+function vnRenderChars(){
+  $('#vnchars').innerHTML=Object.entries(VN.chars).map(([cid,v])=>`<div class="vn-char ${v.pos} ${v.dim?'dim':''}">${portrait(castFor(cid))}</div>`).join('');
+}
+function vnSay(who,text){
+  const c=who==='narrator'?null:castFor(who);
+  const nm=$('#vnname'),tx=$('#vntext');
+  nm.style.display=c?'block':'none';if(c)nm.textContent=c.name;
+  tx.className='vn-text'+(c?'':' narr');
+  Object.keys(VN.chars).forEach(k=>{VN.chars[k].dim=c?(k!==c.id&&k!==who):false;});vnRenderChars();
+  const full=subst(text);tx.textContent='';let n=0;const sp=S.textSpeed||26;
+  clearInterval(VN.typing);VN.full=full;
+  VN.typing=setInterval(()=>{n++;tx.textContent=full.slice(0,n);if(n>=full.length){clearInterval(VN.typing);VN.typing=null;}},sp);
+}
+function vnFinishTyping(){if(VN.typing){clearInterval(VN.typing);VN.typing=null;$('#vntext').textContent=VN.full;return true;}return false;}
+function vnJump(l){const sc=VN.sc;if(l in sc.labels)VN.i=sc.labels[l];else{console.warn('missing label',l);VN.i=sc.lines.length;}}
+function vnStep(){
+  const sc=VN.sc;
+  while(VN.i<sc.lines.length){
+    const L=sc.lines[VN.i];
+    if(L.t==='say'){VN.i++;vnSay(L.who,L.text);return;}
+    if(L.t==='ch'){
+      const opts=[];while(VN.i<sc.lines.length&&sc.lines[VN.i].t==='ch'){const c=sc.lines[VN.i++];
+        if(c.cond==='if'&&!flag(c.flag))continue;if(c.cond==='ifnot'&&flag(c.flag))continue;opts.push(c);}
+      const box=$('#vnch');box.style.display='grid';
+      box.innerHTML=opts.map((o,ix)=>`<button class="vn-choice" data-vn="pick" data-to="${esc(o.to)}">${esc(subst(o.text))}</button>`).join('');
+      $('#vnbox').style.visibility='hidden';return;}
+    if(L.t==='cmd'){VN.i++;if(vnCmd(L)==='end')return;continue;}
+    VN.i++;
+  }
+  vnEnd();
+}
+function vnCmd(L){
+  const a=L.a;
+  switch(L.c){
+    case'bg':VN.bg=a[0];$('#vnbg').innerHTML=bgArt(a[0]);break;
+    case'show':VN.chars[(a[0]||'').toLowerCase()]={pos:a[1]||'right',dim:false};vnRenderChars();break;
+    case'hide':delete VN.chars[(a[0]||'').toLowerCase()];vnRenderChars();break;
+    case'dim':if(VN.chars[a[0]])VN.chars[a[0]].dim=true;vnRenderChars();break;
+    case'set':S.flags[a[0]]=a[1]!==undefined?(isNaN(a[1])?a[1]:Number(a[1])):true;break;
+    case'unset':delete S.flags[a[0]];break;
+    case'rel':S.rel[a[0]]=(S.rel[a[0]]||0)+Number(a[1]||1);break;
+    case'give':addItem(a[0],Number(a[1]||1),a[2]);toast('Received '+(a[1]||1)+' × '+a[0]);break;
+    case'coins':S.coins+=Number(a[0]||0);break;
+    case'goto':vnJump(a[0]);break;
+    case'if':if(flag(a[0]))vnJump(a[a.length-1]);break;
+    case'ifnot':if(!flag(a[0]))vnJump(a[a.length-1]);break;
+    case'end':vnEnd();return'end';
+  }
+}
+function vnEnd(){
+  if(VN.done)return;VN.done=true;clearInterval(VN.typing);
+  const cb=VN.onEnd;VN=null;$('#story').innerHTML='';save();cb&&cb();
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-vn]');if(!t||!VN)return;
+  const a=t.dataset.vn;
+  if(a==='adv'){if(!vnFinishTyping())vnStep();}
+  else if(a==='pick'){$('#vnch').style.display='none';$('#vnbox').style.visibility='visible';vnJump(t.dataset.to);vnStep();}
+  else if(a==='skip'){vnEnd();}
+});
+document.addEventListener('keydown',e=>{
+  if(!VN)return;
+  if((e.key===' '||e.key==='Enter')&&$('#vnch').style.display==='none'){e.preventDefault();if(!vnFinishTyping())vnStep();}
+});
+
+/* ===== game: HUD, stall counter, bench, almanac, flow ===== */
+const PHASES={day:{label:'Day',icon:'☀'},dusk:{label:'Dusk',icon:'◐'},night:{label:'Night',icon:'☾'}};
+const KINDCOLOR=k=>k==='Walk-in'?'#c9b6e8':listColor('reqkinds',k);
+function sel(){return S.tmp.sel||(S.tmp.sel=[]);}
+
+/* ---------- flow ---------- */
+function setPhase(p){S.phase=p;if(p!=='night'){S.queue=[];S.cur=null;}S.tmp.sel=[];save();render();}
+function advanceDay(){S.day++;S.phase='day';S.queue=[];S.cur=null;S.tmp.sel=[];save();render();toast('Day '+S.day+' · '+moonOf(S.day)+' moon');}
+function checkLevel(){let n=1;LEVEL_EARN.forEach((t,i)=>{if(S.earned>=t)n=i+1;});n=Math.min(n,D.levels.length||5);if(n>S.level){S.level=n;toast('Stall level up: '+lvName(n));}}
+function makeCustomer(r){return {id:r.id,name:r.name,kind:r.kind,level:r.level,ask:r.ask,answer:r.answer,pay:r.pay,wrong:r.wrong,walkin:false};}
+function walkIn(){
+  const goods=D.crafts.filter(c=>c.sells&&c.price>0&&c.level<=S.level);if(!goods.length)return null;
+  const g=rnd(goods);const who=rnd(['A passing lamplighter','A veiled traveler','A market child','Two sisters','A tired porter','A sleepy cat-keeper','A lantern-seller','A canal boatwoman']);
+  return {id:'walkin-'+Math.random().toString(36).slice(2,7),name:who,kind:'Walk-in',level:g.level,ask:`I will take a ${g.name}, if you have one.`,answer:g.name,pay:g.price,wrong:'',walkin:true};
+}
+function buildQueue(){
+  if(!flag('night_one_done')&&S.day===1){const m=D.requests.find(r=>/moth/i.test(r.name));return m?[makeCustomer(m)]:[];}
+  const pool=D.requests.filter(r=>r.level<=S.level&&!(S.lastSeen[r.id]>=S.day-1));
+  const q=[];const want=2+S.level;const sh=pool.slice().sort(()=>Math.random()-.5);
+  while(q.length<want&&sh.length){q.push(makeCustomer(sh.pop()));if(Math.random()<.4){const w=walkIn();if(w)q.push(w);}}
+  return q;
+}
+function openStall(){S.phase='night';S.queue=buildQueue();S.cur=null;S.tmp.sel=[];nextCustomer();save();}
+function nextCustomer(){
+  S.cur=S.queue.shift()||null;S.tmp.sel=[];S.tmp.react=null;S.tmp.fresh=true;
+  if(S.cur)S.lastSeen[S.cur.id]=S.day;
+  render();
+}
+function closeNight(){
+  S.queue=[];S.cur=null;
+  const fin=()=>advanceDay();
+  if(!flag('night_one_done')&&flag('moth_served'))playScene('night_one_end',()=>{fin();});else fin();
+}
+function offer(){
+  const c=S.cur;if(!c||!sel().length)return;
+  const keys=sel();const names=keys.map(k=>k.split('|')[0]);
+  const need=parseIng(c.answer).map(p=>p.name.toLowerCase()).sort();
+  const got=[...new Set(names.map(n=>n.toLowerCase()))].sort();
+  const correct=need.length===got.length&&need.every((n,i)=>n===got[i]);
+  const tier=keys.map(k=>k.split('|')[1]).sort((a,b)=>tierRank(a)-tierRank(b))[0]||'Proper';
+  const strict=S.mode==='almanac'&&(S.strict[c.kind]!==false);
+  let pay=0,line='';
+  if(correct){pay=Math.max(1,Math.round(c.pay*tierMult(tier)));
+    line=({Improper:'It will do. Not your best.',Proper:'Yes. That is just right.',Fine:'Oh, that is lovely.',Perfect:'I... how did you make this?'})[tier]||'Thank you.';}
+  else if(!strict){pay=Math.max(1,Math.round(c.pay*tierMult('Improper')*0.5));line='Not what I came for, but I will take it.';}
+  else{line=c.wrong&&c.wrong.length<90?c.wrong:'No. That is not what I need.';}
+  if(pay>0){keys.forEach(k=>{const [n,t]=k.split('|');S.inv[k]=(S.inv[k]||0);});
+    const cnt={};keys.forEach(k=>cnt[k]=(cnt[k]||0)+1);Object.keys(cnt).forEach(k=>{S.inv[k]=(S.inv[k]||0)-cnt[k];if(S.inv[k]<=0)delete S.inv[k];});
+    S.coins+=pay;S.earned+=pay;S.sold++;checkLevel();
+    if(correct&&!c.walkin)S.rel[c.name]=(S.rel[c.name]||0)+1;}
+  S.tmp.react={line,pay,correct};S.tmp.sel=[];S.tmp.locked=true;render();
+  if(pay>0){const g=document.createElement('div');g.className='gain';g.textContent='+'+pay;$('#main').appendChild(g);}
+  const wasMoth=correct&&/moth/i.test(c.name)&&!flag('moth_served');
+  setTimeout(()=>{S.tmp.locked=false;
+    if(wasMoth)playScene('moth_done',()=>nextCustomer());else nextCustomer();},pay>0||correct?1900:1500);
+  save();
+}
+function sendAway(){if(!S.cur)return;nextCustomer();}
+
+/* ---------- crafting & foraging ---------- */
+function canMake(c){return parseIng(c.ingredients).every(p=>haveCount(p.name)>=p.qty);}
+function craft(id){
+  const c=D.crafts.find(x=>x.id===id);if(!c||!canMake(c))return;
+  parseIng(c.ingredients).forEach(p=>takeItems(p.name,p.qty));
+  const tier=(c.moon==='Any'||c.moon===moonOf(S.day))?'Proper':'Improper';
+  addItem(c.name,1,tier);save();
+  toast(`Made ${c.name} (${tier})`+(tier==='Improper'?' · wrong moon':''));
+  if(c.name==='Reed Wick Candle'&&!flag('crafted_candle')){closeModal();playScene('first_candle',()=>render());}else{renderBench();render();}
+}
+function forage(){ // temporary until the real foraging round
+  if(!flag('gathered')){addItem('Reed',2);addItem('Rosemary',1);S.flags.gathered=true;toast('Gathered 2 Reed and 1 Rosemary');}
+  else{const pool=D.gathers.filter(g=>g.source==='Gather'&&g.zone!=='Reward');const got=[];for(let i=0;i<4;i++){const g=rnd(pool);addItem(g.name,1);got.push(g.name);}toast('Foraged: '+got.join(', '));}
+  save();render();
+}
+function visitWren(){
+  if(flag('gathered')&&!flag('wren_gave'))playScene('wren_bring',()=>render());else playScene('wren_chat',()=>render());
+}
+
+/* ---------- render ---------- */
+function render(){
+  if(!S.started){renderTitle();return;}
+  const ph=S.phase;const moon=moonOf(S.day);
+  $('#game').innerHTML=`<div class="hud"><span class="brand">The Night Market</span>
+    <span class="pill">Day <b>${S.day}</b></span><span class="pill">${PHASES[ph].icon} ${PHASES[ph].label}</span><span class="pill">${esc(moon)} moon</span>
+    <span class="pill">Coins <b>${S.coins}</b></span><span class="pill">Stall <b>${S.level}</b> · ${esc(lvName(S.level))}</span><span class="sp"></span>
+    ${ADMIN?'<button class="ibtn" data-g="admin" title="Admin">⚙</button>':''}<button class="ibtn" data-g="settings" title="Settings">☰</button></div>
+   <div id="main">${mainView()}</div>
+   <div class="dock"><button class="btn" data-g="bench">Bench</button><button class="btn" data-g="pack">Pack</button><button class="btn" data-g="almanac">Almanac</button><button class="btn" data-g="wren">Visit Wren</button></div>`;
+  S.tmp.fresh=false;
+}
+function questHtml(){
+  if(flag('night_one_done'))return '';
+  const steps=[['Meet Wren at Stall 13','met_wren'],['Open the almanac','opened_almanac'],['Gather 2 reeds and 1 herb','gathered'],['Bring them to Wren','wren_gave'],['Make your first candle','crafted_candle'],['Sell it at full dark','moth_served']];
+  return `<div class="quest"><h4>Night One</h4><ul style="margin:0;padding:0">${steps.map(([t,f])=>`<li class="${flag(f)?'done':''}"><i>${flag(f)?'✓':''}</i>${t}</li>`).join('')}</ul></div>`;
+}
+function mainView(){
+  const ph=S.phase,moon=moonOf(S.day);
+  let h=`<div id="artback">${stallBack(ph,moon)}</div><div style="position:absolute;inset:0;pointer-events:none;z-index:2">${fireflies(ph==='day'?4:16)}</div>`;
+  let body='';
+  if(ph==='night'){
+    const c=S.cur;
+    if(!c){body=`<div class="center"><h2>The lanterns are low</h2><p>No one is waiting. ${S.sold?`You have sold ${S.sold} things so far.`:''}</p><div class="actions" style="justify-content:center"><button class="btn gold" data-g="close">Close the stall</button></div></div>`;}
+    else body=customerView(c);
+  }else if(ph==='dusk'){
+    body=`<div class="center"><h2>Dusk</h2><p>The lanterns are waking. Gather, make, and open the stall when you are ready.</p><div class="actions" style="justify-content:center"><button class="btn" data-g="forage">Forage (temporary)</button><button class="btn gold" data-g="open">Open the stall</button></div></div>`;
+  }else{
+    body=`<div class="center"><h2>Day ${S.day}</h2><p>The market sleeps. Gather what you can until the light turns.</p><div class="actions" style="justify-content:center"><button class="btn" data-g="forage">Forage (temporary)</button><button class="btn gold" data-g="dusk">Wait for dusk</button></div></div>`;
+  }
+  return h+body+`<div id="artfront">${stallFront(ph)}</div>`+(S.cur&&ph==='night'?'':questHtml());
+}
+function customerView(c){
+  const col=KINDCOLOR(c.kind),ca=castFor(c.walkin?c.id:c.name.toLowerCase().replace(/^the\s+/,'').split(' ')[0]==='moth-winged'?'moth':c.name.toLowerCase(),c.name);
+  const cast=/moth-winged/i.test(c.name)?castFor('moth'):/^fenn$/i.test(c.name)?castFor('fenn'):/shade/i.test(c.name)?castFor('shade'):castFor(c.walkin?c.id:c.name,c.name);
+  const R=S.tmp.react;
+  const inv=invList().filter(x=>x.qty>0);
+  const sk=sel();
+  const selCount={};sk.forEach(k=>selCount[k]=(selCount[k]||0)+1);
+  const shelf=inv.map(x=>{const used=selCount[x.k]||0,left=x.qty-used;
+    return `<button class="item ${used?'sel':''} ${left<=0&&!used?'dis':''}" data-g="pick" data-k="${esc(x.k)}"><span class="c">×${left}</span><div class="n">${esc(x.name)}</div><div class="t"><span class="tier ${x.tier}">${x.tier}</span> · ${x.type==='craft'?esc(x.e.kind):'gathered'}</div></button>`;}).join('')||'<div class="lbl" style="padding:14px">Your pack is empty. Forage, then make something at the Bench.</div>';
+  const counter=sk.length?sk.map(k=>`<span class="chip" style="font:700 13px var(--sans);padding:3px 10px;border-radius:9px;border:1px solid var(--line2);background:rgba(240,198,116,.1)">${esc(k.split('|')[0])} <span class="tier ${k.split('|')[1]}">${k.split('|')[1]}</span></span>`).join(' '):'<span class="lbl">Click items below to set them on the counter</span>';
+  return `<div class="cust ${S.tmp.fresh?'in':''}">${portrait(cast)}</div>
+   <div class="speech"><div class="who"><span class="nm">${esc(c.name)}</span><span class="badge" style="--c:${col}">${esc(c.kind)}</span><span class="sp"></span><span class="lbl">${S.queue.length} waiting</span></div>
+    <div class="q">${R?esc(R.line):'“'+esc(c.ask)+'”'}</div></div>
+   <div class="tray"><div class="actions"><span class="lbl">On the counter</span>${counter}<span class="sp"></span>
+     <button class="btn sm" data-g="almanac">Almanac</button><button class="btn sm" data-g="away" ${S.tmp.locked?'':''}>Send away</button><button class="btn gold sm ${sk.length&&!S.tmp.locked?'':'off'}" data-g="offer">Offer</button></div>
+    <div class="trayrow">${shelf}</div></div>`;
+}
+function renderTitle(){
+  const has=!!localStorage.getItem(SAVE_KEY);
+  $('#game').innerHTML=`<div></div><div id="main"><div id="artback">${stallBack('night','Waxing')}</div><div style="position:absolute;inset:0;z-index:2;pointer-events:none">${fireflies(22)}</div><div id="artfront">${stallFront('night')}</div>
+   <div class="center" style="top:42%"><div class="eyebrow">A cozy gather-and-craft romantasy</div><h2 style="font-size:clamp(46px,8vw,92px)">The Night Market</h2><p>Follow the token. Keep the stall. Be remembered.</p>
+   <div class="actions" style="justify-content:center"><button class="btn gold" data-g="begin">${has?'New game':'Begin'}</button>${has?'<button class="btn" data-g="continue">Continue</button>':''}</div></div></div><div></div>`;
+}
+
+/* ---------- panels ---------- */
+function openModal(html,cls){$('#overlay').innerHTML=`<div class="scrim" data-g="scrim"><div class="modal ${cls||''}">${html}</div></div>`;}
+function closeModal(){$('#overlay').innerHTML='';}
+const X='<button class="ibtn x" data-g="close">✕</button>';
+let benchKind='',almTab='Recipes',almQ='';
+function renderBench(){
+  const kinds=[...new Set(D.crafts.filter(c=>c.id!=='c-wren-s-key').map(c=>c.kind))];
+  const list=D.crafts.filter(c=>c.sells!==false||true).filter(c=>!benchKind||c.kind===benchKind);
+  openModal(`${X}<div class="eyebrow">Stall 13</div><h2>The Bench</h2><div class="note" style="margin:8px 0">Moon tonight: <b>${moonOf(S.day)}</b>. Making a recipe on its wrong moon gives an Improper result. “Any” recipes are never penalised.</div>
+   <div class="tabs"><button class="tab ${!benchKind?'on':''}" data-g="bkind" data-v="">All</button>${kinds.map(k=>`<button class="tab ${benchKind===k?'on':''}" data-g="bkind" data-v="${esc(k)}">${esc(k)}</button>`).join('')}</div>
+   <div class="grid">${list.map(c=>{const lock=c.level>S.level,can=!lock&&canMake(c),ings=parseIng(c.ingredients);
+    return `<div class="rcard ${lock?'lock':''}" style="--c:${listColor('kinds',c.kind)}"><h4>${esc(c.name)}</h4><div class="row"><span class="badge" style="--c:${listColor('kinds',c.kind)}">${esc(c.kind)}</span><span class="badge" style="--c:#c8b6e8">L${c.level}</span><span class="chip">${c.moon==='Any'?'Any moon':esc(c.moon)+' moon'}</span></div>
+     <div class="chips">${ings.map(p=>`<span class="chip ${haveCount(p.name)>=p.qty?'have':'miss'}">${p.qty>1?p.qty+'× ':''}${esc(p.name)} ${haveCount(p.name)}/${p.qty}</span>`).join('')}</div>
+     <p>${esc(c.purpose||'')}</p><div class="actions"><button class="btn gold sm ${can?'':'off'}" data-g="craft" data-id="${c.id}">${lock?'Level '+c.level:'Make'}</button></div></div>`;}).join('')}</div>`);
+}
+function renderPack(){
+  const inv=invList();
+  openModal(`${X}<div class="eyebrow">Your things</div><h2>Pack</h2><div class="note" style="margin:8px 0">Coins <b>${S.coins}</b> · Earned <b>${S.earned}</b> · Sold <b>${S.sold}</b></div>
+   <div class="grid">${inv.map(x=>`<div class="rcard" style="--c:${x.type==='craft'?listColor('kinds',x.e.kind):listColor('zones',x.e?x.e.zone:'')}"><h4>${esc(x.name)} <span style="color:var(--gold)">×${x.qty}</span></h4><div class="tier ${x.tier}">${x.tier}</div><p>${x.e?esc(x.type==='craft'?(x.e.purpose||''):(x.e.lore||'')):''}</p></div>`).join('')||'<p style="color:var(--muted)">Empty.</p>'}</div>`);
+}
+function renderAlmanac(){
+  S.flags.opened_almanac=true;save();
+  const q=almQ.toLowerCase();
+  const rec=D.crafts.filter(c=>!q||(c.name+' '+c.kind+' '+c.purpose+' '+c.ingredients).toLowerCase().includes(q));
+  const gat=D.gathers.filter(g=>!q||(g.name+' '+g.latin+' '+g.lore+' '+g.zone).toLowerCase().includes(q));
+  const body=almTab==='Recipes'?rec.map(c=>`<div class="rcard ${c.level>S.level?'lock':''}" style="--c:${listColor('kinds',c.kind)}"><h4>${esc(c.name)}</h4><div class="row"><span class="badge" style="--c:${listColor('kinds',c.kind)}">${esc(c.kind)}</span><span class="badge" style="--c:#c8b6e8">L${c.level}</span><span class="chip">${c.moon==='Any'?'Any moon':esc(c.moon)+' moon'}</span></div>
+     <p><b>Needs:</b> ${esc(c.ingredients)}</p><p>${esc(c.purpose||'')}</p>${c.method?`<p><i>${esc(c.method)}</i></p>`:''}${c.lore?`<p style="color:#d9cde8">${esc(c.lore)}</p>`:''}${c.safety?`<div class="safety">${esc(c.safety)}</div>`:''}</div>`).join('')
+   :gat.map(g=>`<div class="rcard" style="--c:${listColor('zones',g.zone)}"><h4>${esc(g.name)}</h4>${g.latin?`<p style="font-style:italic;margin:0">${esc(g.latin)}</p>`:''}<div class="row"><span class="badge" style="--c:${listColor('zones',g.zone)}">${esc(g.zone)}</span><span class="chip">${esc(g.rarity)}</span><span class="chip">${esc(g.when)}</span></div>${g.corr?`<p><b>${esc(g.corr)}</b></p>`:''}<p>${esc(g.lore||'')}</p>${g.safety?`<div class="safety">${esc(g.safety)}</div>`:''}</div>`).join('');
+  openModal(`${X}<div class="eyebrow">Your family's book</div><h2>The Almanac</h2><div class="tabs"><button class="tab ${almTab==='Recipes'?'on':''}" data-g="atab" data-v="Recipes">Recipes</button><button class="tab ${almTab==='Gathering'?'on':''}" data-g="atab" data-v="Gathering">Gathering</button><input id="almq" placeholder="Search…" value="${esc(almQ)}" style="padding:6px 12px;border-radius:99px;background:rgba(14,9,22,.6);border:1px solid var(--line);outline:0;min-width:160px"></div><div class="grid">${body}</div>`);
+  const i=$('#almq');if(i){i.addEventListener('input',e=>{almQ=e.target.value;const p=e.target.selectionStart;renderAlmanac();const n=$('#almq');n.focus();n.setSelectionRange(p,p);});}
+}
+function renderSettings(){
+  openModal(`${X}<div class="eyebrow">Settings</div><h2>How strict is the market?</h2>
+   <div class="tabs"><button class="tab ${S.mode==='cozy'?'on':''}" data-g="mode" data-v="cozy">Cozy</button><button class="tab ${S.mode==='almanac'?'on':''}" data-g="mode" data-v="almanac">Witch's Almanac</button></div>
+   <div class="note">${S.mode==='cozy'?'Cozy: a wrong remedy still sells, for less. No one is turned away.':'Witch’s Almanac: ailments, worries, favors and hauntings need the right remedy. Wishes are forgiving. Use the almanac.'}</div>
+   <div class="fld"><label>Text speed</label><select data-g="speed"><option value="40" ${S.textSpeed==40?'selected':''}>Slow</option><option value="26" ${S.textSpeed==26?'selected':''}>Normal</option><option value="10" ${S.textSpeed==10?'selected':''}>Fast</option><option value="1" ${S.textSpeed==1?'selected':''}>Instant</option></select></div>
+   <div class="actions" style="margin-top:12px"><button class="btn danger sm" data-g="newgame">Start over</button></div>`,'narrow');
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-g]');if(!t)return;
+  const a=t.dataset.g;
+  if(a==='scrim'){if(e.target===t)closeModal();return;}
+  switch(a){
+    case'begin':S=DEFAULT();S.started=true;save();render();playScene('arrival',()=>render());break;
+    case'continue':load();S.started=true;render();break;
+    case'close':if(S.phase==='night'&&!S.cur&&!$('#overlay').firstChild)closeNight();else closeModal();break;
+    case'open':openStall();break;
+    case'dusk':setPhase('dusk');break;
+    case'forage':forage();break;
+    case'pick':{const k=t.dataset.k;const inv=S.inv[k]||0;const used=sel().filter(x=>x===k).length;if(S.tmp.locked)break;if(used<inv)sel().push(k);else{const ix=sel().indexOf(k);if(ix>-1)sel().splice(ix,1);}render();break;}
+    case'offer':if(!S.tmp.locked)offer();break;
+    case'away':if(!S.tmp.locked)sendAway();break;
+    case'bench':renderBench();break;
+    case'bkind':benchKind=t.dataset.v;renderBench();break;
+    case'craft':craft(t.dataset.id);break;
+    case'pack':renderPack();break;
+    case'almanac':renderAlmanac();break;
+    case'atab':almTab=t.dataset.v;renderAlmanac();break;
+    case'wren':visitWren();break;
+    case'settings':renderSettings();break;
+    case'mode':S.mode=t.dataset.v;save();renderSettings();break;
+    case'newgame':if(confirm('Delete your save and start over?')){localStorage.removeItem(SAVE_KEY);S=DEFAULT();closeModal();render();}break;
+    case'admin':renderAdmin();break;
+  }
+});
+document.addEventListener('change',e=>{const t=e.target;if(t.dataset&&t.dataset.g==='speed'){S.textSpeed=Number(t.value);save();}});
+
+/* ===== admin: jump anywhere. Open with ?admin in the URL (or localStorage nm-admin=1). ===== */
+function renderAdmin(){
+  const gat=D.gathers.map(g=>g.name),cr=D.crafts.map(c=>c.name);
+  const opt=(arr,sel)=>arr.map(n=>`<option ${n===sel?'selected':''}>${esc(n)}</option>`).join('');
+  const broken=[];D.crafts.concat(D.upgrades).forEach(x=>parseIng(x.ingredients).forEach(p=>{if(!p.r)broken.push(x.name+' needs '+p.name);}));
+  D.requests.forEach(r=>{if(parseIng(r.answer).some(p=>!p.r))broken.push('Request '+r.name+': '+r.answer);});
+  openModal(`${X}<div class="eyebrow">Admin</div><h2>Jump anywhere</h2><div class="adm" style="margin-top:12px">
+  <section><h3>Time</h3><div class="row"><div class="fld"><label>Day</label><input id="a-day" type="number" min="1" value="${S.day}" style="width:90px"></div><div class="fld"><label>Moon (from day)</label><input value="${moonOf(S.day)}" disabled style="width:100px"></div></div>
+   <div class="row"><button class="btn sm" data-a="day">Set day</button><button class="btn sm" data-a="phase" data-v="day">Day</button><button class="btn sm" data-a="phase" data-v="dusk">Dusk</button><button class="btn sm" data-a="phase" data-v="night">Open stall (night)</button></div>
+   <div class="row" style="margin-top:8px"><button class="btn sm" data-a="moon" data-v="1">Next moon phase</button><button class="btn sm" data-a="nextday">Skip to next day</button></div></section>
+  <section><h3>Economy</h3><div class="row"><div class="fld"><label>Coins</label><input id="a-coins" type="number" value="${S.coins}" style="width:100px"></div><div class="fld"><label>Stall level</label><select id="a-lvl">${D.levels.map(l=>`<option value="${l.level}" ${l.level===S.level?'selected':''}>${l.level} · ${esc(l.name)}</option>`).join('')}</select></div></div>
+   <button class="btn sm" data-a="econ">Apply</button> <button class="btn sm" data-a="maxall">Max everything</button></section>
+  <section><h3>Give items</h3><div class="row"><div class="fld"><label>Item</label><select id="a-item">${opt(gat.concat(cr))}</select></div><div class="fld"><label>Qty</label><input id="a-qty" type="number" value="3" min="1" style="width:70px"></div><div class="fld"><label>Quality</label><select id="a-tier">${D.tiers.map(t=>`<option ${t.name==='Proper'?'selected':''}>${esc(t.name)}</option>`).join('')}</select></div></div>
+   <div class="row"><button class="btn sm" data-a="give">Give</button><button class="btn sm" data-a="giveall">All gatherables ×5</button><button class="btn sm danger" data-a="clearinv">Clear pack</button></div></section>
+  <section><h3>Customers</h3><div class="fld"><label>Spawn at the counter now</label><select id="a-req">${opt(D.requests.map(r=>r.name))}</select></div>
+   <div class="row"><button class="btn sm" data-a="spawn">Spawn</button><button class="btn sm" data-a="queue">Refill tonight’s queue</button><button class="btn sm" data-a="walkin">Walk-in</button></div></section>
+  <section><h3>Story</h3><div class="fld"><label>Play a scene</label><select id="a-scene">${opt(Object.keys(SCENES))}</select></div>
+   <div class="row"><button class="btn sm" data-a="scene">Play</button><button class="btn sm" data-a="n1done">Mark Night One done</button><button class="btn sm" data-a="n1reset">Reset Night One</button></div>
+   <div class="row" style="margin-top:8px"><div class="fld"><label>Set flag</label><input id="a-flag" placeholder="flag_name"></div><button class="btn sm" data-a="flag">Set</button><button class="btn sm" data-a="unflag">Clear</button></div>
+   <div class="row"><div class="fld"><label>Relationship</label><input id="a-rel" placeholder="wren"></div><div class="fld"><label>+/-</label><input id="a-reln" type="number" value="1" style="width:60px"></div><button class="btn sm" data-a="rel">Add</button></div>
+   <div class="note" style="margin-top:8px;font-size:12px">Flags: ${esc(Object.keys(S.flags).join(', ')||'none')} · Rel: ${esc(JSON.stringify(S.rel))}</div></section>
+  <section><h3>Rules</h3><div class="row"><button class="tab ${S.mode==='cozy'?'on':''}" data-a="mode" data-v="cozy">Cozy</button><button class="tab ${S.mode==='almanac'?'on':''}" data-a="mode" data-v="almanac">Almanac</button></div>
+   <div class="lbl" style="margin:10px 0 4px">Strict in Almanac mode</div><div class="row">${Object.keys(S.strict).map(k=>`<button class="tab ${S.strict[k]?'on':''}" data-a="strict" data-v="${esc(k)}">${esc(k)}</button>`).join('')}</div></section>
+  <section><h3>Game Book data</h3><div class="note" style="font-size:12.5px">Source: <b>${DATAINFO.source}</b> · rev ${DATAINFO.rev}<br>Cloud rev: ${DATAINFO.cloudRev||'unknown'}${DATAINFO.error?'<br><span style="color:var(--bad)">'+esc(DATAINFO.error)+'</span>':''}<br>${D.gathers.length} gatherables · ${D.crafts.length} recipes · ${D.requests.length} customers</div>
+   <div class="row" style="margin-top:8px"><button class="btn sm" data-a="refresh">Refresh from cloud</button></div>
+   <div class="note" style="margin-top:8px;font-size:12.5px;${broken.length?'border-color:rgba(229,133,133,.4)':''}">${broken.length?broken.slice(0,8).map(esc).join('<br>')+(broken.length>8?'<br>…':''):'Every ingredient resolves.'}</div></section>
+  <section><h3>Save</h3><div class="row"><button class="btn sm" data-a="exp">Export save</button><label class="btn sm" style="cursor:pointer">Import<input type="file" id="a-imp" accept=".json" hidden></label><button class="btn sm danger" data-a="wipe">Wipe save</button></div></section>
+  </div>`);
+}
+document.addEventListener('click',async e=>{
+  const t=e.target.closest('[data-a]');if(!t)return;e.preventDefault();
+  const a=t.dataset.a,v=t.dataset.v,val=id=>$('#'+id).value;
+  const again=()=>{save();render();renderAdmin();};
+  switch(a){
+    case'day':S.day=Math.max(1,parseInt(val('a-day'))||1);again();break;
+    case'phase':if(v==='night'){closeModal();openStall();}else{setPhase(v);renderAdmin();}break;
+    case'moon':S.day+=2;again();break;
+    case'nextday':advanceDay();renderAdmin();break;
+    case'econ':S.coins=parseInt(val('a-coins'))||0;S.level=parseInt(val('a-lvl'))||1;if(S.earned<LEVEL_EARN[S.level-1])S.earned=LEVEL_EARN[S.level-1];again();break;
+    case'maxall':S.coins=9999;S.level=D.levels.length||5;S.earned=LEVEL_EARN[LEVEL_EARN.length-1];D.gathers.forEach(g=>addItem(g.name,5));again();break;
+    case'give':addItem(val('a-item'),parseInt(val('a-qty'))||1,val('a-tier'));again();break;
+    case'giveall':D.gathers.forEach(g=>addItem(g.name,5));again();break;
+    case'clearinv':S.inv={};again();break;
+    case'spawn':{const r=D.requests.find(x=>x.name===val('a-req'));if(r){S.phase='night';S.queue=S.cur?[S.cur].concat(S.queue):S.queue;S.cur=makeCustomer(r);S.tmp.sel=[];S.tmp.react=null;S.tmp.fresh=true;closeModal();save();render();}break;}
+    case'queue':S.phase='night';S.queue=buildQueue();closeModal();nextCustomer();break;
+    case'walkin':{const w=walkIn();if(w){S.phase='night';S.cur=w;S.tmp.sel=[];S.tmp.react=null;S.tmp.fresh=true;closeModal();save();render();}break;}
+    case'scene':closeModal();playScene(val('a-scene'),()=>render());break;
+    case'n1done':S.flags.night_one_done=true;['met_wren','opened_almanac','gathered','wren_gave','crafted_candle','moth_served'].forEach(f=>S.flags[f]=true);again();break;
+    case'n1reset':['night_one_done','met_wren','opened_almanac','gathered','wren_gave','crafted_candle','moth_served'].forEach(f=>delete S.flags[f]);S.day=1;S.phase='dusk';S.inv={};S.coins=0;S.earned=0;S.level=1;S.sold=0;S.queue=[];S.cur=null;again();break;
+    case'flag':if(val('a-flag')){S.flags[val('a-flag').trim()]=true;again();}break;
+    case'unflag':delete S.flags[val('a-flag').trim()];again();break;
+    case'rel':if(val('a-rel')){S.rel[val('a-rel').trim().toLowerCase()]=(S.rel[val('a-rel').trim().toLowerCase()]||0)+(parseInt(val('a-reln'))||0);again();}break;
+    case'mode':S.mode=v;again();break;
+    case'strict':S.strict[v]=!S.strict[v];again();break;
+    case'refresh':DATAINFO.force=true;toast('Checking the cloud…');await fetchCloud();DATAINFO.force=false;toast('Data: '+DATAINFO.source);render();renderAdmin();break;
+    case'exp':{const b=new Blob([JSON.stringify(S,null,1)],{type:'application/json'});const l=document.createElement('a');l.href=URL.createObjectURL(b);l.download='night-market-save.json';l.click();break;}
+    case'wipe':if(confirm('Wipe the save?')){localStorage.removeItem(SAVE_KEY);S=DEFAULT();closeModal();render();}break;
+  }
+});
+document.addEventListener('change',e=>{if(e.target.id==='a-imp'&&e.target.files[0]){const r=new FileReader();r.onload=()=>{try{const v=JSON.parse(r.result);if(v.v!==1)throw 0;S=Object.assign(DEFAULT(),v);S.started=true;save();render();renderAdmin();toast('Save imported');}catch(x){toast('Not a Night Market save');}};r.readAsText(e.target.files[0]);}});
+document.addEventListener('keydown',e=>{if(ADMIN&&e.shiftKey&&e.key==='A'&&!/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)){e.preventDefault();renderAdmin();}if(e.key==='Escape'&&!VN)closeModal();});
+
+/* ===== boot ===== */
+(async function boot(){
+  loadEmbedded();
+  SCENES=parseScenes($('#scenes').textContent);
+  const had=load();if(had&&S.started){/* keep */}
+  render();
+  const changed=await fetchCloud();
+  if(changed){toast('Game Book updated from the cloud');if(S.started&&!VN&&!$('#overlay').firstChild)render();}
+})();
+window.NM={get S(){return S;},get D(){return D;},render,playScene,openStall,craft,offer,forage,closeNight,advanceDay,addItem,SCENES:()=>SCENES,fetchCloud};
+
+
+</script></body></html>
