@@ -169,8 +169,8 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}input,
 .cmfoot{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;color:var(--muted)}.cmfoot .am-sp{flex:1}
 
 /* customers match the time of day */
-.cust.ph-night{filter:brightness(.92) drop-shadow(0 0 2px rgba(12,6,24,.7)) drop-shadow(0 0 7px rgba(12,6,24,.35))}
-.cust.ph-dusk{filter:brightness(.97) drop-shadow(0 0 2px rgba(12,6,24,.45))}
+.cust.ph-night{filter:url(#nmnight) saturate(.9) drop-shadow(0 0 2px rgba(12,6,24,.7)) drop-shadow(0 0 7px rgba(12,6,24,.3))}
+.cust.ph-dusk{filter:url(#nmdusk) drop-shadow(0 0 2px rgba(12,6,24,.45))}
 .cust img{transform:scaleX(var(--flip,1))}
 
 .wscrim{background:#000}.wscrim .wbg{position:absolute;inset:0;z-index:0;overflow:hidden}.wscrim .wbg .stage{position:absolute;inset:0}.wscrim .modal{position:relative;z-index:1;background:rgba(14,9,22,.88);backdrop-filter:blur(3px)}
@@ -2727,6 +2727,9 @@ document.addEventListener('click',e=>{
   }
 });
 document.addEventListener('change',e=>{const t=e.target;if(t.dataset&&t.dataset.g==='speed'){S.textSpeed=Number(t.value);save();}});
+
+/* time-of-day grades for customers: a warm violet dim (no blue) */
+(function(){const h='<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="nmnight" color-interpolation-filters="sRGB"><feComponentTransfer><feFuncR type="linear" slope=".80" intercept=".035"/><feFuncG type="linear" slope=".72" intercept=".02"/><feFuncB type="linear" slope=".80" intercept=".07"/></feComponentTransfer></filter><filter id="nmdusk" color-interpolation-filters="sRGB"><feComponentTransfer><feFuncR type="linear" slope=".95" intercept=".01"/><feFuncG type="linear" slope=".9" intercept=".01"/><feFuncB type="linear" slope=".9" intercept=".03"/></feComponentTransfer></filter></svg>';const go=()=>document.body.insertAdjacentHTML('beforeend',h);if(document.body)go();else document.addEventListener('DOMContentLoaded',go);})();
 
 /* ===== hands-on actions: timing minigame, foraging scene, crafting steps ===== */
 const STEPS={
