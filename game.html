@@ -244,6 +244,8 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}input,
 
 #mglayer{pointer-events:none}#mglayer>*{pointer-events:auto}
 #pgname{position:fixed;left:8px;bottom:5px;z-index:999;pointer-events:none;font:600 10.5px var(--sans,sans-serif);letter-spacing:.04em;color:rgba(235,222,190,.72);text-shadow:0 1px 3px #000,0 0 6px #000}
+
+.vn-char.flip{transform:scaleX(-1)}.vn-char.center.flip{transform:translateX(-50%) scaleX(-1)}
 </style></head><body>
 <div id="game"></div><div id="overlay"></div><div id="story"></div><div id="toast"></div>
 <script type="application/json" id="gamedata">{
@@ -2499,6 +2501,7 @@ function parseScenes(txt){
 let SCENES={};
 const subst=t=>String(t).replace(/\{p\}/g,PLAYER());
 let VN=null;
+function vnFlip(cid){try{const sid=slotScene('bg_'+VN.bg),sc=sid&&AS.scenes[sid],k=cid==='player'?'azlynn':cid;return !!(sc&&sc.cflip&&sc.cflip[k]);}catch(e){return false;}}
 function playScene(id,onEnd){
   const sc=SCENES[id];if(!sc){toast('No scene: '+id);onEnd&&onEnd();return;}
   VN={sc,i:0,bg:'black',chars:{},typing:null,done:false,onEnd,wait:null};
@@ -2510,7 +2513,7 @@ function playScene(id,onEnd){
   S.scenesSeen[id]=true;vnStep();
 }
 function vnRenderChars(){
-  $('#vnchars').innerHTML=Object.entries(VN.chars).map(([cid,v])=>`<div class="vn-char ${v.pos} ${v.dim?'dim':''}">${portrait(castFor(cid))}</div>`).join('');fitStages();
+  $('#vnchars').innerHTML=Object.entries(VN.chars).map(([cid,v])=>`<div class="vn-char ${v.pos} ${v.dim?'dim':''} ${vnFlip(cid)?'flip':''}">${portrait(castFor(cid))}</div>`).join('');fitStages();
 }
 function vnSay(who,text){
   const c=who==='narrator'?null:castFor(who);
