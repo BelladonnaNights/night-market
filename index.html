@@ -3673,7 +3673,7 @@ function itDefs(){
   D.upgrades.forEach(u=>o.push({key:u.id,label:u.name,sub:u.stall||'',grp:['Stall upgrades']}));
   D.requests.forEach(r=>o.push({key:r.id,label:r.name,sub:r.kind||'',grp:['Customers (portraits)']}));
   IT_PRESET.forEach(([g,l,sb])=>o.push({key:'x_'+slug(l),label:sb||l,sub:'',grp:[g],folder:g==='Azlynn walking sprite'?AZ_F:null,fname:l}));
-  o.push({key:'ui_almanac_open',label:'Almanac: open book (the pages)',sub:'3:2 open book. The game sets the text on the pages, so keep the paper areas clear',grp:['UI','Almanac'],folder:['UI','Almanac'],fname:'almanac_open_book'},{key:'ui_almanac_cover',label:'Almanac: closed cover',sub:'Shown first when she opens it, transparent PNG',grp:['UI','Almanac'],folder:['UI','Almanac'],fname:'almanac_cover'});
+  o.push({key:'ui_almanac_open',label:'Almanac: open book (the pages)',sub:'3:2 open book. The game sets the text on the pages, so keep the paper areas clear',grp:['UI','Almanac'],folder:['UI','Almanac'],fname:'almanac_open_book'},{key:'ui_almanac_page',label:'Almanac: one blank page (for the page turn)',sub:'Optional. One parchment page with transparent edges, drawn as a RIGHT-hand page. Used for the turning sheet',grp:['UI','Almanac'],folder:['UI','Almanac'],fname:'almanac_page'},{key:'ui_almanac_cover',label:'Almanac: closed cover',sub:'Shown first when she opens it, transparent PNG',grp:['UI','Almanac'],folder:['UI','Almanac'],fname:'almanac_cover'});
   Object.keys(AS.slots).filter(k=>k.startsWith('itemdef_')).forEach(k=>o.push({key:'x_'+k.slice(8),label:AS.slots[k],sub:'your own',grp:['Your own items'],custom:k}));
   return o;
 }
