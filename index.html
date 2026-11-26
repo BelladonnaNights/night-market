@@ -3498,11 +3498,16 @@ function refit(sc,ns){const od=DIMS[sc._ps||'screen']||DIMS.screen,nd=DIMS[ns]||
   if(sc.walls)sc.walls=[];if(sc.nospawn)sc.nospawn=[];if(sc.counter)sc.counter=[];if(sc.spawn)delete sc.spawn;toast('Resized: the picture was re-centred and fitted. Walkable shapes were cleared, so redraw them.');}
 function amStage(id){
   const sc=AS.scenes[id],tn=node(id);
-  return `<div class="am-sbar"><b>${esc(tn.name)}</b><button class="btn sm ${AS.walk?'gold':''}" data-am="walk">Walkable area${sc.walls&&sc.walls.length?' ✓':''}</button><button class="btn sm" data-am="pop">⤢ Pop out / close</button><input list="am-cl" class="pcin" data-pc placeholder="Preview a customer… (type to search)" value="${esc(AS.prevCust?((window.__book.data.requests.find(r=>r.id===AS.prevCust)||{}).name||''):'')}" title="Pick a customer to stand on the counter while you design. Not saved to the scene."><datalist id="am-cl">${window.__book.data.requests.map(r=>`<option value="${esc(r.name)}">`).join('')}</datalist><span class="am-sp"></span>Preview as <span class="tabs" style="margin:0">${['sunrise','day','dusk','night'].map(p=>`<button class="tab ${AS.phase===p?'on':''}" data-am="ph" data-v="${p}" title="${AS.slots['stall_'+p]?'Shows your uploaded stall for '+p:''}">${p}</button>`).join('')}</span></div>
+  return `<div class="am-sbar"><b>${esc(tn.name)}</b><button class="btn sm ${AS.walk?'gold':''}" data-am="walk">Walkable area${sc.walls&&sc.walls.length?' ✓':''}</button><button class="btn sm" data-am="pop">⤢ Pop out / close</button><input list="am-cl" class="pcin" data-pc placeholder="Preview a customer… (type to search)" value="${esc(AS.prevCust?((window.__book.data.requests.find(r=>r.id===AS.prevCust)||{}).name||''):'')}" title="Pick a customer to stand on the counter while you design. Not saved to the scene."><datalist id="am-cl">${window.__book.data.requests.map(r=>`<option value="${esc(r.name)}">`).join('')}</datalist><span class="am-sp"></span>Preview as <span class="tabs" style="margin:0">${['sunrise','day','dusk','night'].map(p=>`<button class="tab ${AS.phase===p?'on':''}" data-am="ph" data-v="${p}" title="${stallFor(p)?'Shows your '+p+' stall':'No stall scene found for '+p+'. Name one like Stall – '+p+' or link it to its slot'}">${p}</button>`).join('')}</span></div>
   <div class="am-stagewrap" id="am-sw"><div class="stage edit" id="am-stage">${stageInner(id)}</div></div>
   <div class="am-sbar" style="font-size:12px;opacity:.8">Drag assets from the left onto the picture. Drag layers to move. The game crops the edges to fit any screen, so keep important things toward the middle.</div>`;
 }
 function cYat(sc,x){const pts=[].concat(...(sc.counter||[]).filter(s=>s.t==='wall'&&s.pts).map(s=>s.pts)).sort((a,b)=>a[0]-b[0]);if(!pts.length)return null;if(x<=pts[0][0])return pts[0][1];for(let i=1;i<pts.length;i++)if(x<=pts[i][0]){const a=pts[i-1],b=pts[i],t=(x-a[0])/((b[0]-a[0])||1);return a[1]+(b[1]-a[1])*t;}return pts[pts.length-1][1];}
+const PH_WORDS={sunrise:/sunrise|dawn|morning/i,day:/\bday\b|noon/i,dusk:/dusk|sunset|evening/i,night:/night/i};
+function stallFor(p){let id=AS.slots['stall_'+p];if(id&&AS.scenes[id])return id;
+  const c=AS.tree.filter(n=>n.type==='scene'&&AS.scenes[n.id]&&/stall/i.test(n.name)&&PH_WORDS[p].test(n.name));
+  if(c.length){id=c[0].id;AS.slots['stall_'+p]=id;saveMeta();return id;}return null;}
+function isStallScene(id){if(!id)return false;if(['stall','stall_sunrise','stall_day','stall_dusk','stall_night'].some(k=>AS.slots[k]===id))return true;const n=node(id);return !!(n&&/stall/i.test(n.name));}
 function custFlip(key){const a=AS.slots['item_'+key];return !!(a&&AS.slots['assetflip_'+a]);}
 function custK(key){let v=parseFloat(AS.slots['itemsz_'+key]);if(!(v>0)){const a=AS.slots['item_'+key];v=parseFloat(AS.slots['assetsz_'+a]);}return v>0?v/100:1;}
 function pcustHtml(sc,W,H){if(!AS.prevCust)return '';if(AS.pcxFor!==AS.scene){AS.pcx=null;AS.pcxFor=AS.scene;}const r=window.__book.data.requests.find(x=>x.id===AS.prevCust);if(!r)return '';
@@ -3824,7 +3829,7 @@ document.addEventListener('pointerdown',e=>{
   cv.setPointerCapture(e.pointerId);drawWalk();
 });
 document.addEventListener('pointermove',e=>{
-  if(AS.mv&&AS.walk&&document.getElementById('am-walk')){moveMove(wpt(e),AS.scenes[AS.scene]);return;}
+  if(AS.mv){if(!AS.walk||!document.getElementById('am-walk')||!(e.buttons&1)){AS.mv=null;saveMeta();return;}moveMove(wpt(e),AS.scenes[AS.scene]);return;}
   if(e.target.id!=='am-walk'||!AS.walk||!AS.draft)return;const d=AS.draft,p=wpt(e);
   if(d.tool==='wall'||d.tool==='poly'){d.cursor=p;drawWalk();return;}
   if(!(e.buttons&1))return;
@@ -3832,6 +3837,7 @@ document.addEventListener('pointermove',e=>{
   else{const l=d.pts[d.pts.length-1];if(!l||Math.hypot(p[0]-l[0],p[1]-l[1])>Math.max(5,AS.walkSize/4))d.pts.push(p);}
   drawWalk();
 });
+document.addEventListener('pointercancel',()=>{if(AS.mv){AS.mv=null;saveMeta();}});
 document.addEventListener('pointerup',e=>{
   if(AS.mv){AS.mv=null;saveMeta();drawWalk();return;}
   const d=AS.draft;if(!AS.walk||!d||d.tool==='wall'||d.tool==='poly')return;const sc=AS.scenes[AS.scene],W_=wl(sc);
@@ -3878,8 +3884,8 @@ document.addEventListener('click',async e=>{
    case'phseed':{const k=phSeed()+phMigrate();saveMeta();amRender();toast(k?'Added '+k+' placeholders in their folders':'Every placeholder is already in place');break;}
    case'dl':{const n=node(AS.sel),l=document.createElement('a');l.href=AS.urls[n.id];l.download=n.name+'.'+n.ext;l.click();break;}
    case'cut':openCutout();break;
-   case'ph':{const v=t.dataset.v;AS.phase=v;const stallIds=['stall','stall_sunrise','stall_day','stall_dusk','stall_night'].map(k=>AS.slots[k]).filter(Boolean);
-    if(AS.scene&&stallIds.includes(AS.scene)){const to=AS.slots['stall_'+v];if(to&&AS.scenes[to]&&to!==AS.scene){const keep=AS.walk;AS.draft=null;AS.scene=to;AS.sel=null;AS.layer=null;AS.wsel=null;AS.walk=keep;const nd=node(to);if(nd)AS.cur=nd.parent;}}
+   case'ph':{const v=t.dataset.v;AS.phase=v;
+    if(isStallScene(AS.scene)){const to=stallFor(v);if(to&&to!==AS.scene){const keep=AS.walk;AS.draft=null;AS.mv=null;AS.scene=to;AS.sel=null;AS.layer=null;AS.wsel=null;AS.walk=keep;const nd=node(to);if(nd)AS.cur=nd.parent;}}
     amRender();break;}
    case'lsel':AS.layer=id;amRender();break;
    case'lvis':{e.stopPropagation();const l=AS.scenes[AS.scene].layers.find(x=>x.id===id);l.hidden=!l.hidden;saveMeta();amRender();break;}
@@ -3970,7 +3976,9 @@ document.addEventListener('drop',async e=>{
   else if(e.target.closest('#am-tree'))moveNode(id,null,null);
   dragId=null;amRender();
 });
-document.addEventListener('pointerdown',e=>{const pc=e.target.closest&&e.target.closest('#am-st .pcust');if(!pc)return;e.preventDefault();e.stopPropagation();const st=document.getElementById('am-st'),[W]=dimsOf(AS.scene);const mv=ev=>{const rc=st.getBoundingClientRect(),k=rc.width/W;AS.pcxFor=AS.scene;AS.pcx=Math.max(0,Math.min(W,(ev.clientX-rc.left)/k));stageRefresh();};const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);};addEventListener('pointermove',mv);addEventListener('pointerup',up);},true);
+document.addEventListener('pointerdown',e=>{const pc=e.target.closest&&e.target.closest('#am-st .pcust');if(!pc)return;e.preventDefault();e.stopPropagation();const [W]=dimsOf(AS.scene);
+  const mv=ev=>{const st=document.getElementById('am-st');if(!st)return;if(!(ev.buttons&1)){up();return;}const rc=st.getBoundingClientRect();if(!rc.width)return;const k=rc.width/W;AS.pcxFor=AS.scene;AS.pcx=Math.max(0,Math.min(W,(ev.clientX-rc.left)/k));const sc=AS.scenes[AS.scene],H=dimsOf(AS.scene)[1],cur=document.querySelector('#am-st .pcust');if(cur){const t=document.createElement('div');t.innerHTML=pcustHtml(sc,W,H);cur.replaceWith(t.firstChild);}};
+  const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);};addEventListener('pointermove',mv);addEventListener('pointerup',up);addEventListener('pointercancel',up);},true);
 (function(){let w=0;try{w=+localStorage.getItem('nmamw')||0;}catch(e){}if(w)document.documentElement.style.setProperty('--amw',w+'px');
 document.addEventListener('pointerdown',e=>{const h=e.target.closest&&e.target.closest('#am-rs');if(!h)return;e.preventDefault();h.classList.add('on');const body=h.parentElement,x0=e.clientX,w0=document.getElementById('am-tree').getBoundingClientRect().width;
 const mv=ev=>{const nw=Math.max(200,Math.min(Math.round(body.clientWidth*.7),Math.round(w0+ev.clientX-x0)));document.documentElement.style.setProperty('--amw',nw+'px');try{localStorage.setItem('nmamw',nw);}catch(_){}fitEdit();};
