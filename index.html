@@ -2808,7 +2808,7 @@ function detail(type,id){
 /* ---------- forms ---------- */
 const SCHEMA={
  gather:[['name','Name','text',{req:1}],['zone','Zone','list','zones'],['when','When','text',{hint:'Day, Dusk only, Low tide… or Any.'}],['rarity','Rarity','list','rarities'],['source','Source','text',{hint:'Gather, Trade with Wren, Buy or trade in town…',dl:['Gather','Trade with Wren','Buy or trade in town','Scavenge in town','Gift']}],['latin','Latin name','text'],['corr','Correspondences','text',{hint:'Planet · Element, as in your reference book.'}],['accuracy','Accuracy','list','accuracy'],['lore','Real-world lore','area'],['safety','Safety note','area'],['notes','Notes','area']],
- craft:[['name','Name','text',{req:1}],['kind','Kind','list','kinds'],['level','Level','level'],['moon','Best moon','list','moons'],['ingredients','Ingredients','ing','all'],['purpose','What it answers','area'],['method','Method','area'],['price','Base price (coins)','num'],['sells','Sold at Stall 13','bool'],['improper','Done badly it looks like','area'],['accuracy','Accuracy','list','accuracy'],['lore','Real-world basis','area'],['safety','Safety note','area'],['notes','Notes','area']],
+ craft:[['name','Name','text',{req:1}],['kind','Kind','list','kinds'],['level','Level','level'],['moon','Best moon','list','moons'],['ingredients','Ingredients','ing','all'],['purpose','What it answers','area'],['method','Method','area'],['price','Base price (coins)','num'],['sells','Sold at Stall 13','bool'],['improper','Done badly it looks like','area'],['outcomes','Come-back stories (one per line)','area',{hint:'When a customer returns to say it worked. One story per line; one is picked at random. Blank = generic.'}],['accuracy','Accuracy','list','accuracy'],['lore','Real-world basis','area'],['safety','Safety note','area'],['notes','Notes','area']],
  request:[['name','Customer','text',{req:1}],['kind','Kind','list','reqkinds'],['level','Level','level'],['ask','What they say','area'],['answer','Right answer (recipes)','ing','crafts'],['pay','Pays, done right','num'],['wrong','If you give the wrong thing','area'],['notes','Notes','area']],
  upgrade:[['name','Name','text',{req:1}],['stall','Stall','text'],['ingredients','Made from','ing','all'],['effect','What it does','area'],['notes','Notes','area']]
 };
@@ -2838,7 +2838,7 @@ function openForm(type,id,preset){
   let e;
   if(isNew){
     e=({gather:{name:'',zone:D.lists.zones[0].name,when:'Any',rarity:'Common',source:'Gather',latin:'',corr:'',accuracy:'Traditional',lore:'',safety:'',notes:''},
-        craft:{name:'',kind:D.lists.kinds[0].name,level:1,moon:'Any',ingredients:'',purpose:'',method:'',price:null,sells:true,improper:'',accuracy:'Traditional',lore:'',safety:'',notes:''},
+        craft:{name:'',kind:D.lists.kinds[0].name,level:1,moon:'Any',ingredients:'',purpose:'',method:'',price:null,sells:true,improper:'',outcomes:'',accuracy:'Traditional',lore:'',safety:'',notes:''},
         request:{name:'',kind:D.lists.reqkinds[0].name,level:1,ask:'',answer:'',pay:0,wrong:'',notes:''},
         upgrade:{name:'',stall:'Stall 13',ingredients:'',effect:'',notes:''}})[type];
     Object.assign(e,preset||{});
