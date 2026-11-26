@@ -2807,10 +2807,10 @@ function detail(type,id){
 
 /* ---------- forms ---------- */
 const SCHEMA={
- gather:[['name','Name','text',{req:1}],['zone','Zone','list','zones'],['when','When','text',{hint:'Day, Dusk only, Low tide… or Any.'}],['rarity','Rarity','list','rarities'],['source','Source','text',{hint:'Gather, Trade with Wren, Buy or trade in town…',dl:['Gather','Trade with Wren','Buy or trade in town','Scavenge in town','Gift']}],['latin','Latin name','text'],['corr','Correspondences','text',{hint:'Planet · Element, as in your reference book.'}],['accuracy','Accuracy','list','accuracy'],['lore','Real-world lore','area'],['safety','Safety note','area'],['notes','Notes','area']],
- craft:[['name','Name','text',{req:1}],['kind','Kind','list','kinds'],['level','Level','level'],['moon','Best moon','list','moons'],['ingredients','Ingredients','ing','all'],['purpose','What it answers','area'],['method','Method','area'],['price','Base price (coins)','num'],['sells','Sold at Stall 13','bool'],['improper','Done badly it looks like','area'],['outcomes','Come-back stories (one per line)','area',{hint:'When a customer returns to say it worked. One story per line; one is picked at random. Blank = generic.'}],['accuracy','Accuracy','list','accuracy'],['lore','Real-world basis','area'],['safety','Safety note','area'],['notes','Notes','area']],
- request:[['name','Customer','text',{req:1}],['kind','Kind','list','reqkinds'],['level','Level','level'],['ask','What they say','area'],['answer','Right answer (recipes)','ing','crafts'],['pay','Pays, done right','num'],['wrong','If you give the wrong thing','area'],['notes','Notes','area']],
- upgrade:[['name','Name','text',{req:1}],['stall','Stall','text'],['ingredients','Made from','ing','all'],['effect','What it does','area'],['notes','Notes','area']]
+ gather:[['name','Name','text',{req:1}],['zone','Zone','list','zones'],['when','When','text',{hint:'Day, Dusk only, Low tide… or Any.'}],['rarity','Rarity','list','rarities'],['rate','Spawn rate (%)','num',{hint:'How often it turns up when foraging its zone. Common is about 60, Uncommon 30, Rare 10. Blank uses the rarity.'}],['source','Source','text',{hint:'Gather, Trade with Wren, Buy or trade in town…',dl:['Gather','Trade with Wren','Buy or trade in town','Scavenge in town','Gift']}],['latin','Latin name','text'],['corr','Correspondences','text',{hint:'Planet · Element, as in your reference book.'}],['accuracy','Accuracy','list','accuracy'],['lore','Real-world lore','area'],['safety','Safety note','area'],['notes','Notes','area'],['img','Image URL','text',{hint:'Optional. A direct https:// link to its picture. You can add or change it later in Assets.'}]],
+ craft:[['name','Name','text',{req:1}],['kind','Kind','list','kinds'],['level','Level','level'],['moon','Best moon','list','moons'],['ingredients','Ingredients','ing','all'],['purpose','What it answers','area'],['method','Method','area'],['price','Base price (coins)','num'],['sells','Sold at Stall 13','bool'],['improper','Done badly it looks like','area'],['outcomes','Come-back stories (one per line)','area',{hint:'When a customer returns to say it worked. One story per line; one is picked at random. Blank = generic.'}],['accuracy','Accuracy','list','accuracy'],['lore','Real-world basis','area'],['safety','Safety note','area'],['notes','Notes','area'],['img','Image URL','text',{hint:'Optional. A direct https:// link to its picture. You can add or change it later in Assets.'}]],
+ request:[['name','Customer','text',{req:1}],['kind','Kind','list','reqkinds'],['level','Level','level'],['ask','What they say','area'],['answer','Right answer (recipes)','ing','crafts'],['pay','Pays, done right','num'],['wrong','If you give the wrong thing','area'],['notes','Notes','area'],['img','Image URL','text',{hint:'Optional. A direct https:// link to its picture. You can add or change it later in Assets.'}]],
+ upgrade:[['name','Name','text',{req:1}],['stall','Stall','text'],['ingredients','Made from','ing','all'],['effect','What it does','area'],['notes','Notes','area'],['img','Image URL','text',{hint:'Optional. A direct https:// link to its picture. You can add or change it later in Assets.'}]]
 };
 const TITLES={gather:'gathered thing',craft:'recipe',request:'customer',upgrade:'upgrade'};
 function field(type,def,val){
@@ -2837,10 +2837,10 @@ function openForm(type,id,preset){
   const list={gather:D.gathers,craft:D.crafts,request:D.requests,upgrade:D.upgrades}[type];
   let e;
   if(isNew){
-    e=({gather:{name:'',zone:D.lists.zones[0].name,when:'Any',rarity:'Common',source:'Gather',latin:'',corr:'',accuracy:'Traditional',lore:'',safety:'',notes:''},
-        craft:{name:'',kind:D.lists.kinds[0].name,level:1,moon:'Any',ingredients:'',purpose:'',method:'',price:null,sells:true,improper:'',outcomes:'',accuracy:'Traditional',lore:'',safety:'',notes:''},
-        request:{name:'',kind:D.lists.reqkinds[0].name,level:1,ask:'',answer:'',pay:0,wrong:'',notes:''},
-        upgrade:{name:'',stall:'Stall 13',ingredients:'',effect:'',notes:''}})[type];
+    e=({gather:{name:'',zone:D.lists.zones[0].name,when:'Any',rarity:'Common',rate:null,img:'',source:'Gather',latin:'',corr:'',accuracy:'Traditional',lore:'',safety:'',notes:''},
+        craft:{name:'',kind:D.lists.kinds[0].name,level:1,moon:'Any',ingredients:'',purpose:'',method:'',price:null,sells:true,improper:'',outcomes:'',img:'',accuracy:'Traditional',lore:'',safety:'',notes:''},
+        request:{img:'',name:'',kind:D.lists.reqkinds[0].name,level:1,ask:'',answer:'',pay:0,wrong:'',notes:''},
+        upgrade:{img:'',name:'',stall:'Stall 13',ingredients:'',effect:'',notes:''}})[type];
     Object.assign(e,preset||{});
   }else e=list.find(x=>x.id===id);
   const color={gather:'#4fb5a0',craft:'#f0c674',request:'#9fb4e8',upgrade:'#e8a33d'}[type];
@@ -2888,13 +2888,14 @@ function saveForm(form){
     delete v['__new_'+k];
   });
   const list={gather:D.gathers,craft:D.crafts,request:D.requests,upgrade:D.upgrades}[type];
+  const imgUrl=v.img;delete v.img;
   if(id){
     const e=list.find(x=>x.id===id);
     if((type==='gather'||type==='craft')&&e.name!==v.name)renameRefs(e.name,v.name);
     Object.assign(e,v);
   }else{
     const p={gather:'g-',craft:'c-',request:'r-',upgrade:'u-'}[type];
-    list.push(Object.assign({id:uid(p)},v));
+    const nid=uid(p);list.push(Object.assign({id:nid},v));setTimeout(()=>{try{AssetsTab.afterAdd(nid,imgUrl);}catch(e){}},50);
   }
   save();closeModal();render(true);
 }
@@ -3113,7 +3114,7 @@ function flies(){
 loadData();normalize();
 flies();
 render();fbInit();
-window.__book={dbSet,dbDel,dbGet:dbGetV,cfg:FBCFG,get data(){return D;},UI,render,save,fb:()=>FB,signin:()=>{if(FB.user){toast('Already signed in');}else if(FB.state==='live')openSignin();else toast('Still connecting to the cloud… try again in a moment');},exportX:buildXlsx,exportC:buildCsv};
+window.__book={openForm,dbSet,dbDel,dbGet:dbGetV,cfg:FBCFG,get data(){return D;},UI,render,save,fb:()=>FB,signin:()=>{if(FB.user){toast('Already signed in');}else if(FB.state==='live')openSignin();else toast('Still connecting to the cloud… try again in a moment');},exportX:buildXlsx,exportC:buildCsv};
 })();
 
 /* ===== ASSETS TAB (folders, images, scene composer) ===== */
@@ -3149,6 +3150,15 @@ const SLOTS=[
  {id:'bg_market_day',label:'Story background: market by day',group:'Story backgrounds',size:'screen'},
  {id:'bg_stall',label:'Story background: the stall',group:'Story backgrounds',size:'screen'},
  {id:'bg_marsh_night',label:'Story background: marsh at night',group:'Story backgrounds',size:'screen'},
+ {id:'bg_bench',label:'The bench screen',group:'Other screens',size:'screen'},
+ {id:'bg_cottage',label:'Witch\'s cottage interior',group:'Other screens',size:'screen'},
+ {id:'bg_garden',label:'Witch\'s garden',group:'Other screens',size:'screen'},
+ {id:'loading',label:'Loading screen',group:'Other screens',size:'screen'},
+ {id:'day_card',label:'New day card (between nights)',group:'Other screens',size:'screen'},
+ {id:'cg_arrival',label:'Key art: arrival at the market',group:'Story key art (CGs)',size:'screen'},
+ {id:'cg_first_candle',label:'Key art: the first candle',group:'Story key art (CGs)',size:'screen'},
+ {id:'cg_moth_visit',label:'Key art: the moth-winged visitor',group:'Story key art (CGs)',size:'screen'},
+ {id:'cg_night_one_end',label:'Key art: end of Night One',group:'Story key art (CGs)',size:'screen'},
  {id:'char_azlynn',label:'Azlynn (hero)',group:'Characters (portrait)',size:'portrait'},
  {id:'char_wren',label:'Wren',group:'Characters (portrait)',size:'portrait'},
  {id:'char_fenn',label:'Fenn',group:'Characters (portrait)',size:'portrait'},
@@ -3198,8 +3208,8 @@ async function syncDown(){
     if(!v&&!AS.tree.length&&!AS.rev){seedStarter(true);}
     const miss=[];for(const n of AS.tree)if(n.type==='asset'&&!n.ph){if(n.url){AS.urls[n.id]=n.url;continue;}let have=null;try{have=await dbGet('files',n.id);}catch(e){}if(!have)miss.push(n);}
     let k=0;for(const n of miss){cstat('Downloading from the cloud… '+(++k)+'/'+miss.length);const o=await rget('assetfiles/'+n.id);if(o&&o.d){const b=unb64(o.d,o.e||n.ext);try{await dbPut('files',n.id,b);}catch(e){}AS.urls[n.id]=URL.createObjectURL(b);}}
-    if(AS.slots.__ph!=='1'&&(AS.tree.length||v)){AS.slots.__ph='1';AS.slots.__gl='2';phSeed();phMigrate();saveMeta();}
-    else if(AS.slots.__gl!=='2'&&AS.tree.length){AS.slots.__gl='2';phMigrate();saveMeta();amRender();}
+    if(AS.slots.__ph!=='1'&&(AS.tree.length||v)){AS.slots.__ph='1';AS.slots.__gl='3';phSeed();phMigrate();phEnsure();saveMeta();}
+    else if(AS.slots.__gl!=='3'&&AS.tree.length){AS.slots.__gl='3';phSeed();phMigrate();phEnsure();saveMeta();amRender();}
     if(cloudOn()&&(AS.rev>(AS.cloudRev||0)||AS.pending.length||AS.removed.length))await syncUp();
     else cstat(cloudOn()?'Saved to the cloud ✓':'Loaded from the cloud ✓');
     amRender();
@@ -3473,7 +3483,7 @@ function amRender(){
   <div class="am-body"><div class="am-tree" id="am-tree"><div class="am-tools"><div class="am-in">In: <b>${esc(inName)}</b> <label style="margin-left:8px;cursor:pointer"><input type="checkbox" data-showused ${AS.showUsed?'checked':''}> show images used in scenes</label></div><div class="am-tb"><button data-am="newf" data-id="${AS.cur||''}">+ folder</button><button data-am="newsc" data-id="${AS.cur||''}">+ scene</button><button data-am="up" data-id="${AS.cur||''}">upload</button><button data-am="urlf" data-id="${AS.cur||''}">from URL</button><button data-am="ren" data-id="${AS.cur||''}" ${cn?'':'disabled'}>rename</button><button data-am="del" data-id="${AS.cur||''}" class="dn" ${cn?'':'disabled'}>delete</button></div></div>
    <div class="am-list" id="am-list"><div class="tr root ${AS.cur?'':'cur'}" data-id="" data-am="fsel">All files <span class="cnt">${AS.tree.filter(n=>n.type==='asset'&&vis(n)).length}</span></div>${trRows(null,0)||'<p class="am-empty">Nothing here yet. Press Starter folders, or make a folder and upload into it. Drag anything onto a folder to move it.</p>'}</div></div>
   <div class="am-rs" id="am-rs" title="Drag to widen or narrow the folder list (double-click to reset)"></div><div class="am-mid" id="am-mid">${sc?amStage(sc):as?amPreview(as):'<div class="am-empty big">Pick an asset to preview it, or open a scene to build a screen from layers.<br><br>Tip: drop image files straight onto a folder.</div>'}</div>
-  <div class="am-right" id="am-right">${sc?amLayers(sc):as?amInfo(as):amHelp()}</div></div>
+  <div class="am-right" id="am-right">${sc?amLayers(sc):as?amInfo(as):(cn&&cn.type==='folder'?amFolder(cn):amHelp())}</div></div>
   <input type="file" id="am-file" multiple hidden accept=".png,.jpg,.jpeg,.webp,.gif,.svg,.avif,.glb,.gltf,.mp3,.ogg,.wav,.m4a">`;
   ['am-list','am-right'].forEach(i=>{const e=document.getElementById(i);if(e&&keep[i])e.scrollTop=keep[i];});const lr2=document.querySelector('.lrows');if(lr2&&keep.lr)lr2.scrollTop=keep.lr;
   sp.forEach(([e,v])=>{e.scrollTop=v;});window.scrollTo(0,keep.w);
@@ -3483,7 +3493,7 @@ function amHelp(){return `<div class="am-p"><h3>How this works</h3><p>Folders ar
 function amPreview(n){const u=AS.urls[n.id];return `<div class="am-prev">${IMGX.test(n.ext)&&u?`<img src="${u}" style="max-width:100%;max-height:100%;object-fit:contain;background:repeating-conic-gradient(#2a2038 0 25%,#1c1428 0 50%) 0 0/24px 24px">`:`<div class="am-empty big">${n.ph?'Placeholder: no image yet. The game shows its own stand-in until you upload or link one.':MODX.test(n.ext)?'3D model (shown in the 3D version later)':IMGX.test(n.ext)?'Image not available (still loading, or the link is broken).':'Audio file'}<br>${esc(n.name)}.${esc(n.ext)}</div>`}</div>`;}
 function amInfo(n){
   if(n.ph)return `<div class="am-p"><h3>${esc(n.name)}</h3><div class="note" style="font-size:12.5px;color:#f0c674">PLACEHOLDER</div>
-   <p class="note" style="font-size:13px;margin:8px 0">${n.phScene?'The game draws its own stand-in for this screen or portrait until you add art. It is already linked. Add an image here and I build the scene for you.':'The game shows its own stand-in (or nothing) for this item until you add art. It is already linked. Add an image here and the game uses it straight away.'}</p>
+   <p class="note" style="font-size:13px;margin:8px 0">${n.phFolder?'A reminder of what belongs in this folder. Upload a picture or use Image from URL and it becomes the real thing.':n.phScene?'The game draws its own stand-in for this screen or portrait until you add art. It is already linked. Add an image here and I build the scene for you.':'The game shows its own stand-in (or nothing) for this item until you add art. It is already linked. Add an image here and the game uses it straight away.'}</p>
    <div class="am-btns"><button class="btn gold sm" data-am="repl">Upload image</button><button class="btn gold sm" data-am="phurl">Image from URL</button><button class="btn sm" data-am="rename-asset">Rename</button><button class="btn sm danger" data-am="del" data-id="${n.id}">Delete</button></div></div>`;
   return `<div class="am-p"><h3>${esc(n.name)}</h3><div class="note" style="font-size:12.5px">${kindOf(n.ext)} · .${esc(n.ext)} · ${n.url?'linked from a URL':fmtSz(n.size||0)}${n.w?' · '+n.w+'×'+n.h+' px':''}</div>
   <div class="fld"><label>Name</label><input data-ai="name" value="${esc(n.name)}"></div>
@@ -3549,6 +3559,15 @@ function curLayer(){const sc=AS.scenes[AS.scene];return sc&&sc.layers.find(l=>l.
 
 /* ----- "What to make": the art each place in the game needs (from the story scenes and the gather data) ----- */
 const NEEDS={
+ bg_bench:{f:['Stall & Bench','Crafting Bench & Minigames'],t:['The bench and its tools, seen from Azlynn\'s side','Room for the recipe cards on top']},
+ bg_cottage:{f:['Garden & Home','Cottage Interior'],t:['The cottage interior: hearth, shelves, drying herbs']},
+ bg_garden:{f:['Garden & Home','Witch\'s Garden'],t:['The witch\'s garden at dusk: beds, drying rack, bee skeps']},
+ loading:{f:['Screens & Scenes','Transitions & Loading'],t:['A calm loading picture. Keep the middle clear for the spinner']},
+ day_card:{f:['Screens & Scenes','Transitions & Loading'],t:['The card shown when a new day starts (moon phase is drawn on top)']},
+ cg_arrival:{f:['Story & Visual Novel','Key Art & CGs'],story:'Arrival',t:['Azlynn at the edge of the market, token in hand']},
+ cg_first_candle:{f:['Story & Visual Novel','Key Art & CGs'],story:'The first candle',t:['The first candle lit at the bench']},
+ cg_moth_visit:{f:['Story & Visual Novel','Key Art & CGs'],story:'Night One',t:['The moth-winged visitor at the counter']},
+ cg_night_one_end:{f:['Story & Visual Novel','Key Art & CGs'],story:'Night One ends',t:['Wren and Azlynn after the first night']},
  title:{f:['Screens & Scenes','Title & Menus'],t:['Title backdrop: the town at dusk, canal, lanterns still dark','Game logo “The Night Market” as its own PNG layer','Lantern glow layers (+ Glow, set to pulse)','Fireflies layer (+ Fireflies)']},
  stall:{f:['Screens & Scenes','The Stall'],t:['Stall 13 counter and awning','Hanging lanterns as separate PNGs so they can glow','Shelves behind the counter','Day, dusk and night versions of the lights (set each layer’s “show in”)','Keep the middle clear: customers stand there'],items:'upgrades',extra:['x_coin']},
  bg_market_dusk:{f:['Story & Visual Novel','Story Backgrounds'],story:'Arrival, Wren brings supplies, Wren chat, Night One ends',t:['The canal with lanterns opening one by one','Rows of stalls that were not there a moment ago','Stall 13 at the far end: bare wood counter, no lantern','Leave room for Wren (right) and Azlynn (left)'],chars:['char_wren','char_azlynn']},
@@ -3616,6 +3635,75 @@ function phSeed(){let n=0;const have=new Set(AS.tree.filter(x=>x.ph).map(x=>x.ph
     if(d.t==='item'){nd.phKey=d.key;AS.slots['item_'+d.key]=nd.id;}else nd.phScene=d.slot;
     AS.tree.push(nd);if(d.link)linkTo(nd.id,d.link);n++;});
   return n;}
+
+/* ----- folder guide: what goes in each folder, and how to add it ----- */
+const KINDMAP={'Candles':'Candle','Incense':'Incense','Charms':'Charm','Brews & Teas':'Brew','Salves & Oils':'Salve','Lanterns':'Lantern','Crafts & Keepsakes':'Craft','Story Items':'Story'};
+const ZONEMAP={'Marsh':'Marsh','Garden & Hedgerow':'Garden and hedgerow','Woods':'Woods','Canal & Shore':'Canal and shore','Town Lanes':'Town'};
+const GUIDE=[
+ [/^Gathering Zones › [^›]+ › (Plants & Finds|Finds & Trades)$/,'add','gather','Every gatherable that spawns in this zone. Press + New gatherable: you set its name, this zone, its spawn rate %, rarity, when it appears, where you get it (forage, Wren, town), and its image URL. It also appears under Items › Gatherables in its category.',['Plant sprite (one per gatherable)']],
+ [/^Gathering Zones › [^›]+ › Backgrounds & Maps$/,'scene','','The zone\'s walkable map picture, plus any variants (day, dusk, night). Make a scene here, add the picture as a layer, then draw the walkable area.',['Zone map']],
+ [/^Gathering Zones › [^›]+ › Props & Decor$/,'own','','Loose scenery for this zone: signs, stumps, boats, lamps. Each is a picture you can drop onto the zone map as a layer.',['Zone prop']],
+ [/^Gathering Zones › [^›]+ › Look-alikes$/,'own','','Poisonous or false look-alikes of this zone\'s plants, for the Hag Stone reveal. One picture per look-alike.',['Look-alike plant']],
+ [/^Gathering Zones › Hag Stone & Reveals/,'own','','Art for the Hag Stone mechanic: the stone, the hole you look through, and the reveal effects.',['Hag stone view']],
+ [/^Gathering Zones › Foraging Tools/,'own','','Basket, scissors, trowel, and other tools the player carries while foraging.',['Foraging tool']],
+ [/^Items › Gatherables/,'gather','','Gatherable items, sorted by type (herbs, flowers, roots, mushrooms, reeds, finds). These are the same items as the ones in Gathering Zones. Press + New gatherable to add one: name, zone, spawn rate, rarity, when, source, image URL.',['Gatherable icon']],
+ [/^Items › Crafted Goods › /,'craft','','Finished products the player makes and sells in this group. Press + New recipe: name, kind, level, best moon, ingredients, what it answers, method, price, and image URL.',['Product icon']],
+ [/^Items › Materials/,'own','','Raw materials that are not gathered plants: wax, wicks, jars, thread. One icon each.',['Material icon']],
+ [/^Items › Quality Tier Badges/,'own','','Four small badges for the quality tiers: Improper, Proper, Fine, Perfect.',['Tier badge']],
+ [/^Items › Tools & Upgrades/,'upgrade','','Upgrades the player builds for the stall (a better awning, more shelves). Press + New upgrade: name, which stall, what it is made from, what it does, image URL.',['Upgrade icon']],
+ [/^Stall & Bench › Upgrades/,'upgrade','','Art for each stall upgrade. Press + New upgrade to add one.',['Upgrade picture']],
+ [/^Stall & Bench › /,'own','','Pieces of the stall itself and the bench screen. Each is a loose picture you place in a scene as a layer.',['Stall piece']],
+ [/^Calendar & Festivals › Moon Phases/,'own','','Four pictures: New, Waxing, Full and Waning moon. The game shows the right one in the top bar and on the Almanac\'s Tonight page. Which moon a recipe needs is set on the recipe (Best moon). The list of moons itself is under Categories.',['New moon','Waxing moon','Full moon','Waning moon']],
+ [/^Calendar & Festivals › Wheel of the Year › /,'own','','One picture for this festival: its seasonal banner or decoration. Seasonal events use it later.',['Festival picture']],
+ [/^Calendar & Festivals/,'own','','Calendar art: moons and the eight festivals of the Wheel of the Year.',['Calendar art']],
+ [/^Garden & Home/,'own','','Places and props at the witch\'s cottage: garden, drying rack, bee skeps, interior, seasonal decor.',['Scene or prop']],
+ [/^Characters › Customers › Regulars$/,'request','','Named regulars. Press + New customer: name, kind (ailment, worry, wish…), level, what they say, the right answer, what they pay, image URL. Their portrait goes in this folder.',['Customer portrait']],
+ [/^Characters › Customers › Walk-ins$/,'own','','Portraits for unnamed walk-in customers. Any number of pictures; the game picks one at random.',['Walk-in portrait']],
+ [/^Characters › Customers/,'own','','Special visitors: the moth-winged visitor, shades and hauntings. One portrait each.',['Visitor portrait']],
+ [/^Characters › Azlynn/,'own','','Azlynn (the player). Portraits for dialogue, expressions, outfits, full body poses, and her walking sprite frames.',['Azlynn art']],
+ [/^Characters › /,'own','','Art for this character: portraits, expressions, poses.',['Character art']],
+ [/^Screens & Scenes › Title/,'scene','','The title screen. Make or open a scene here and bind it to Title.',['Title screen']],
+ [/^Screens & Scenes › The Stall/,'scene','','The four stall scenes: sunrise, day, dusk, night. Each is a scene with the counter and awning as layers.',['Stall scene']],
+ [/^Screens & Scenes › Transitions/,'scene','','Loading screen and the new-day card.',['Loading screen','New day card']],
+ [/^Screens & Scenes/,'scene','','Full screens, built as scenes from layers.',['Screen']],
+ [/^Story & Visual Novel/,'scene','','Story pictures: backgrounds for visual novel scenes, key art and CGs for big moments, and endings. Make a scene per picture.',['Story picture']],
+ [/^UI › Almanac/,'own','','The Almanac book: the open book, the cover, and one blank page (used by the page turn).',['Almanac art']],
+ [/^UI/,'own','','Interface pieces: frames, buttons, icons, cards, menus, cursors, minigame bars, dialogue boxes and notification toasts.',['UI piece']],
+ [/^Effects & Atmosphere/,'own','','Overlay effects laid on top of scenes: glows, fireflies, mist, sky and stars, vignettes.',['Effect layer']],
+ [/^3D Models/,'own','','3D models (GLB). Not used by the 2D game yet.',['3D model']],
+ [/^Audio/,'own','','Sound files: music, ambience, sound effects, voice.',['Audio file']],
+ [/^Marketing & Brand/,'own','','Logo, key art, screenshots, social posts and store page images.',['Marketing image']],
+ [/^Reference & Style/,'own','','Reference only. Never shown in the game: palettes, mood boards, lore, prompts.',['Reference image']],
+ [/^Inbox|^Archive/,'own','','Holding area. Move things out when you know where they go.',['Unsorted file']]
+];
+const fpath=n=>{const s=[n.name];let c=n.parent?node(n.parent):null;while(c){s.unshift(c.name);c=c.parent?node(c.parent):null;}return s;};
+function guideFor(n){const p=fpath(n).join(' › ');return GUIDE.find(g=>g[0].test(p))||null;}
+function addPreset(n){const p=fpath(n),g=guideFor(n);if(!g)return{};
+  if(g[2]==='gather'){const z=p[0]==='Gathering Zones'?ZONEMAP[p[1]]:null;return z?{zone:z}:{};}
+  if(g[2]==='craft')return KINDMAP[p[2]]?{kind:KINDMAP[p[2]]}:{};return {};}
+function amFolder(n){
+  const g=guideFor(n),kidsN=kids(n.id),a=kidsN.filter(x=>x.type!=='folder'),ph=a.filter(x=>x.ph).length;
+  const lbl={gather:'+ New gatherable',craft:'+ New recipe',upgrade:'+ New upgrade',request:'+ New customer'}[g&&g[2]];
+  const btn=!g?'':g[1]==='add'||g[1]==='request'||g[1]==='upgrade'||g[1]==='craft'||g[1]==='gather'?`<button class="btn gold sm" data-am="fadd" data-id="${n.id}">${lbl}</button>`:g[1]==='scene'?`<button class="btn gold sm" data-am="newsc" data-id="${n.id}">+ New scene here</button>`:`<button class="btn gold sm" data-am="fown" data-id="${n.id}">+ Add a picture here (name + URL)</button>`;
+  return `<div class="am-p"><h3>${esc(n.name)}</h3><div class="note" style="font-size:12px">${esc(fpath(n).join(' › '))}</div>
+   <h4 style="margin:12px 0 4px;color:#f0c674;font-size:12px;letter-spacing:.08em">WHAT GOES HERE</h4>
+   <p class="note" style="font-size:13px">${esc(g?g[3]:'Anything that belongs under this heading. Make sub-folders if you need them.')}</p>
+   ${a.length?`<p class="note" style="font-size:12px">${a.length} item${a.length>1?'s':''} here${ph?` · ${ph} still placeholder`:''}.</p>`:''}
+   <div class="am-btns" style="margin-top:8px">${btn}<button class="btn sm" data-am="up" data-id="${n.id}">upload files</button><button class="btn sm" data-am="newf" data-id="${n.id}">+ folder</button></div>
+   <p class="note" style="font-size:12px;margin-top:10px">Put a picture's web link on any placeholder: click it, then <b>Image from URL</b>.</p></div>`;}
+function phEnsure(){let n=0;
+  AS.tree.filter(f=>f.type==='folder'&&!AS.tree.some(c=>c.parent===f.id&&c.type==='folder')&&!AS.tree.some(c=>c.parent===f.id&&c.type!=='folder')).forEach(f=>{
+    const g=guideFor(f),names=g&&g[4]&&g[4].length?(g[4].length>1?g[4]:[g[4][0]]):[f.name];
+    names.forEach(nm=>{AS.tree.push({id:uid(),type:'asset',ph:1,phFolder:1,name:nm,ext:'png',parent:f.id,order:nextOrder(f.id),size:0});n++;});});
+  return n;}
+async function afterAdd(id,img){const d=itDefs().find(x=>x.key===id);if(!d)return;
+  if(img&&await itLink(d,img,true)){}else phSeed();phMigrate();phEnsure();saveMeta();amRender();itRender();}
+async function ownAdd(fid){const nm=(prompt('Name of the picture (for example: Full moon)','')||'').trim();if(!nm)return;
+  const u=(prompt('Paste its image link (https://…) or leave blank to add a placeholder','')||'').trim();
+  const par=fid;let nd={id:uid(),type:'asset',name:nm,ext:'png',parent:par,order:nextOrder(par),size:0};
+  if(/^https?:\/\//i.test(u)){let w=0,h=0;try{const im=new Image();im.src=u;await im.decode();w=im.naturalWidth;h=im.naturalHeight;}catch(e){toast('Could not load that link. Added as a placeholder.');nd.ph=1;}
+    if(!nd.ph){nd.ext=((u.split('?')[0].match(/\.(png|jpe?g|webp|gif|svg|avif)$/i)||[])[1]||'png').toLowerCase();nd.w=w;nd.h=h;nd.url=u;AS.urls[nd.id]=u;}}else nd.ph=1;
+  AS.tree.push(nd);AS.open.add(fid);saveMeta();amRender();}
 function phMakeScene(n){const sl=SLOTS.find(x=>x.id===n.phScene);if(!sl)return;const dm=DIMS[sl.size||'screen']||DIMS.screen,W=dm[0],H=dm[1];
   const cover=!/^char_/.test(n.phScene),k=n.w&&n.h?(cover?Math.max(W/n.w,H/n.h):Math.min(W/n.w,H/n.h)):1;
   const sid=uid();AS.tree.push({id:sid,type:'scene',name:n.name,parent:n.parent,order:nextOrder(n.parent)});
@@ -3661,8 +3749,8 @@ function phMigrate(){let moved=0;const gp=AS.tree.find(n=>n.type==='folder'&&n.n
     const real=AS.tree.find(x=>x.type==='asset'&&!x.ph&&areaIds.has(x.parent)&&x.name.toLowerCase()===d.label.toLowerCase());
     if(real&&(!n||n.ph)){if(n&&n.ph)AS.tree=AS.tree.filter(x=>x.id!==n.id&&x.to!==n.id);AS.slots['item_'+d.key]=real.id;n=real;}
     if(!n)return;
-    if(areaIds.has(n.parent)){const par=ensureFolder(d.folder);n.parent=par;n.order=nextOrder(par);moved++;}
-    const want=ensureFolder(d.folder);if(n.parent===want)moved+=linkTo(n.id,d.link);});
+    if(areaIds.has(n.parent)){const par=ensureFolder(d.folder||['Items'].concat(d.grp));n.parent=par;n.order=nextOrder(par);moved++;}
+    const want=ensureFolder(d.folder||['Items'].concat(d.grp));if(n.parent===want)moved+=linkTo(n.id,d.link);});
   areaIds.forEach(id=>{if(!kids(id).length)AS.tree=AS.tree.filter(x=>x.id!==id);});return moved;}
 const slug=s=>String(s).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
 const IT={q:'',target:null};
@@ -3672,7 +3760,7 @@ function itDefs(){
   D.crafts.forEach(c=>o.push({key:c.id,label:c.name,sub:'Level '+c.level+(c.sells===false?' · not sold':''),grp:['Crafted goods',c.kind||'Other']}));
   D.upgrades.forEach(u=>o.push({key:u.id,label:u.name,sub:u.stall||'',grp:['Stall upgrades']}));
   D.requests.forEach(r=>o.push({key:r.id,label:r.name,sub:r.kind||'',grp:['Customers (portraits)']}));
-  IT_PRESET.forEach(([g,l,sb])=>o.push({key:'x_'+slug(l),label:sb||l,sub:'',grp:[g],folder:g==='Azlynn walking sprite'?AZ_F:null,fname:l}));
+  IT_PRESET.forEach(([g,l,sb])=>o.push({key:'x_'+slug(l),label:sb||l,sub:'',grp:[g],folder:g==='Azlynn walking sprite'?AZ_F:null,fname:l,link:/ moon$/.test(l)?['Calendar & Festivals','Moon Phases']:undefined}));
   o.push({key:'ui_almanac_open',label:'Almanac: open book (the pages)',sub:'3:2 open book. The game sets the text on the pages, so keep the paper areas clear',grp:['UI','Almanac'],folder:['UI','Almanac'],fname:'almanac_open_book'},{key:'ui_almanac_page',label:'Almanac: one blank page (for the page turn)',sub:'Optional. One parchment page with transparent edges, drawn as a RIGHT-hand page. Used for the turning sheet',grp:['UI','Almanac'],folder:['UI','Almanac'],fname:'almanac_page'},{key:'ui_almanac_cover',label:'Almanac: closed cover',sub:'Shown first when she opens it, transparent PNG',grp:['UI','Almanac'],folder:['UI','Almanac'],fname:'almanac_cover'});
   Object.keys(AS.slots).filter(k=>k.startsWith('itemdef_')).forEach(k=>o.push({key:'x_'+k.slice(8),label:AS.slots[k],sub:'your own',grp:['Your own items'],custom:k}));
   return o;
@@ -3882,7 +3970,9 @@ document.addEventListener('click',async e=>{
    case'rename-asset':{const n=node(AS.sel),v=document.querySelector('[data-ai=name]').value.trim();if(n&&v){n.name=v;saveMeta();amRender();}break;}
    case'repl':{const f=document.getElementById('am-file');f.onchange=async()=>{const fl=f.files[0];if(!fl)return;const n=node(AS.sel);await dbPut('files',n.id,fl);mark(n.id);delete n.url;AS.urls[n.id]=URL.createObjectURL(fl);n.size=fl.size;n.ext=(fl.name.split('.').pop()||n.ext).toLowerCase();try{const im=new Image();im.src=AS.urls[n.id];await im.decode();n.w=im.naturalWidth;n.h=im.naturalHeight;}catch(x){}if(n.ph){await phDone(n);}else{saveMeta();amRender();}f.value='';};f.click();break;}
    case'phurl':{const n=node(AS.sel),u=prompt('Paste the image link (https://…)');if(!u||!/^https?:\/\//i.test(u))break;try{const im=new Image();im.src=u.trim();await im.decode();n.w=im.naturalWidth;n.h=im.naturalHeight;}catch(x){toast('Could not load that image. It must be a direct, public image link.');break;}n.url=u.trim();AS.urls[n.id]=n.url;n.ext=((n.url.split('?')[0].match(/\.(png|jpe?g|webp|gif|svg|avif)$/i)||[])[1]||'png').toLowerCase();await phDone(n);break;}
-   case'phseed':{const k=phSeed()+phMigrate();saveMeta();amRender();toast(k?'Added '+k+' placeholders in their folders':'Every placeholder is already in place');break;}
+   case'fadd':{const n=node(id),g=guideFor(n);if(g&&window.__book.openForm)window.__book.openForm(g[2],null,addPreset(n));break;}
+   case'fown':ownAdd(id);break;
+   case'phseed':{const k=phSeed()+phMigrate()+phEnsure();saveMeta();amRender();toast(k?'Added '+k+' placeholders in their folders':'Every placeholder is already in place');break;}
    case'dl':{const n=node(AS.sel),l=document.createElement('a');l.href=AS.urls[n.id];l.download=n.name+'.'+n.ext;l.click();break;}
    case'cut':openCutout();break;
    case'ph':{const v=t.dataset.v;AS.phase=v;
@@ -4041,7 +4131,7 @@ async function exportAssets(){
   const l=document.createElement('a');l.href=URL.createObjectURL(zipBin(files));l.download='night-market-assets.zip';l.click();toast('Unzip next to your index.html (it makes an “assets” folder)');
 }
 
-return {mount,load:assetsLoad,AS,render:amRender,sync:()=>{if(cloudOn())syncUp();}};
+return {afterAdd,mount,load:assetsLoad,AS,render:amRender,sync:()=>{if(cloudOn())syncUp();}};
 })();
 
 </script>
