@@ -2579,6 +2579,11 @@ function setPhase(p){S.phase=p;S.tmp.dawn=0;if(p!=='night'){S.queue=[];S.cur=nul
 function advanceDay(){S.day++;S.phase='day';S.tmp.dawn=1;S.queue=[];S.cur=null;S.tmp.sel=[];save();render();toast('Day '+S.day+' · '+moonOf(S.day)+' moon');}
 function checkLevel(){let n=1;LEVEL_EARN.forEach((t,i)=>{if(S.earned>=t)n=i+1;});n=Math.min(n,D.levels.length||5);if(n>S.level){S.level=n;toast('Stall level up: '+lvName(n));}}
 function makeCustomer(r){return {id:r.id,name:r.name,kind:r.kind,level:r.level,ask:r.ask,answer:r.answer,pay:r.pay,wrong:r.wrong,walkin:false};}
+const FU_GENERIC={Ailment:['It worked. I slept straight through, first time in weeks.','Whatever was in that, the ache is gone. I came to say so.','Three days and I am a new person. Thank you.'],Wish:['The wish came true, or near enough. I wanted you to know.','Something turned my way the very next morning.','Luck, at last. I brought you nothing but my thanks.'],Favor:['It did what they needed. They sent me with a word of thanks.','The favor is done, and well done.'],Worry:['I stood up and did it. My hands barely shook.','The worry has loosened its grip. Thank you.']};
+function thanksFor(f){const r=D.requests.find(x=>x.id===f.rid),c=D.crafts.find(x=>x.name===f.craft);if(!r)return null;
+  const own=String((c&&c.outcomes)||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);
+  const pool=own.length?own:(FU_GENERIC[r.kind]||FU_GENERIC.Ailment);
+  return {id:r.id,name:r.name,kind:'Thanks',level:r.level,ask:rnd(pool),answer:'',pay:Math.max(1,Math.round(r.pay*.25)),wrong:'',walkin:false,thanks:true};}
 function walkIn(){
   const goods=D.crafts.filter(c=>c.sells&&c.price>0&&c.level<=S.level);if(!goods.length)return null;
   const g=rnd(goods);const who=rnd(['A passing lamplighter','A veiled traveler','A market child','Two sisters','A tired porter','A sleepy cat-keeper','A lantern-seller','A canal boatwoman']);
@@ -2587,7 +2592,7 @@ function walkIn(){
 function buildQueue(){
   if(!flag('night_one_done')&&S.day===1){const m=D.requests.find(r=>/moth/i.test(r.name));return m?[makeCustomer(m)]:[];}
   const pool=D.requests.filter(r=>r.level<=S.level&&!(S.lastSeen[r.id]>=S.day-1));
-  const q=[];const want=2+S.level;const sh=pool.slice().sort(()=>Math.random()-.5);
+  const q=[];const due=(S.follow||[]).filter(f=>f.due<=S.day);S.follow=(S.follow||[]).filter(f=>f.due>S.day);due.forEach(f=>{const t=thanksFor(f);if(t)q.unshift(t);});const want=2+S.level;const sh=pool.slice().sort(()=>Math.random()-.5);
   while(q.length<want&&sh.length){q.push(makeCustomer(sh.pop()));if(Math.random()<.4){const w=walkIn();if(w)q.push(w);}}
   return q;
 }
@@ -2595,7 +2600,9 @@ function openStall(){S.phase='night';S.queue=buildQueue();S.cur=null;S.tmp.sel=[
 function nextCustomer(){
   S.cur=S.queue.shift()||null;S.tmp.sel=[];S.tmp.react=null;S.tmp.fresh=true;
   if(S.cur)S.lastSeen[S.cur.id]=S.day;
+  if(S.cur&&S.cur.thanks){const t=S.cur;S.coins+=t.pay;S.earned+=t.pay;checkLevel();S.tmp.react={line:t.ask,pay:t.pay,correct:true};}
   render();
+  if(S.cur&&S.cur.thanks){const g=document.createElement('div');g.className='gain';g.textContent='+'+S.cur.pay;$('#main').appendChild(g);}
 }
 function closeNight(){
   S.queue=[];S.cur=null;
@@ -2618,7 +2625,7 @@ function offer(){
   if(pay>0){keys.forEach(k=>{const [n,t]=k.split('|');S.inv[k]=(S.inv[k]||0);});
     const cnt={};keys.forEach(k=>cnt[k]=(cnt[k]||0)+1);Object.keys(cnt).forEach(k=>{S.inv[k]=(S.inv[k]||0)-cnt[k];if(S.inv[k]<=0)delete S.inv[k];});
     S.coins+=pay;S.earned+=pay;S.sold++;checkLevel();
-    if(correct&&!c.walkin)S.rel[c.name]=(S.rel[c.name]||0)+1;}
+    if(correct&&!c.walkin){S.rel[c.name]=(S.rel[c.name]||0)+1;if(Math.random()<.4){S.follow=S.follow||[];if(!S.follow.some(f=>f.rid===c.id))S.follow.push({rid:c.id,craft:c.answer,due:S.day+1+Math.floor(Math.random()*4)});}}}
   S.tmp.react={line,pay,correct};S.tmp.sel=[];S.tmp.locked=true;render();
   if(pay>0){const g=document.createElement('div');g.className='gain';g.textContent='+'+pay;$('#main').appendChild(g);}
   const wasMoth=correct&&/moth/i.test(c.name)&&!flag('moth_served');
@@ -2689,7 +2696,7 @@ function counterY(sc,x){const pts=[].concat(...(sc.counter||[]).filter(s=>s.t===
 function placeCust(){
   const el=document.querySelector('.cust'),m=document.getElementById('main'),sid=stallScene(S.phase),cs=counterScene();if(!el||!m||!sid||!cs)return;const sc=AS.scenes[cs];if(counterY(sc,0)==null)return;
   if(!el._pl){el._pl=1;el.querySelectorAll('img').forEach(i=>i.addEventListener('load',placeCust));}
-  const [W,H]=dimsOf(sid),cw=m.clientWidth,ch=m.clientHeight,k=Math.max(cw/W,ch/H),w=el.offsetWidth,h=el.offsetHeight;if(!h)return;
+  const [W,H]=dimsOf(sid),cw=m.clientWidth,ch=m.clientHeight,k=Math.max(cw/W,ch/H),sc2=parseFloat(el.dataset.sc)||1;el.style.width=(H*k*.4*sc2)+'px';el.style.height=(H*k*.6*sc2)+'px';el.querySelectorAll(':scope>img').forEach(i=>{i.style.cssText+=';width:100%;height:100%;object-fit:contain;object-position:bottom';});const w=el.offsetWidth,h=el.offsetHeight;if(!h)return;
   const sy=x=>ch/2+(counterY(sc,W/2+(x-cw/2)/k)-H/2)*k,cx=cw/2,mid=sy(cx),top=mid+h*.1-h;
   el.style.bottom='auto';el.style.top=top+'px';
   const pts=[];for(let i=0;i<=10;i++){const px=i*w/10;pts.push(`${px}px ${sy(cx-w/2+px)-top}px`);}
@@ -2706,7 +2713,7 @@ function customerView(c){
   const shelf=inv.map(x=>{const used=selCount[x.k]||0,left=x.qty-used;
     return `<button class="item ${used?'sel':''} ${left<=0&&!used?'dis':''}" data-g="pick" data-k="${esc(x.k)}"><span class="c">×${left}</span>${itemImg(x.e,'tray')}<div class="n">${esc(x.name)}</div><div class="t"><span class="tier ${x.tier}">${x.tier}</span> · ${x.type==='craft'?esc(x.e.kind):'gathered'}</div></button>`;}).join('')||'<div class="lbl" style="padding:14px">Your pack is empty. Forage, then make something at the Bench.</div>';
   const counter=sk.length?sk.map(k=>`<span class="chip" style="font:700 13px var(--sans);padding:3px 10px;border-radius:9px;border:1px solid var(--line2);background:rgba(240,198,116,.1)">${esc(k.split('|')[0])} <span class="tier ${k.split('|')[1]}">${k.split('|')[1]}</span></span>`).join(' '):'<span class="lbl">Click items below to set them on the counter</span>';
-  return `<div class="cust ph-${S.phase} ${S.tmp.fresh?'in':''}" style="width:calc(min(40vh,62vw)*${custScale(c)})${custFlip(c)?';--flip:-1':''}">${portrait(cast)}</div>
+  return `<div class="cust ph-${S.phase} ${S.tmp.fresh?'in':''}" data-sc="${custScale(c)}" style="width:calc(min(40vh,62vw)*${custScale(c)})${custFlip(c)?';--flip:-1':''}">${portrait(cast)}</div>
    <div class="speech"><div class="who"><span class="nm">${esc(c.name)}</span><span class="badge" style="--c:${col}">${esc(c.kind)}</span><span class="sp"></span><span class="lbl">${S.queue.length} waiting</span></div>
     <div class="q">${R?esc(R.line):'“'+esc(c.ask)+'”'}</div></div>
    <div class="tray"><div class="actions"><span class="lbl">On the counter</span>${counter}<span class="sp"></span>
