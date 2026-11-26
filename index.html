@@ -3509,6 +3509,7 @@ function refit(sc,ns){const od=DIMS[sc._ps||'screen']||DIMS.screen,nd=DIMS[ns]||
 function amStage(id){
   const sc=AS.scenes[id],tn=node(id);
   return `<div class="am-sbar"><b>${esc(tn.name)}</b><button class="btn sm ${AS.walk?'gold':''}" data-am="walk">Walkable area${sc.walls&&sc.walls.length?' ✓':''}</button><button class="btn sm" data-am="pop">⤢ Pop out / close</button>${AS.prevCust?`<button class="btn sm ${cfl(sc,AS.prevCust)?'gold':''}" data-am="cflip" title="Mirror this customer, in this scene only">⇋ Flip customer here</button>`:''}<input list="am-cl" class="pcin" data-pc placeholder="Preview a customer… (type to search)" value="${esc(AS.prevCust?((window.__book.data.requests.find(r=>r.id===AS.prevCust)||{}).name||''):'')}" title="Pick a customer to stand on the counter while you design. Not saved to the scene."><datalist id="am-cl">${window.__book.data.requests.map(r=>`<option value="${esc(r.name)}">`).join('')}</datalist><span class="am-sp"></span>Preview as <span class="tabs" style="margin:0">${['sunrise','day','dusk','night'].map(p=>`<button class="tab ${AS.phase===p?'on':''}" data-am="ph" data-v="${p}" title="${stallFor(p)?'Shows your '+p+' stall':'No stall scene found for '+p+'. Name one like Stall – '+p+' or link it to its slot'}">${p}</button>`).join('')}</span></div>
+  ${sc.size==='tile'||/^zone_/.test(slotsOf(id)[0]||'')?'':`<div class="am-sbar" style="font-size:12.5px"><span style="opacity:.8">Flip story characters in this scene:</span>${[['azlynn','Azlynn'],['wren','Wren'],['fenn','Fenn'],['moth','Moth-winged'],['shade','Shade']].map(([k,l])=>`<button class="btn sm ${sc.cflip&&sc.cflip[k]?'gold':''}" data-am="cflip2" data-k="${k}">⇋ ${l}</button>`).join('')}</div>`}
   <div class="am-stagewrap" id="am-sw"><div class="stage edit" id="am-stage">${stageInner(id)}</div></div>
   <div class="am-sbar" style="font-size:12px;opacity:.8">Drag assets from the left onto the picture. Drag layers to move. The game crops the edges to fit any screen, so keep important things toward the middle.</div>`;
 }
@@ -3992,6 +3993,7 @@ document.addEventListener('click',async e=>{
    case'starter':seedStarter();break;
    case'walk':AS.walk=!AS.walk;AS.draft=null;AS.layer=null;amRender();break;
    case'wmode':finishDraft();AS.wmode=t.dataset.v;AS.draft=null;if(AS.wmode==='ctr')AS.wtool='wall';amRender();break;
+   case'cflip2':{const sc=AS.scenes[AS.scene];if(!sc)break;const k=t.dataset.k;sc.cflip=sc.cflip||{};sc.cflip[k]=sc.cflip[k]?0:1;saveMeta();amRender();break;}
    case'cflip':{const sc=AS.scenes[AS.scene];if(!sc||!AS.prevCust)break;sc.cflip=sc.cflip||{};sc.cflip[AS.prevCust]=cfl(sc,AS.prevCust)?0:1;saveMeta();amRender();break;}
    case'pop':document.body.classList.toggle('am-pop');setTimeout(()=>{fitEdit();},60);break;
    case'wtool':finishDraft();AS.wtool=t.dataset.v;AS.draft=null;amRender();break;
