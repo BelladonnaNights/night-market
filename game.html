@@ -17,7 +17,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}input,
 #main{position:relative;overflow:hidden;min-height:0}
 #artback,#artfront{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 #artfront{z-index:4}
-.cust{position:absolute;left:50%;bottom:21%;transform:translateX(-50%);z-index:3;width:min(300px,34vh);transition:.5s}
+.cust{position:absolute;left:50%;bottom:21%;transform:translateX(-50%);z-index:3;width:min(40vh,62vw);transition:.5s}
 .cust.in{animation:walkin .6s ease-out}
 @keyframes walkin{from{opacity:0;transform:translateX(-30%)}to{opacity:1;transform:translateX(-50%)}}
 .speech{position:absolute;z-index:6;left:50%;top:4%;transform:translateX(-50%);width:min(620px,92%);padding:16px 22px;border-radius:20px;background:linear-gradient(160deg,rgba(43,31,63,.96),rgba(26,18,38,.96));border:1px solid var(--line2);box-shadow:0 18px 50px rgba(0,0,0,.5)}
@@ -224,17 +224,18 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}input,
 .rb{position:absolute;left:0;height:6.2%;min-height:2em;width:100%;pointer-events:auto;text-align:left;padding:0 2.2cqw 0 1.5cqw;color:#e9c777;font:700 1.3cqw var(--serif);letter-spacing:.04em;background:linear-gradient(90deg,#4a2144,#6e2f5f);clip-path:polygon(0 0,100% 0,93% 50%,100% 100%,0 100%);transition:transform .22s,background .2s;display:flex;align-items:center}
 .rb:hover{transform:translateX(.9cqw);background:linear-gradient(90deg,#5a2a52,#83386f)}
 .rb.on{transform:translateX(1.5cqw);background:linear-gradient(90deg,#7a3566,#a14d88);color:#ffe9b0}
-/* the turning sheet */
-.alm-sheet{position:absolute;top:0;height:100%;width:50%;transform-style:preserve-3d;transition:transform .95s cubic-bezier(.5,.05,.3,1);z-index:5;will-change:transform}
-.alm-sheet.fwd{left:50%;transform-origin:0 50%}.alm-sheet.fwd.go{transform:rotateY(-180deg)}
-.alm-sheet.back{left:0;transform-origin:100% 50%}.alm-sheet.back.go{transform:rotateY(180deg)}
+/* the turning sheet (sliced so the paper can bend) */
+.alm-sheet{position:absolute;top:0;height:100%;width:50%;transform-style:preserve-3d;z-index:5}
+.alm-sheet.fwd{left:50%}.alm-sheet.back{left:0}
+.alm-sheet .strip{position:absolute;top:0;height:100%;transform-style:preserve-3d;will-change:transform}
 .alm-sheet .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
 .alm-sheet .face.b{transform:rotateY(180deg)}
-.alm-w{position:absolute;top:0;width:200%;height:100%}
-.alm-paper{position:absolute;background-image:var(--open);background-repeat:no-repeat;box-shadow:0 0 1.2cqw rgba(30,15,5,.5)}
-.alm-sheet .shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(20,10,4,.12),rgba(20,10,4,.55));opacity:0}
-.alm-sheet.go .f .shade{animation:almShA .95s ease-in both}.alm-sheet.go .b .shade{animation:almShB .95s ease-out both}
-@keyframes almShA{from{opacity:0}to{opacity:1}}@keyframes almShB{from{opacity:1}to{opacity:0}}
+.alm-w{position:absolute;top:0;height:100%}
+.alm-paper{position:absolute;background-image:var(--open);background-repeat:no-repeat}
+.alm-sheet .shade{position:absolute;inset:-1px;mix-blend-mode:multiply;pointer-events:none;background:rgb(24,12,5);opacity:0}
+.alm-cast{position:absolute;top:6%;height:78%;width:36%;filter:blur(14px);pointer-events:none;z-index:2;opacity:0}
+.alm-cast.r{left:50%;background:linear-gradient(90deg,rgba(20,10,4,.55),rgba(20,10,4,0))}
+.alm-cast.l{left:10%;background:linear-gradient(270deg,rgba(20,10,4,.55),rgba(20,10,4,0))}
 @media (max-width:760px){.alm-book{width:92vw;margin-right:0}.alm-rib{left:94%}}
 @media (max-width:760px){.alm-txt{overflow-y:auto;scrollbar-width:thin;scrollbar-color:#a47a34 transparent}}
 </style></head><body>
@@ -2705,7 +2706,7 @@ function customerView(c){
   const shelf=inv.map(x=>{const used=selCount[x.k]||0,left=x.qty-used;
     return `<button class="item ${used?'sel':''} ${left<=0&&!used?'dis':''}" data-g="pick" data-k="${esc(x.k)}"><span class="c">×${left}</span>${itemImg(x.e,'tray')}<div class="n">${esc(x.name)}</div><div class="t"><span class="tier ${x.tier}">${x.tier}</span> · ${x.type==='craft'?esc(x.e.kind):'gathered'}</div></button>`;}).join('')||'<div class="lbl" style="padding:14px">Your pack is empty. Forage, then make something at the Bench.</div>';
   const counter=sk.length?sk.map(k=>`<span class="chip" style="font:700 13px var(--sans);padding:3px 10px;border-radius:9px;border:1px solid var(--line2);background:rgba(240,198,116,.1)">${esc(k.split('|')[0])} <span class="tier ${k.split('|')[1]}">${k.split('|')[1]}</span></span>`).join(' '):'<span class="lbl">Click items below to set them on the counter</span>';
-  return `<div class="cust ph-${S.phase} ${S.tmp.fresh?'in':''}" style="width:calc(min(300px,34vh)*${custScale(c)})${custFlip(c)?';--flip:-1':''}">${portrait(cast)}</div>
+  return `<div class="cust ph-${S.phase} ${S.tmp.fresh?'in':''}" style="width:calc(min(40vh,62vw)*${custScale(c)})${custFlip(c)?';--flip:-1':''}">${portrait(cast)}</div>
    <div class="speech"><div class="who"><span class="nm">${esc(c.name)}</span><span class="badge" style="--c:${col}">${esc(c.kind)}</span><span class="sp"></span><span class="lbl">${S.queue.length} waiting</span></div>
     <div class="q">${R?esc(R.line):'“'+esc(c.ask)+'”'}</div></div>
    <div class="tray"><div class="actions"><span class="lbl">On the counter</span>${counter}<span class="sp"></span>
@@ -2862,9 +2863,19 @@ function almTonight(){
 function almPageHtml(i){const p=ALM.pages[i];if(!p)return '<div class="orn" style="margin-top:30%">✦</div>';return p.t==='contents'?almContents():p.t==='tonight'?almTonight():p.html;}
 const almSide=i=>i%2===0?'L':'R';
 function almTxt(i){const s=almSide(i),b=ALM_BOX[s];return `<div class="alm-txt ${s}" style="left:${b.x}%;top:${b.y}%;width:${b.w}%;height:${b.h}%">${almPageHtml(i)}</div><div class="alm-num ${s}">${i<ALM.pages.length?i+1:''}</div>`;}
-function almPaper(s){const p=ALM_PAPER[s];return `<div class="alm-paper" style="left:${p.x}%;top:${p.y}%;width:${p.w}%;height:${p.h}%;background-size:${10000/p.w}% ${10000/p.h}%;background-position:${p.x/(100-p.w)*100}% ${p.y/(100-p.h)*100}%"></div>`;}
-/* a page shown inside a sheet: book-sized layer so the same % positions work */
-function almFace(i,leftOffsetPct){return `<div class="alm-w" style="left:${leftOffsetPct}%">${almPaper(almSide(i))}${almTxt(i)}</div>`;}
+const _almN=(u,p)=>0.5+0.25*Math.sin(u*7+p)+0.15*Math.sin(u*17+p*2.3)+0.1*Math.sin(u*31+p*4.1);
+function almClip(side){const pts=[],n=26,L=side==='L';
+  const jx=y=>.5+1.6*_almN(y,L?1.7:4.2),jy=x=>.25+.9*_almN(x,L?2.9:0.6);
+  /* top edge from the spine outwards, then down the outer edge, then back along the bottom */
+  for(let k=0;k<=n;k++){const u=k/n,x=L?100-u*100:u*100;pts.push([x,jy(u)+(k>n-3?(k-(n-3))*.5:0)]);}
+  for(let k=1;k<n;k++){const y=k/n*100,x=L?jx(k/n):100-jx(k/n);pts.push([x,y]);}
+  for(let k=n;k>=0;k--){const u=k/n,x=L?100-u*100:u*100;pts.push([x,100-jy(u+3)-(k>n-3?(k-(n-3))*.5:0)]);}
+  return 'polygon('+pts.map(p=>p[0].toFixed(2)+'% '+p[1].toFixed(2)+'%').join(',')+')';}
+function almPaper(s){const p=ALM_PAPER[s],pg=itemUrl('ui_almanac_page');
+  const bg=pg?`background-image:url(&quot;${pg}&quot;);background-size:100% 100%;background-position:0 0;${s==='L'?'transform:scaleX(-1);':''}`:`background-size:${10000/p.w}% ${10000/p.h}%;background-position:${p.x/(100-p.w)*100}% ${p.y/(100-p.h)*100}%;clip-path:${almClip(s)};`;
+  return `<div class="alm-paper" style="left:${p.x}%;top:${p.y}%;width:${p.w}%;height:${p.h}%;${bg}"></div>`;}
+/* one slice of a page: a book-sized layer shifted so only this slice shows */
+function almFace(i,leftPx,bookW){return `<div class="alm-w" style="left:${leftPx}px;width:${bookW}px">${almPaper(almSide(i))}${almTxt(i)}</div>`;}
 
 function almMount(){
   const sp=ALM.spread;
@@ -2894,7 +2905,7 @@ function renderAlmanac(){
 }
 function almOpenBook(){ALM.seen=true;const c=document.querySelector('.alm-cover'),b=document.querySelector('.alm-book');if(!c||!b)return;c.classList.add('opening');b.classList.remove('shut');setTimeout(()=>{c.classList.add('gone');ALM.cover=false;},620);}
 
-/* turn to a spread. Forward: the right page swings left. Backward: the left page swings right. */
+/* turn to a spread. The sheet is cut into thin slices that hinge off each other, so the paper bends as it swings. */
 function almGo(page){
   if(ALM.cover){almOpenBook();}
   const tgt=Math.max(0,Math.min(almSpreads()-1,Math.floor((+page||0)/2)));almTurnTo(tgt);}
@@ -2903,14 +2914,29 @@ function almTurnTo(tgt){
   const book=document.querySelector('.alm-book');if(!book||ALM.busy)return;tgt=Math.max(0,Math.min(almSpreads()-1,tgt));const cur=ALM.spread;if(tgt===cur)return;
   const fwd=tgt>cur,d3=book.querySelector('.alm-3d');ALM.busy=true;
   const front=fwd?cur*2+1:cur*2,back=fwd?tgt*2:tgt*2+1;
-  /* what shows underneath once the sheet lifts */
   if(fwd)almStatic(cur,cur*2,tgt*2+1);else almStatic(cur,tgt*2,cur*2+1);
-  const sh=document.createElement('div');sh.className='alm-sheet '+(fwd?'fwd':'back');
-  sh.innerHTML=`<div class="face f">${almFace(front,fwd?-100:0)}<i class="shade"></i></div><div class="face b">${almFace(back,fwd?0:-100)}<i class="shade"></i></div>`;
-  d3.appendChild(sh);void sh.offsetWidth;
-  requestAnimationFrame(()=>{sh.classList.add('go');});
-  let done=false;const fin=()=>{if(done)return;done=true;ALM.spread=tgt;almStatic(tgt);sh.remove();ALM.busy=false;almRibbons();};
-  sh.addEventListener('transitionend',e=>{if(e.target===sh&&e.propertyName==='transform')fin();});setTimeout(fin,1100);
+  const bw=book.clientWidth,Sw=bw/2,N=16,sw=Sw/N;
+  let inner='';
+  for(let i=N-1;i>=0;i--){
+    const A=-(Sw+i*sw),B=-(Sw-(i+1)*sw),fl=fwd?A:B,bl=fwd?B:A;
+    const pos=i===0?(fwd?'left:0':'left:'+(Sw-sw)+'px'):(fwd?'left:'+sw+'px':'left:'+(-sw)+'px');
+    inner=`<div class="strip" style="width:${sw+1.5}px;${pos};transform-origin:${fwd?'0':'100%'} 50%"><div class="face f">${almFace(front,fl,bw)}<i class="shade"></i></div><div class="face b">${almFace(back,bl,bw)}<i class="shade"></i></div>${inner}</div>`;
+  }
+  const sh=document.createElement('div');sh.className='alm-sheet '+(fwd?'fwd':'back');sh.innerHTML=inner;
+  const cast=document.createElement('div');cast.className='alm-cast '+(fwd?'r':'l');
+  d3.appendChild(cast);d3.appendChild(sh);
+  const strips=[...sh.querySelectorAll('.strip')],shades=strips.map(s=>[...s.querySelectorAll(':scope > .face > .shade')]);
+  const dir=fwd?-1:1,dur=1250,CURL=4.2;let t0=null,done=false;
+  const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+  const fin=()=>{if(done)return;done=true;ALM.spread=tgt;almStatic(tgt);sh.remove();cast.remove();ALM.busy=false;almRibbons();};
+  const frame=ts=>{if(done)return;if(t0==null)t0=ts;const t=Math.min(1,(ts-t0)/dur),e=ease(t),th=180*e,bend=Math.sin(2*Math.PI*e);
+    let cum=0;
+    strips.forEach((s,i)=>{const f=.55+.9*i/(N-1),c=i?CURL*bend*f:0,ang=i?c:th;s.style.transform=`rotateY(${dir*ang}deg)`;cum+=ang;
+      const phi=cum*Math.PI/180,facing=Math.abs(Math.cos(phi)),lit=.5*(1-facing)+Math.max(-.08,Math.min(.14,(i?c:0)*.02));
+      shades[i].forEach(x=>{x.style.opacity=Math.max(0,Math.min(.75,lit)).toFixed(3);});});
+    cast.style.opacity=(.38*Math.sin(Math.PI*e)).toFixed(3);
+    if(t<1)requestAnimationFrame(frame);else fin();};
+  requestAnimationFrame(frame);setTimeout(fin,dur+400);
 }
 document.addEventListener('keydown',e=>{if(!document.querySelector('.alm-book'))return;if(/INPUT|TEXTAREA/.test((e.target||{}).tagName))return;
   if(e.key==='ArrowRight'||e.key==='PageDown'){almStep(1);e.preventDefault();}else if(e.key==='ArrowLeft'||e.key==='PageUp'){almStep(-1);e.preventDefault();}else if(e.key==='Escape'){closeModal();}});
