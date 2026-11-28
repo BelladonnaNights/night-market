@@ -360,6 +360,7 @@ body.am-pop #am-mid{position:fixed;left:0;top:0;bottom:0;right:340px;z-index:900
 #asm .actions{display:flex;gap:8px;flex-wrap:wrap}
 .modal.cut{width:min(900px,96vw)}
 
+#undobtn.dis{opacity:.4}
 </style>
 </head>
 <body>
@@ -2367,7 +2368,20 @@ function loadData(){
   }catch(e){}
 }
 let saveTimer=null;
+const UNDO=[];let _lastD=null,_undoing=false,_lastAU=0;
+const _strip=s=>s.replace(/"rev":\d+/,'');
+function undoPush(k,s){UNDO.push({k,s});if(UNDO.length>40)UNDO.shift();const b=document.getElementById('undobtn');if(b)b.classList.remove('dis');}
+window.__undo={push:undoPush,busy:()=>_undoing};
+setInterval(()=>{if(D&&_lastD==null)_lastD=JSON.stringify(D);},400);
+function doUndo(){const u=UNDO.pop();if(!u){toast('Nothing to undo');return;}
+  _undoing=true;try{
+    if(u.k==='d'){D=JSON.parse(u.s);_lastD=u.s;try{localStorage.setItem(STORE,u.s);}catch(e){}D.rev=Date.now();updateFoot();push();try{buildIdx();}catch(e){}render(true);}
+    else{AssetsTab.restore(u.s);}
+    toast('Undone');}finally{_undoing=false;}
+  const b=document.getElementById('undobtn');if(b)b.classList.toggle('dis',!UNDO.length);}
+document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&!e.shiftKey&&e.key==='z'){const t=e.target;if(t&&(/INPUT|TEXTAREA|SELECT/.test(t.tagName)||t.isContentEditable))return;e.preventDefault();doUndo();}});
 function save(quiet){
+  if(!_undoing){const now=JSON.stringify(D);if(_lastD!=null&&_strip(_lastD)!==_strip(now))undoPush('d',_lastD);_lastD=now;}
   D.rev=Date.now();
   try{localStorage.setItem(STORE,JSON.stringify(D));}catch(e){}
   updateFoot();push();
@@ -2732,6 +2746,7 @@ function render(keepScroll){
    <div class="main"><header class="top">
      <label class="search">${ico('search',18)}<input id="q" type="search" placeholder="Search everything…" value="${esc(UI.q)}" autocomplete="off"><kbd>/</kbd></label>
      <span class="sp"></span>
+     <button class="btn ${UNDO.length?'':'dis'}" id="undobtn" data-act="undo" title="Undo the last change (Ctrl/Cmd+Z)"><span class="lbl-t">↶ Undo</span></button>
      <button class="btn ${UI.edit?'on':''}" data-act="toggle-edit"><span class="switch"></span><span class="lbl-t">Edit mode</span></button>
      <button class="btn" data-act="cats">${ico('gear',18)}<span class="lbl-t">Categories</span></button>
      <button class="btn gold" data-act="publish">${ico('download',18)}<span class="lbl-t">Publish</span><span class="dot" id="pubdot" style="display:none;background:#2a1a08;box-shadow:none"></span></button>
@@ -3057,6 +3072,7 @@ document.addEventListener('click',ev=>{
     case'del-yes':{const L={gather:D.gathers,craft:D.crafts,request:D.requests,upgrade:D.upgrades}[t.dataset.type];const i=L.findIndex(x=>x.id===t.dataset.id);if(i>-1)L.splice(i,1);save();closeModal();render(true);break;}
     case'ing-add':{const p=t.closest('.ingp');const row=document.createElement('div');row.className='ingrow';row.innerHTML=ingRow({qty:1,name:''},p.dataset.src).replace(/^<div class="ingrow">|<\/div>$/g,'');t.before(row);row.querySelector('input[type=text]').focus();break;}
     case'ing-del':{const row=t.closest('.ingrow');const p=row.parentElement;if($$('.ingrow',p).length>1)row.remove();else $$('input',row).forEach((i,ix)=>i.value=ix?'':1);break;}
+    case'undo':doUndo();break;
     case'cats':closeModal();openCats();break;
     case'cat-add':{const k=t.dataset.list;const pal=['#4fb5a0','#c9a24a','#6c9bd8','#d98a5a','#b58be0','#e08fa0','#8bd3b0','#e6a86c'];let n='New category',i=2;while(D.lists[k].find(x=>x.name===n))n='New category '+(i++);D.lists[k].push({name:n,color:pal[D.lists[k].length%pal.length]});save(true);openCats();render(true);break;}
     case'cat-del':{const k=t.dataset.list,ix=+t.dataset.ix;const [,,,coll,fld]=CATS.find(c=>c[0]===k);const n=CI(coll).filter(x=>x[fld]===D.lists[k][ix].name).length;if(n)return toast('Still in use by '+n+'. Move those first.');D.lists[k].splice(ix,1);save(true);openCats();render(true);break;}
@@ -3157,19 +3173,25 @@ const SLOTS=[
  {id:'day_card',label:'New day card (between nights)',group:'Other screens',size:'screen'},
  {id:'cg_arrival',label:'Key art: arrival at the market',group:'Story key art (CGs)',size:'screen'},
  {id:'cg_first_candle',label:'Key art: the first candle',group:'Story key art (CGs)',size:'screen'},
- {id:'cg_moth_visit',label:'Key art: the moth-winged visitor',group:'Story key art (CGs)',size:'screen'},
  {id:'cg_night_one_end',label:'Key art: end of Night One',group:'Story key art (CGs)',size:'screen'},
  {id:'char_azlynn',label:'Azlynn (hero)',group:'Characters (portrait)',size:'portrait'},
  {id:'char_wren',label:'Wren',group:'Characters (portrait)',size:'portrait'},
  {id:'char_fenn',label:'Fenn',group:'Characters (portrait)',size:'portrait'},
- {id:'char_moth',label:'The moth-winged visitor',group:'Characters (portrait)',size:'portrait'},
  {id:'char_shade',label:'The shade',group:'Characters (portrait)',size:'portrait'}
 ];
 const slotLabel=id=>(SLOTS.find(s=>s.id===id)||{label:id}).label;
 const slotsOf=sid=>Object.keys(AS.slots).filter(k=>AS.slots[k]===sid);
 const stateObj=()=>({tree:AS.tree,scenes:AS.scenes,slots:AS.slots,rev:AS.rev,cloudRev:AS.cloudRev,pending:AS.pending,removed:AS.removed});
 let _sv=null,_ct=null;
-function saveMeta(){clearTimeout(_sv);AS.rev=Date.now();cloudSoon();return dbPut('meta','state',stateObj()).catch(()=>toast('Could not save assets (browser storage blocked?)'));}
+let _lastA=null,_lastAT=0,_delStash={};
+function _snapA(){return JSON.stringify({tree:AS.tree,scenes:AS.scenes,slots:AS.slots});}
+setInterval(()=>{if(_lastA==null&&AS.tree&&AS.tree.length)_lastA=_snapA();},500);
+function restore(s){const m=JSON.parse(s);AS.tree=m.tree;AS.scenes=m.scenes;AS.slots=m.slots;
+  AS.tree.forEach(n=>{if(n.type!=='asset')return;if(n.url)AS.urls[n.id]=n.url;else if(!AS.urls[n.id]&&_delStash[n.id]){AS.urls[n.id]=_delStash[n.id];AS.removed=AS.removed.filter(x=>x!==n.id);fetch(_delStash[n.id]).then(r=>r.blob()).then(bl=>{dbPut('files',n.id,bl);mark(n.id);}).catch(()=>{});}});
+  _lastA=s;if(AS.scene&&!AS.scenes[AS.scene])AS.scene=null;if(AS.sel&&!node(AS.sel))AS.sel=null;saveMeta();amRender();}
+function saveMeta(){
+  if(!(window.__undo&&window.__undo.busy())){const now=_snapA();if(_lastA!=null&&now!==_lastA){const tt=Date.now();if(tt-_lastAT>700)window.__undo.push('a',_lastA);_lastAT=tt;}_lastA=now;}
+  clearTimeout(_sv);AS.rev=Date.now();cloudSoon();return dbPut('meta','state',stateObj()).catch(()=>toast('Could not save assets (browser storage blocked?)'));}
 function saveSoon(){clearTimeout(_sv);_sv=setTimeout(saveMeta,400);}
 const mark=id=>{if(!AS.pending.includes(id))AS.pending.push(id);};
 /* ----- cloud (Firebase Realtime Database, same project as the Game Book) ----- */
@@ -3411,7 +3433,7 @@ function moveNode(id,newParent,beforeId){
 function delNode(id){
   const n=node(id);if(!n)return;
   if(n.type==='folder')kids(id).forEach(k=>delNode(k.id));
-  if(n.type==='asset'){dbDel('files',id);delete AS.urls[id];AS.pending=AS.pending.filter(x=>x!==id);AS.removed.push(id);for(const k in AS.slots)if(AS.slots[k]===id)delete AS.slots[k];Object.values(AS.scenes).forEach(s=>s.layers=s.layers.filter(l=>l.asset!==id));}
+  if(n.type==='asset'){_delStash[id]=AS.urls[id];dbDel('files',id);delete AS.urls[id];AS.pending=AS.pending.filter(x=>x!==id);AS.removed.push(id);for(const k in AS.slots)if(AS.slots[k]===id)delete AS.slots[k];Object.values(AS.scenes).forEach(s=>s.layers=s.layers.filter(l=>l.asset!==id));}
   if(n.type==='scene'){delete AS.scenes[id];for(const k in AS.slots)if(AS.slots[k]===id)delete AS.slots[k];if(AS.scene===id)AS.scene=null;}
   AS.tree=AS.tree.filter(x=>x.id!==id&&x.to!==id);if(AS.sel===id)AS.sel=null;
 }
@@ -3509,7 +3531,7 @@ function refit(sc,ns){const od=DIMS[sc._ps||'screen']||DIMS.screen,nd=DIMS[ns]||
 function amStage(id){
   const sc=AS.scenes[id],tn=node(id);
   return `<div class="am-sbar"><b>${esc(tn.name)}</b><button class="btn sm ${AS.walk?'gold':''}" data-am="walk">Walkable area${sc.walls&&sc.walls.length?' ✓':''}</button><button class="btn sm" data-am="pop">⤢ Pop out / close</button>${AS.prevCust?`<button class="btn sm ${cfl(sc,AS.prevCust)?'gold':''}" data-am="cflip" title="Mirror this customer, in this scene only">⇋ Flip customer here</button>`:''}<input list="am-cl" class="pcin" data-pc placeholder="Preview a customer… (type to search)" value="${esc(AS.prevCust?((window.__book.data.requests.find(r=>r.id===AS.prevCust)||{}).name||''):'')}" title="Pick a customer to stand on the counter while you design. Not saved to the scene."><datalist id="am-cl">${window.__book.data.requests.map(r=>`<option value="${esc(r.name)}">`).join('')}</datalist><span class="am-sp"></span>Preview as <span class="tabs" style="margin:0">${['sunrise','day','dusk','night'].map(p=>`<button class="tab ${AS.phase===p?'on':''}" data-am="ph" data-v="${p}" title="${stallFor(p)?'Shows your '+p+' stall':'No stall scene found for '+p+'. Name one like Stall – '+p+' or link it to its slot'}">${p}</button>`).join('')}</span></div>
-  ${sc.size==='tile'||/^zone_/.test(slotsOf(id)[0]||'')?'':`<div class="am-sbar" style="font-size:12.5px"><span style="opacity:.8">Flip story characters in this scene:</span>${[['azlynn','Azlynn'],['wren','Wren'],['fenn','Fenn'],['moth','Moth-winged'],['shade','Shade']].map(([k,l])=>`<button class="btn sm ${sc.cflip&&sc.cflip[k]?'gold':''}" data-am="cflip2" data-k="${k}">⇋ ${l}</button>`).join('')}</div>`}
+  ${sc.size==='tile'||/^zone_/.test(slotsOf(id)[0]||'')?'':`<div class="am-sbar" style="font-size:12.5px"><span style="opacity:.8">Flip story characters in this scene:</span>${[['azlynn','Azlynn'],['wren','Wren'],['fenn','Fenn'],['shade','Shade']].map(([k,l])=>`<button class="btn sm ${sc.cflip&&sc.cflip[k]?'gold':''}" data-am="cflip2" data-k="${k}">⇋ ${l}</button>`).join('')}</div>`}
   <div class="am-stagewrap" id="am-sw"><div class="stage edit" id="am-stage">${stageInner(id)}</div></div>
   <div class="am-sbar" style="font-size:12px;opacity:.8">Drag assets from the left onto the picture. Drag layers to move. The game crops the edges to fit any screen, so keep important things toward the middle.</div>`;
 }
@@ -3568,18 +3590,16 @@ const NEEDS={
  day_card:{f:['Screens & Scenes','Transitions & Loading'],t:['The card shown when a new day starts (moon phase is drawn on top)']},
  cg_arrival:{f:['Story & Visual Novel','Key Art & CGs'],story:'Arrival',t:['Azlynn at the edge of the market, token in hand']},
  cg_first_candle:{f:['Story & Visual Novel','Key Art & CGs'],story:'The first candle',t:['The first candle lit at the bench']},
- cg_moth_visit:{f:['Story & Visual Novel','Key Art & CGs'],story:'Night One',t:['The moth-winged visitor at the counter']},
  cg_night_one_end:{f:['Story & Visual Novel','Key Art & CGs'],story:'Night One ends',t:['Wren and Azlynn after the first night']},
  title:{f:['Screens & Scenes','Title & Menus'],t:['Title backdrop: the town at dusk, canal, lanterns still dark','Game logo “The Night Market” as its own PNG layer','Lantern glow layers (+ Glow, set to pulse)','Fireflies layer (+ Fireflies)']},
  stall:{f:['Screens & Scenes','The Stall'],t:['Stall 13 counter and awning','Hanging lanterns as separate PNGs so they can glow','Shelves behind the counter','Day, dusk and night versions of the lights (set each layer’s “show in”)','Keep the middle clear: customers stand there'],items:'upgrades',extra:['x_coin']},
  bg_market_dusk:{f:['Story & Visual Novel','Story Backgrounds'],story:'Arrival, Wren brings supplies, Wren chat, Night One ends',t:['The canal with lanterns opening one by one','Rows of stalls that were not there a moment ago','Stall 13 at the far end: bare wood counter, no lantern','Leave room for Wren (right) and Azlynn (left)'],chars:['char_wren','char_azlynn']},
  bg_market_day:{f:['Story & Visual Novel','Story Backgrounds'],story:'Not used by a story scene yet',t:['The same market by day: shuttered, quiet, the stalls half there']},
- bg_stall:{f:['Story & Visual Novel','Story Backgrounds'],story:'First candle, Moth-winged visitor served',t:['Inside Stall 13, warm and close','Candle flame glow (pulse layer)','Leave room for the Moth-winged visitor (right) and Azlynn (left)'],chars:['char_moth','char_azlynn'],items:['c-reed-wick-candle']},
+ bg_stall:{f:['Story & Visual Novel','Story Backgrounds'],story:'First candle',t:['Inside Stall 13, warm and close','Candle flame glow (pulse layer)','Leave room for the Moth-winged visitor (right) and Azlynn (left)'],chars:['char_moth','char_azlynn'],items:['c-reed-wick-candle']},
  bg_marsh_night:{f:['Story & Visual Novel','Story Backgrounds'],story:'Fenn test scene (Fenn lives in the marsh)',t:['The marsh at night: mist, still water, reeds','Leave room for Fenn (left) and Wren (right)'],chars:['char_fenn','char_wren']},
  char_azlynn:{f:['Characters','Azlynn (Hero)','Portraits'],t:['Red-haired hero, 2:3 portrait, transparent background']},
  char_wren:{f:['Characters','Wren','Portraits'],t:['Wren, keeper of the market, 2:3 portrait, transparent background']},
  char_fenn:{f:['Characters','Fenn','Portraits'],t:['Fenn, the marsh, 2:3 portrait, transparent background']},
- char_moth:{f:['Characters','Customers','Moth-winged Visitor'],t:['The moth-winged visitor, 2:3 portrait, wings included']},
  char_shade:{f:['Characters','Customers','Shades & Hauntings'],t:['The shade, 2:3 portrait, semi-transparent']}
 };
 NEEDS.bg_wrens_corner={f:['Screens & Scenes',"Wren's Corner"],story:'Trade with Wren (her table) and Just talk',t:['Wren\'s corner of the market: her little table, shelves, warm lantern light','Leave room for Wren (right) and Azlynn (left)'],chars:['char_wren','char_azlynn']};
@@ -3661,7 +3681,7 @@ const GUIDE=[
  [/^Garden & Home/,'own','','Places and props at the witch\'s cottage: garden, drying rack, bee skeps, interior, seasonal decor.',['Scene or prop']],
  [/^Characters › Customers › Regulars$/,'request','','Named regulars. Press + New customer: name, kind (ailment, worry, wish…), level, what they say, the right answer, what they pay, image URL. Their portrait goes in this folder.',['Customer portrait']],
  [/^Characters › Customers › Walk-ins$/,'own','','Portraits for unnamed walk-in customers. Any number of pictures; the game picks one at random.',['Walk-in portrait']],
- [/^Characters › Customers/,'own','','Special visitors: the moth-winged visitor, shades and hauntings. One portrait each.',['Visitor portrait']],
+ [/^Characters › Customers/,'own','','Special visitors: shades and hauntings. One portrait each.',['Visitor portrait']],
  [/^Characters › Azlynn/,'own','','Azlynn (the player). Portraits for dialogue, expressions, outfits, full body poses, and her walking sprite frames.',['Azlynn art']],
  [/^Characters › /,'own','','Art for this character: portraits, expressions, poses.',['Character art']],
  [/^Screens & Scenes › Title/,'scene','','The title screen. Make or open a scene here and bind it to Title.',['Title screen']],
@@ -4135,7 +4155,7 @@ async function exportAssets(){
   const l=document.createElement('a');l.href=URL.createObjectURL(zipBin(files));l.download='night-market-assets.zip';l.click();toast('Unzip next to your index.html (it makes an “assets” folder)');
 }
 
-return {afterAdd,mount,load:assetsLoad,AS,render:amRender,sync:()=>{if(cloudOn())syncUp();}};
+return {restore,afterAdd,mount,load:assetsLoad,AS,render:amRender,sync:()=>{if(cloudOn())syncUp();}};
 })();
 
 </script>
